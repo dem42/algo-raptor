@@ -79,6 +79,7 @@ function bsearch(data, tf, h, l, m)
 		arrow = svg.append("image")
 			.style("display","none")
 			.attr("y",0)
+	                .attr("x",0)
 			.attr("width",30)
 			.attr("height",30)
 			.attr("xlink:href", "arrow2.svg");
@@ -99,6 +100,10 @@ function bsearch(data, tf, h, l, m)
 		cumulative_delay+=2000;
 		arrow.style("display","block").transition().delay(cumulative_delay).duration(1000).attr("x",2*w*l-3);
 		//svg.transition().delay(cumulative_delay).duration(1000).append
+	        svg.append("text")
+			.attr("dy", "20px")
+			.attr("class", "not-found-label")
+			.transition().delay(cumulative_delay).duration(1000).text("Found!");
 	};
 	/*callback called if a match was NOT found
 	 */
@@ -118,11 +123,11 @@ function bsearch(data, tf, h, l, m)
 
 	/*setup the DOM elements*/
 	var forms = d3.select(".forms").selectAll("input[type='text']")
-	.data(data)
-	.enter().append("input")
-	.attr("type","text")
-	.attr("class","input-box")
-	.attr("maxlength", 2);
+	 .data(data)
+	 .enter().append("input")
+	 .attr("type","text")
+	 .attr("class","input-box")
+	 .attr("maxlength", 2);
 
 	/*populate the inputs*/
 	var inputs = document.querySelectorAll("input[type='text']");
