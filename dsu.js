@@ -4,9 +4,9 @@ function find(a, data) {
     }
     return a;
 }
-function union (a, b, data) {
-    r1 = find(a);
-    r2 = find(b);
+function union (a, b, data, find_function) {
+    r1 = find_function(a, data);
+    r2 = find_function(b, data);
     if(r1 !== r2)
     {
       if(data[r1].rank > data[r2].rank)
@@ -35,18 +35,27 @@ function union (a, b, data) {
 }
 
 (function chart() {
-    var jsondata = 
-	{"name": "a", "children": [
-	    {"name": "b", "children": [
-		{"name": "c"},
-		{"name": "e"},
-		{"name": "f"}
-	]},
-	{"name": "d"},
-	{"name": "z", "children": [
-	    {"name": "r"}
-	]}
-	]};
+    var cbsFind = {};
+    var cbsUnion = {};
+    cbsFind[3] = function(a, data) {
+	console.log("in find with a=",a,"and root =",data[a].root);
+    }
+    cbsUnion[3] = function(r1,r2,a,b) {
+	console.log("for a=",a,"parent=",r1,"for b=",b,"parent=",r2);  
+    }
+    cbsUnion[8] = function(b) {
+	console.log("the new root is parent of ",b);  
+    }
+    cbsUnion[12] = function(a) {
+	console.log("the new root is parent of ",a);  
+    }
+    cbsUnion[16] = function(prob) {
+	console.log("both trees have the same size, we rolled a die and got", prob);  
+    }
+
+    var dsuFind = new Algorithm(find, cbsFind);
+    var dsuUnion = new Algorithm(union, cbsUnion);
+
 
     var margin = { left: 10, top: 30, right: 10, bottom: 50};
     var height = 150;
@@ -80,9 +89,13 @@ function union (a, b, data) {
 	    setTimeout(function() { 	    
 		console.log("kickoff");
 		console.log(selected[0].data, data);
-		var r1 = find(selected[0].data.name, data);
-		var r2 = find(selected[1].data.name, data);
-		union(r1, r2, data);
+		console.log(selected[1].data, data);
+		var selected1 = selected[0].data.name;
+		var selected2 = selected[1].data.name;
+		var findInClosure = function(node, data) {
+		    return dsuFind.run(node, data);
+		}
+		dsuUnion.run(selected1, selected2, data, findInClosure);
 		console.log(data);
 		selected.forEach(function (d) {d.obj.setAttribute("class", "node")});
 		selected = [];
@@ -141,22 +154,7 @@ function union (a, b, data) {
 	for(var j, x, i = this.length; i; j = parseInt(Math.random() * i), x = this[--i], this[i] = this[j], this[j] = x) ;
     };
 
-    var cbsFind = {};
-    var cbsUnion = {};
-/*    cbsFind[14] = function(data,r1,r2,a,b) {
-	console.log("r1=",r1,data[r1].rank,data[r1].root,a,b);
-    }
-    cbsFind[15] = function(data,r1,r2,a,b) {
-	console.log("r2=",r2,data[r2].rank,data[r2].root,a,b);  
-    }
-    cbs[48] = function(data,r1,r2,a,b) {
-	console.log("data=",data);  
-    }
-*/
 
-
-    var dsuFind = new Algorithm(find, cbsFind);
-    var dsuUnion = new Algorithm(union, cbsUnion);
 
     d3.select("#dsu-tab .code")
 	.append("pre")
@@ -164,7 +162,7 @@ function union (a, b, data) {
         .attr("class", "prettyprint lang-js linenums:1")
 	.append("code")
         .attr("class", "language-js")
-        .text(dsuFind.toString());
+        .text(dsuFind.decorated());
 
     d3.select("#dsu-tab .code")
 	.append("pre")
@@ -172,7 +170,7 @@ function union (a, b, data) {
         .attr("class", "prettyprint lang-js linenums:1")
 	.append("code")
         .attr("class", "language-js")
-        .text(dsuUnion.toString());
+        .text(dsuUnion.decorated());
 
     /*calls google-prettify to make the code look nice*/
     prettyPrint();
