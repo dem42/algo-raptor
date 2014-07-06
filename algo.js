@@ -5,6 +5,12 @@
  * This class represents source code which has been decorated
  * with user defined callbacks on arbitrary, user-defined code lines
  * This decorated source code can then be executed using Algorithm#run
+ *
+ * Callbacks added to the algorithm can bind to any local variable inside
+ * the algorithm. The binding is by name, this means that when defining the
+ * callback you should give the callback arguments the same name as the
+ * name of the local variable that they should bind to.
+ *
  * @author mpapanek
  */
  function Algorithm(func, callbacks)
@@ -42,7 +48,8 @@ Algorithm.prototype.addDebugging = function(fstr) {
 	{
 		if (i in this.callbacks)
 		{
-			nfun += "self.callbacks["+i+"]("+this.getParams()+");\n";
+		    var fun_param = this.callbacks[i].toString().match(/\(([^\(\)]*)\)/);
+		    nfun += "self.callbacks["+i+"]("+fun_param[1].split(",")+");\n";
 		}
    		nfun += tokens[i]+"\n";
 	}
@@ -64,7 +71,7 @@ Algorithm.prototype.run = function() {
 	console.log(args);
 	//preserve this for the eval inside var self
 	var self = this;
-	eval(c);
+	return eval(c);
 }
 Algorithm.prototype.callback = function() {
 	console.log("called");
