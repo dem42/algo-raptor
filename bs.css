@@ -19,13 +19,13 @@
 
 .controls {
     border: solid black 1px;
-    padding: 5px;
-    width: auto;
-    max-width: 700px;
-    font-weight: bold;
+    #padding: 5px;
+    #width: auto;
+    #max-width: 700px;
+    #font-weight: bold;
 }
 
-.graphics, .code, .controls {
+.graphics, .code {
     font-size: 12px;
     font-family: sans-serif;
 }
