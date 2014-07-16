@@ -36,9 +36,9 @@ function union (a, b, data, find_function) {
 
 (function chart() {
     var margin = { left: 10, top: 30, right: 10, bottom: 50};
-    var height = 150;
+    var height = 450;
     var width = 1600;
-    var treew = 150;
+    var treew = 200;
     var svg = d3.select("#dsu-tab .graphics").append("svg")
 	.attr("width", width)
 	.attr("height", height)
@@ -47,12 +47,15 @@ function union (a, b, data, find_function) {
 
 
     var o = [{"name": 0}, {"name": 1}, {"name": 2}, {"name": 3}, {"name": 4}, {"name": 5}, {"name": 6}]//, {"name": 7}, {"name": 8}, {"name": 9}, {"name": 10}, {"name": 11}];
+    var next_num = 7;
 
+    // data is the global container of nodes used by the code
     var data = []
-    //linearize and add rank/root
+    //linearize and add "rank"/"root" and "order" which determines where they will be drawn
     o.forEach(function(d) {
 	d.rank = 0;
 	d.root = d.name;
+	d.order = +d.name;
 	if (!("children" in d)) {
 	    d.children = [];
 	}
@@ -103,7 +106,7 @@ function union (a, b, data, find_function) {
 
 	var tg = svg.append("g")
 	   .attr("id", "tree-" + i)
-	   .attr("transform", "translate(" + i*treew + ",0)"); 
+	   .attr("transform", "translate(" + data.order*treew + ",0)"); 
 
 
 	var diagonal = d3.svg.diagonal();
@@ -129,6 +132,8 @@ function union (a, b, data, find_function) {
 	nodes.append("text")
             .attr("dx", "-0.25em")
             .attr("dy", "0.25em")
+	    .attr("onmousedown", "return false;")
+	    .style("cursor", "not-allowed")
 	    .text(function(d) { return d.name; });
 
     }
@@ -142,6 +147,16 @@ function union (a, b, data, find_function) {
     function push(obj, elem) {
 	(obj.children = obj.children || []).push(elem);
     }
+    function cleanup(winner, winner_num, loser, loser_num) {
+	remove_merged_nodes([winner_num,loser_num]);
+	push(winner, loser);
+	drawTreeFun(winner, winner_num);
+	var loser_order = loser.order;
+	var new_node = {"name": next_num, "rank": 0, "root": next_num, "children": [], "order": loser_order};
+	data.push(new_node);
+	drawTreeFun(new_node, next_num);
+	next_num++;
+    }
 
     var cbsFind = {};
     var cbsUnion = {};
@@ -153,33 +168,23 @@ function union (a, b, data, find_function) {
     }
     cbsUnion[8] = function(b, r1, r2, data) {
 	console.log("the new root of ", r2," is ",r1);
-	remove_merged_nodes([r2,r1]);
-	push(data[r1], data[r2]);
-	drawTreeFun(data[r1], r1);
+	cleanup(data[r1], r1, data[r2], r2);
     }
     cbsUnion[12] = function(a, r2, r1, data) {
 	console.log("the new root of ", r1," is ",r2);
-	remove_merged_nodes([r2,r1]);
-	push(data[r2],data[r1]);
-	drawTreeFun(data[r2], r2);
+	cleanup(data[r2], r2, data[r1], r1);
     }
     cbsUnion[20] = function(r2, r1, data) {
 	console.log("the new root of ", r1," is ",r2);
-	remove_merged_nodes([r2,r1]);
-	push(data[r2],data[r1]);
-	drawTreeFun(data[r2], r2);
+	cleanup(data[r2], r2, data[r1], r1);
     }
     cbsUnion[25] = function(r1, r2, data) {
 	console.log("the new root of ", r2," is ",r1);
-	remove_merged_nodes([r2,r1]);
-	push(data[r1],data[r2]);
-	drawTreeFun(data[r1], r1);
+	cleanup(data[r1], r1, data[r2], r2);
     }
 
     var dsuFind = new Algorithm(find, cbsFind);
     var dsuUnion = new Algorithm(union, cbsUnion);
-
-
 
 
 
