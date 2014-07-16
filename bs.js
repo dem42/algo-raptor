@@ -152,13 +152,15 @@ function bsearch(data, tf, h, l, m)
 	d3.select("#bsearch-tab .code")
 			.append("pre")
 				//to get line numbering use .attr("class", "prettyprint lang-js linenums:1 highlight:10")
-			   .attr("class", "prettyprint lang-js")
+			   .attr("class", "prettyprint lang-js linenums:1")
 			.append("code")
 			   .attr("class", "language-js")
 			   .text(balgo.toString());
-	/*calls google-prettify to make the code look nice*/
+	/*calls google-prettify to make the code look nice
+	  called automatically with new loader script
 	prettyPrint();
-
+	*/
+	
 	/*the function that starts the simulation*/
 	var kickoff = function kickOff() {
 		var lo = 0, hi = N, m, tf = document.getElementById("find").value;

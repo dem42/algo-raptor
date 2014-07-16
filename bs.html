@@ -2,21 +2,22 @@
 <html lang="en"
       <meta charset="utf-8">
       <link rel="stylesheet" href="bs.css" type="text/css">
-      <link rel="stylesheet" href="prettify.css" type="text/css">
-      <script src="prettify.js"></script>
+      <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=desert"></script>
+      <!--<link rel="stylesheet" href="prettify.css" type="text/css">
+      <script src="prettify.js"></script>-->
       <script src="http://d3js.org/d3.v3.min.js"></script>
       <script src="algo.js"></script>
 
       <!-- bootstrap css -->
-      <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-      <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
 
 
       <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />
       <script src="http://code.jquery.com/jquery-1.8.3.js"></script>
       <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
 <body>
-  <nav class="navbar-inverse navbar-default" role="navigation">
+  <nav class="navbar navbar-inverse" role="navigation">
     <div class="container-fluid">
       <!-- Brand and toggle get grouped for better mobile display -->
       <div class="navbar-header">
@@ -62,7 +63,6 @@
 	  <div class="panel-body code"></div>
 	</div>
       </div>
-      <script src="bs.js"></script>
     </div>
     
     <!-- dsu tab -->
@@ -78,15 +78,18 @@
 	</div>
 	<div class="code"></div>
       </div>
-      <script src="dsu.js"></script>
-    </div>
+      </div>
   </div>
   <!-- bootstrap css script which contains all plugins -->
-  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
   <script>
     $(function () {
     $('#algoTabs a:first').tab('show')
     })
   </script>
+  <!-- algorithm visualization d3 scripts -->
+  <script src="bs.js"></script>
+  <script src="dsu.js"></script>
+  
 </body>
 </html>

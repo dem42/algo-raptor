@@ -199,8 +199,10 @@ function union (a, b, data, find_function) {
         .attr("class", "language-js")
         .text(dsuUnion);
 
-    /*calls google-prettify to make the code look nice*/
+    /*calls google-prettify to make the code look nice
+      called automatically
     prettyPrint();
+    */
 
     data.forEach(function(d) { d.rank = 0;});
     data.forEach(drawTreeFun);
