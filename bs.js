@@ -34,7 +34,6 @@ function bsearch(data, tf, h, l, m)
     Y = 50;
     var cbs = {};
     arrow = false;
-    cumulative_delay = 0;
     svg = null;
     /* callback called right after entering the function
      * it initializes the data
@@ -46,8 +45,10 @@ function bsearch(data, tf, h, l, m)
      * it draws the data
      */
     cbs[6] = function(data) { 
-        d3.select("#bs-code li:nth-child(6)").classed("highlighted-row", true);
-        d3.select("#bs-code li:nth-child(6)").transition().delay(1000).duration(1000).style("background-color", "orange");
+	var animation_duration = 1000;
+	var initial_delay = 1000;
+	this.cumulative_delay = initial_delay;
+	Algorithm.highlightRow("bs-code", 6, this.cumulative_delay, animation_duration + initial_delay);
 
 	svg = d3.select("#bsearch-tab .graphics").append("svg")
 	    .attr("width", width)
@@ -74,7 +75,7 @@ function bsearch(data, tf, h, l, m)
 	    .text(function(d) { return d.val; });
 
 	/*interpolating works with transforms too .. so cool -> move to new spot*/
-	gs.transition().delay(1000).duration(1000).attr("transform", function(d, i) {
+	gs.transition().delay(initial_delay).duration(animation_duration).attr("transform", function(d, i) {
 	    return "translate(" + 2*w*i + "," + Y + ")";
 	});
 
@@ -86,36 +87,46 @@ function bsearch(data, tf, h, l, m)
 	    .attr("width",30)
 	    .attr("height",30)
 	    .attr("xlink:href", "arrow2.svg");
-	cumulative_delay = 0;
+	
+	this.cumulative_delay += animation_duration;
     };
     /*callback called inside every iteration
      * updates the arrow pointer
      */
     cbs[10] = function(data, tf, h, l, m) { 
-	console.log(l,h,m,2*w*m-3);
-	cumulative_delay+=2000;
-	arrow.style("display","block").transition().delay(cumulative_delay).duration(1000).attr("x",2*w*m-3);
+	var animation_duration = 1000;
+	var initial_delay = 1000;
+	Algorithm.highlightRow("bs-code", 10, this.cumulative_delay, animation_duration + initial_delay);
+	this.cumulative_delay += initial_delay;
+	arrow.style("display","block").transition().delay(this.cumulative_delay).duration(animation_duration).attr("x",2*w*m-3);
+	this.cumulative_delay += animation_duration;
     };
     /*callback called after a match was found
      */
     cbs[18] = function(data, tf, h, l, m) { 
-	console.log(l,h,m,2*w*m-3);
-	cumulative_delay+=2000;
-	arrow.style("display","block").transition().delay(cumulative_delay).duration(1000).attr("x",2*w*l-3);
-	//svg.transition().delay(cumulative_delay).duration(1000).append
+	var animation_duration = 1000;
+	var initial_delay = 1000;
+	Algorithm.highlightRow("bs-code", 18, this.cumulative_delay, animation_duration + initial_delay);
+	this.cumulative_delay += initial_delay;
+	arrow.style("display","block").transition().delay(this.cumulative_delay).duration(animation_duration).attr("x",2*w*l-3);
 	svg.append("text")
 	    .attr("dy", "20px")
 	    .attr("class", "not-found-label")
-	    .transition().delay(cumulative_delay).duration(1000).text("Found!");
+	    .transition().delay(this.cumulative_delay).duration(animation_duration).text("Found!");
+	this.cumulative_delay += animation_duration;
     };
     /*callback called if a match was NOT found
      */
     cbs[22] = function(data, tf, h, l, m) { 
-	cumulative_delay+=2000;
+	var animation_duration = 1000;
+	var initial_delay = 1000;
+	Algorithm.highlightRow("bs-code", 22, this.cumulative_delay, animation_duration + initial_delay);
+	this.cumulative_delay += initial_delay;
 	svg.append("text")
 	    .attr("dy", "20px")
 	    .attr("class", "not-found-label")
-	    .transition().delay(cumulative_delay).duration(1000).text("Not Found!");
+	    .transition().delay(this.cumulative_delay).duration(animation_duration).text("Not Found!");
+	this.cumulative_delay += animation_duration;
     };
 
     /* create an Algorithm instance wired with callbacks */

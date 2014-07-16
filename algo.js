@@ -18,6 +18,13 @@ function Algorithm(func, callbacks)
     this.func = func;
     this.param = func.toString().match(/\(([^\(\)]*)\)/);
     this.callbacks = callbacks;
+
+    /* 
+     * this delay counter can be accessed from within the callbacks.
+     * It is meant to be used to sync the visualization transitions
+     * this means you would say d3.select(..).transition().delay(this.cumulative_delay).duration(animation_duration)
+     */
+    this.callbacks["cumulative_delay"] = 0;
 }
 /* statics */
 Algorithm.paramArg = function(N) {
@@ -29,7 +36,17 @@ Algorithm.paramArg = function(N) {
 	    res+=",";
     }
     return res;
-}
+};
+
+Algorithm.highlightRow = function(codeTagId, rowNumber, startDelay, durationOfHighlight) {
+    var rowToHighlightSelector = "#" + codeTagId + " li:nth-child(" + rowNumber +")";
+    setTimeout(function() {
+	$(rowToHighlightSelector).toggleClass("highlighted-row");
+    }, startDelay);
+    setTimeout(function() {
+	$(rowToHighlightSelector).toggleClass("highlighted-row");
+    }, startDelay + durationOfHighlight);
+};
 
 /* methods .. passed to all objects of this class and called using the instance */
 /**
@@ -68,9 +85,6 @@ Algorithm.prototype.run = function() {
     var N = this.getParams().length;
     var args = Algorithm.paramArg(N);
     var c = "("+this.decorated()+")("+args+");";
-    console.log(this.getParams());
-    console.log(c.split("\n"));
-    console.log(args);
     //preserve this for the eval inside var self
     var self = this;
     return eval(c);
