@@ -52,3 +52,7 @@
 
 /* Fix to make pretty-print print all line numbers */
 .prettyprint ol.linenums > li { list-style-type: decimal; }
+
+li.highlighted-row {
+    background: #B80000;
+}

@@ -13,22 +13,22 @@
  *
  * @author mpapanek
  */
- function Algorithm(func, callbacks)
+function Algorithm(func, callbacks)
 {
-	this.func = func;
-	this.param = func.toString().match(/\(([^\(\)]*)\)/);
-	this.callbacks = callbacks;
+    this.func = func;
+    this.param = func.toString().match(/\(([^\(\)]*)\)/);
+    this.callbacks = callbacks;
 }
 /* statics */
 Algorithm.paramArg = function(N) {
-	var res = "";
-	for(var i=0;i<N;i++)
-	{
-		res+="arguments["+i+"]";
-		if(i != N-1)
-			res+=",";
-	}
-	return res;
+    var res = "";
+    for(var i=0;i<N;i++)
+    {
+	res+="arguments["+i+"]";
+	if(i != N-1)
+	    res+=",";
+    }
+    return res;
 }
 
 /* methods .. passed to all objects of this class and called using the instance */
@@ -37,44 +37,46 @@ Algorithm.paramArg = function(N) {
  * with callbacks on the provided lines
  */
 Algorithm.prototype.addDebugging = function(fstr) {
-	var lmp = {}, i, nfun, tokens;
-	if (typeof(fstr) != "string")
+    var lmp = {}, i, nfun, tokens;
+    if (typeof(fstr) != "string")
+    {
+	fstr = fstr.toString();
+    }
+    nfun = "";
+    tokens = fstr.split("\n");
+    for (i=0;i<tokens.length;i++)
+    {
+	if (i in this.callbacks)
 	{
-		fstr = fstr.toString();
+	    var fun_param = this.callbacks[i].toString().match(/\(([^\(\)]*)\)/);
+	    nfun += "self.callbacks["+i+"]("+fun_param[1].split(",")+");\n";
 	}
-	nfun = "";
-	tokens = fstr.split("\n");
-	for (i=0;i<tokens.length;i++)
-	{
-		if (i in this.callbacks)
-		{
-		    var fun_param = this.callbacks[i].toString().match(/\(([^\(\)]*)\)/);
-		    nfun += "self.callbacks["+i+"]("+fun_param[1].split(",")+");\n";
-		}
-   		nfun += tokens[i]+"\n";
-	}
-	return nfun;
+   	nfun += tokens[i]+"\n";
+    }
+    return nfun;
 }
 Algorithm.prototype.getParams = function(){
-	return this.param[1].split(",");
+    return this.param[1].split(",");
 }
 Algorithm.prototype.toString = function(){
-	return this.func.toString();
+    return this.func.toString();
 }
 Algorithm.prototype.decorated = function() {
-	return this.addDebugging(this.func);
+    return this.addDebugging(this.func);
 }
 Algorithm.prototype.run = function() {
-	var N = this.getParams().length;
-	var args = Algorithm.paramArg(N);
-	var c = "("+this.decorated()+")("+args+");";
-	console.log(args);
-	//preserve this for the eval inside var self
-	var self = this;
-	return eval(c);
+    var N = this.getParams().length;
+    var args = Algorithm.paramArg(N);
+    var c = "("+this.decorated()+")("+args+");";
+    console.log(this.getParams());
+    console.log(c.split("\n"));
+    console.log(args);
+    //preserve this for the eval inside var self
+    var self = this;
+    return eval(c);
 }
 Algorithm.prototype.callback = function() {
-	console.log("called");
+    console.log("called");
 }
 /////////////////////////////////////////////////////////////////
 // Algorithm class end ///

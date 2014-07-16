@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en"
       <meta charset="utf-8">
-      <link rel="stylesheet" href="algo.css" type="text/css">
+      <!-- this script kicks off the code prettification with a "desert" skin -->
       <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=desert"></script>
       <script src="http://d3js.org/d3.v3.min.js"></script>
+      <!-- our algo code -->
+      <link rel="stylesheet" href="algo.css" type="text/css">
       <script src="algo.js"></script>
 
       <!-- bootstrap css -->
@@ -19,7 +21,7 @@
     <div class="container-fluid">
       <!-- Brand and toggle get grouped for better mobile display -->
       <div class="navbar-header">
-	<a class="navbar-brand" href="#" title="Algorithm visualizations in d3.js"><span class="text-danger">Algoviz</span></a>
+	<a class="navbar-brand" href="#" title="Algorithm visualizations in d3.js"><span class="text-danger"><span class="glyphicon glyphicon-star"></span>Algoviz</span></a>
       </div>
 
       <!-- Collect the nav links, forms, and other content for toggling -->
@@ -41,24 +43,30 @@
       <div class="row">
 	<div class="col-md-6">
 	  <div class="row controls">
-	    <div class=" panel panel-default">
-	      <div class="panel-heading">Controls:</div>
-	      <div class="panel-body">
-		<div class="forms"></div>
-		<div class="options"></div>
+	    <div class="col-md-12">
+	      <div class="panel panel-default">
+		<div class="panel-heading">Controls:</div>
+		<div class="panel-body">
+		  <div class="forms"></div>
+		  <div class="options"></div>
+		</div>
 	      </div>
 	    </div>
 	  </div>
 	  <div class="row">
-	    <div class="panel panel-default">
-	      <div class="panel-heading">Visualization Goes Here:</div>
-	      <div class="panel-body graphics"></div>
+	    <div class="col-md-12">
+	      <div class="panel panel-default">
+		<div class="panel-heading">Visualization Goes Here:</div>
+		<div class="panel-body graphics"></div>
+	      </div>
 	    </div>
 	  </div>
 	</div>
-	<div class="col-md-6 panel panel-default">
-	  <div class="panel-heading">Code</div>
-	  <div class="panel-body code"></div>
+	<div class="col-md-6">
+	  <div class="panel panel-default">
+	    <div class="panel-heading">Code</div>
+	    <div class="panel-body code"></div>
+	  </div>
 	</div>
       </div>
     </div>
@@ -66,17 +74,21 @@
     <!-- dsu tab -->
     <div class="tab-pane" id="dsu-tab">
       <div class="row">
-	<div class="col-md-6 panel panel-default">
-	  <div class="panel-heading">Tree Nodes</div>
-	  <div class="panel-body graphics"></div>
+	<div class="col-md-6">
+	  <div class="panel panel-default">
+	    <div class="panel-heading">Tree Nodes</div>
+	    <div class="panel-body graphics"></div>
+	  </div>
 	</div>
-	<div class="col-md-6 panel panel-default">
-	  <div class="panel-heading">Code</div>
-	  <div class="panel-body code"></div>
+	<div class="col-md-6">
+	  <div class="panel panel-default">
+	    <div class="panel-heading">Code</div>
+	    <div class="panel-body code"></div>
+	  </div>
 	</div>
 	<div class="code"></div>
       </div>
-      </div>
+    </div>
   </div>
   <!-- bootstrap css script which contains all plugins -->
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
