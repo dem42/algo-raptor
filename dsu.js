@@ -34,8 +34,9 @@ function union (a, b, data, find_function) {
     }
 }
 
+
 (function chart() {
-    var margin = { left: 10, top: 30, right: 10, bottom: 50};
+    var margin = { left: 10, top: 30, right: 10, bottom: 100};
     var height = 450;
     var width = 1600;
     var treew = 200;
@@ -46,23 +47,19 @@ function union (a, b, data, find_function) {
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
-    var o = [{"name": 0}, {"name": 1}, {"name": 2}, {"name": 3}, {"name": 4}, {"name": 5}, {"name": 6}]//, {"name": 7}, {"name": 8}, {"name": 9}, {"name": 10}, {"name": 11}];
+    var data = [{"name": 0}, {"name": 1}, {"name": 2}, {"name": 3}, {"name": 4}, {"name": 5}, {"name": 6}];
     var next_num = 7;
 
     // data is the global container of nodes used by the code
-    var data = []
     //linearize and add "rank"/"root" and "order" which determines where they will be drawn
-    o.forEach(function(d) {
+    data.forEach(function(d) {
 	d.rank = 0;
 	d.root = d.name;
 	d.order = +d.name;
 	if (!("children" in d)) {
 	    d.children = [];
 	}
-	data.push(d);
     });
-    o = data;
-
     console.log("data", data);
 
     /**
@@ -86,56 +83,78 @@ function union (a, b, data, find_function) {
 		console.log(data);
 		selected.forEach(function (d) {d.obj.setAttribute("class", "node")});
 		selected = [];
-	    }, 1000);
+	    }, 500);
 	}
     }
 
     /**
      * tree rendering function, called to draw a d3 tree hierarchy 
      */
-    function drawTreeFun(data, i) {
+    function drawTreeFun(data, i, child) {
+
+	var animation_duration = 3000;
 
 	console.log("in draw tree fun", data, i);
 
-	tree = d3.layout.tree().size([treew - margin.right, height - margin.bottom])
+	var tree = d3.layout.tree().size([treew - margin.right, height - margin.bottom])
 	    .children(function(d) {
 		return d.children;
 	    });
-	nodes = tree.nodes(data),
-	links = tree.links(nodes);
-
-	var tg = svg.append("g")
-	   .attr("id", "tree-" + i)
-	   .attr("transform", "translate(" + data.order*treew + ",0)"); 
-
-
+	var nodes = tree.nodes(data);
+	var links = tree.links(nodes);
+	
 	var diagonal = d3.svg.diagonal();
-	tg.selectAll(".link")
-	    .data(links)
+	var movers = d3.selectAll(".link")
+	    .data(links, function (d) { return d.source.name + "-to-" + d.target.name })
+	    .transition()
+	    .duration(animation_duration)
+	    .attr("d", diagonal)
+	    .attr("transform", "translate(" + data.order*treew + ",0)");
+
+	var svgLinks = svg.selectAll(".link")
+	    .data(links, function (d) { return d.source.name + "-to-" + d.target.name })
 	    .enter().append("path")
 	    .attr("class", "link")
+	    .attr("id", function(d) { return "from-" + d.source.name + "-to-" + d.target.name; })
+	    .attr("transform", "translate(" + data.order*treew + ",0)")
 	    .attr("d", diagonal);
 
-	var nodes = tg.selectAll(".node")
-	    .data(nodes)
+	var mover_nodes = svg.selectAll(".node")
+	    .data(nodes, function(d) { return d.name; })
+	    .transition()
+	    .duration(animation_duration)
+	    .attr("transform", function(d) {return "translate(" + (d.x + data.order*treew) + "," + d.y + ")";});
+
+	var svgNodes = svg.selectAll(".node")
+	    .data(nodes, function(d) { return d.name; })
 	    .enter().append("g")
 	    .attr("class", "node")
-            .attr("transform", function(d) {return "translate(" + d.x + "," + d.y + ")";})
+	    .attr("id", function(d) { return "node-" + d.name; })
+            .attr("transform", function(d) {return "translate(" + (d.x + data.order*treew) + "," + d.y + ")";})
 	    .on("click", function(d) {selectNode(this, d);});
 	
 
-	nodes.append("circle")
-	    .attr("r", "1em")
+	var circles = svgNodes.append("circle")
 	    .attr("cx", 0)
-	    .attr("cy", 0);
+	    .attr("cy", 0)
+	    .attr("r", "0em")
+	    .transition() //transitioning from 0em to 2em
+	    .duration(animation_duration)
+//	    .each("start", function() { d3.select(this).attr("r", "0em"); }) //this gives them a start value which is needed for the animation
+	    .attr("r", "2em");
 
-	nodes.append("text")
+	var texts = svgNodes.append("text")
             .attr("dx", "-0.25em")
             .attr("dy", "0.25em")
 	    .attr("onmousedown", "return false;")
 	    .style("cursor", "not-allowed")
-	    .text(function(d) { return d.name; });
+	    .text(function(d) { return d.name; })
+	    .transition()
+	    .duration(animation_duration)
+	    .each("start", function() { d3.select(this).attr("font-size", "0pt");})
+	    .attr("font-size", "12pt")
 
+	console.log("after draw tree fun", data, i);
     }
 
     function remove_merged_nodes(nodes) {
@@ -148,9 +167,9 @@ function union (a, b, data, find_function) {
 	(obj.children = obj.children || []).push(elem);
     }
     function cleanup(winner, winner_num, loser, loser_num) {
-	remove_merged_nodes([winner_num,loser_num]);
+	//remove_merged_nodes([winner_num,loser_num]);
 	push(winner, loser);
-	drawTreeFun(winner, winner_num);
+	drawTreeFun(winner, winner_num, loser);
 	var loser_order = loser.order;
 	var new_node = {"name": next_num, "rank": 0, "root": next_num, "children": [], "order": loser_order};
 	data.push(new_node);
@@ -210,6 +229,8 @@ function union (a, b, data, find_function) {
     */
 
     data.forEach(function(d) { d.rank = 0;});
-    data.forEach(drawTreeFun);
+    data.forEach(function(d, i) {
+	drawTreeFun(d, i);
+    });
 
 }());
