@@ -50,6 +50,12 @@ function union (a, b, data, find_function) {
     var data = [{"name": 0}, {"name": 1}, {"name": 2}, {"name": 3}, {"name": 4}, {"name": 5}, {"name": 6}];
     var next_num = 7;
 
+    d3.selection.prototype.moveToFront = function() {
+	return this.each(function(){
+	    this.parentNode.appendChild(this);
+	});
+    };
+
     // data is the global container of nodes used by the code
     //linearize and add "rank"/"root" and "order" which determines where they will be drawn
     data.forEach(function(d) {
@@ -102,21 +108,32 @@ function union (a, b, data, find_function) {
 	    });
 	var nodes = tree.nodes(data);
 	var links = tree.links(nodes);
-	
+
+
 	var diagonal = d3.svg.diagonal();
-	var movers = d3.selectAll(".link")
+	var movers = d3.selectAll(".link-g")
 	    .data(links, function (d) { return d.source.name + "-to-" + d.target.name })
+	
+	movers.transition()
+	    .duration(animation_duration)
+	    .attr("transform", "translate(" + data.order*treew + ",0)");
+
+	movers.select(".link")
 	    .transition()
 	    .duration(animation_duration)
 	    .attr("d", diagonal)
-	    .attr("transform", "translate(" + data.order*treew + ",0)");
 
 	var svgLinks = svg.selectAll(".link")
 	    .data(links, function (d) { return d.source.name + "-to-" + d.target.name })
-	    .enter().append("path")
+	    .enter()
+	    .append("g")
+	    .attr("class", "link-g")
+	    .attr("transform", "translate(" + data.order*treew + ",0)")
+	    .append("path")
 	    .attr("class", "link")
 	    .attr("id", function(d) { return "from-" + d.source.name + "-to-" + d.target.name; })
-	    .attr("transform", "translate(" + data.order*treew + ",0)")
+	    .transition()
+	    .delay(animation_duration)
 	    .attr("d", diagonal);
 
 	var mover_nodes = svg.selectAll(".node")
@@ -139,6 +156,7 @@ function union (a, b, data, find_function) {
 	    .attr("cy", 0)
 	    .attr("r", "0em")
 	    .transition() //transitioning from 0em to 2em
+	    .delay(animation_duration)
 	    .duration(animation_duration)
 //	    .each("start", function() { d3.select(this).attr("r", "0em"); }) //this gives them a start value which is needed for the animation
 	    .attr("r", "2em");
@@ -149,18 +167,20 @@ function union (a, b, data, find_function) {
 	    .attr("onmousedown", "return false;")
 	    .style("cursor", "not-allowed")
 	    .text(function(d) { return d.name; })
+	    .attr("font-size", "0pt")
 	    .transition()
+	    .delay(animation_duration)
 	    .duration(animation_duration)
-	    .each("start", function() { d3.select(this).attr("font-size", "0pt");})
 	    .attr("font-size", "12pt")
 
-	console.log("after draw tree fun", data, i);
-    }
+	// in svg the order of elements defines the z-index 
+	// we added a moveToFront function to d3.selection that changes the order of elements
+	setTimeout(function() {
+	    svg.select("#node-" + data.name).moveToFront();
+	    if (child != undefined) svg.select("#node-" + child.name).moveToFront();
+	}, animation_duration + 10);
 
-    function remove_merged_nodes(nodes) {
-	nodes.forEach(function(node) {
-	    d3.select("g#tree-" + node).remove();
-	});
+	console.log("after draw tree fun", data, i);
     }
 
     function push(obj, elem) {
