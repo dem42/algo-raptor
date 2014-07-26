@@ -1,40 +1,3 @@
-function find(a, data) {
-    while(data[a].root != a) {
-      a = data[a].root;
-    }
-    return a;
-}
-function union (a, b, data, find_function) {
-    r1 = find_function(a, data);
-    r2 = find_function(b, data);
-    if(r1 !== r2)
-    {
-      if(data[r1].rank > data[r2].rank)
-      {
-        data[r2].root = r1; 
-      }
-      else if(data[r1].rank < data[r2].rank)
-      {
-        data[r1].root = r2;
-      }
-      else
-      {
-        var prob = Math.random();
-        if(prob > 0.5) 
-        {
-          data[r1].root = r2;
-          data[r2].rank++;
-        }
-        else
-        {
-          data[r2].root = r1;
-          data[r1].rank++;  
-        }
-      }
-    }
-}
-
-
 (function chart() {
     var margin = { left: 10, top: 30, right: 10, bottom: 100};
     var height = 450;
@@ -50,23 +13,43 @@ function union (a, b, data, find_function) {
     var data = [{"name": 0}, {"name": 1}, {"name": 2}, {"name": 3}, {"name": 4}, {"name": 5}, {"name": 6}];
     var next_num = 7;
 
-    d3.selection.prototype.moveToFront = function() {
-	return this.each(function(){
-	    this.parentNode.appendChild(this);
-	});
-    };
-
-    // data is the global container of nodes used by the code
-    //linearize and add "rank"/"root" and "order" which determines where they will be drawn
-    data.forEach(function(d) {
-	d.rank = 0;
-	d.root = d.name;
-	d.order = +d.name;
-	if (!("children" in d)) {
-	    d.children = [];
+    // the dsu find and union functions
+    function find(a, data) {
+	while(data[a].root != a) {
+	    a = data[a].root;
 	}
-    });
-    console.log("data", data);
+	return a;
+    }
+    function union (a, b, data, find_function) {
+	r1 = find_function(a, data);
+	r2 = find_function(b, data);
+	if(r1 !== r2)
+	{
+	    if(data[r1].rank > data[r2].rank)
+	    {
+		data[r2].root = r1; 
+	    }
+	    else if(data[r1].rank < data[r2].rank)
+	    {
+		data[r1].root = r2;
+	    }
+	    else
+	    {
+		var prob = Math.random();
+		if(prob > 0.5) 
+		{
+		    data[r1].root = r2;
+		    data[r2].rank++;
+		}
+		else
+		{
+		    data[r2].root = r1;
+		    data[r1].rank++;  
+		}
+	    }
+	}
+    }
+
 
     /**
      * node selection function, triggered when user clicks on a circle
@@ -98,7 +81,7 @@ function union (a, b, data, find_function) {
      */
     function drawTreeFun(data, i, child) {
 
-	var animation_duration = 3000;
+	var animation_duration = 1600;
 
 	console.log("in draw tree fun", data, i);
 
@@ -154,23 +137,22 @@ function union (a, b, data, find_function) {
 	var circles = svgNodes.append("circle")
 	    .attr("cx", 0)
 	    .attr("cy", 0)
-	    .attr("r", "0em")
+	    .attr("r", "0px")
 	    .transition() //transitioning from 0em to 2em
 	    .delay(animation_duration)
 	    .duration(animation_duration)
 //	    .each("start", function() { d3.select(this).attr("r", "0em"); }) //this gives them a start value which is needed for the animation
-	    .attr("r", "2em");
+	    .attr("r", "20px");
 
 	var texts = svgNodes.append("text")
-            .attr("dx", "-0.25em")
-            .attr("dy", "0.25em")
+            .attr("dx", "-5px")
+            .attr("dy", "5px")
 	    .attr("onmousedown", "return false;")
 	    .style("cursor", "not-allowed")
 	    .text(function(d) { return d.name; })
 	    .attr("font-size", "0pt")
 	    .transition()
-	    .delay(animation_duration)
-	    .duration(animation_duration)
+	    .delay(2*animation_duration)
 	    .attr("font-size", "12pt")
 
 	// in svg the order of elements defines the z-index 
@@ -199,6 +181,27 @@ function union (a, b, data, find_function) {
 
     var cbsFind = {};
     var cbsUnion = {};
+
+    // processing and enhancing the data
+    d3.selection.prototype.moveToFront = function() {
+	return this.each(function(){
+	    this.parentNode.appendChild(this);
+	});
+    };
+
+    // data is the global container of nodes used by the code
+    //linearize and add "rank"/"root" and "order" which determines where they will be drawn
+    data.forEach(function(d) {
+	d.rank = 0;
+	d.root = d.name;
+	d.order = +d.name;
+	if (!("children" in d)) {
+	    d.children = [];
+	}
+    });
+    console.log("data", data);
+
+
     cbsFind[3] = function(a, data) {
 	console.log("in find with a=",a,"and root =",data[a].root);
     }
@@ -222,23 +225,23 @@ function union (a, b, data, find_function) {
 	cleanup(data[r1], r1, data[r2], r2);
     }
 
-    var dsuFind = new Algorithm(find, cbsFind);
-    var dsuUnion = new Algorithm(union, cbsUnion);
+    var dsuFind = new Algorithm(find, cbsFind, "dsu-find-code");
+    var dsuUnion = new Algorithm(union, cbsUnion, "dsu-union-code");
 
 
 
     d3.select("#dsu-tab .code")
 	.append("pre")
-    //to get line numbering use .attr("class", "prettyprint lang-js linenums:1 highlight:10")
         .attr("class", "prettyprint lang-js linenums:1")
+	.attr("id", "dsu-find-code")
 	.append("code")
         .attr("class", "language-js")
         .text(dsuFind);
 
     d3.select("#dsu-tab .code")
 	.append("pre")
-    //to get line numbering use .attr("class", "prettyprint lang-js linenums:1 highlight:10")
         .attr("class", "prettyprint lang-js linenums:1")
+	.attr("id", "dsu-union-code")
 	.append("code")
         .attr("class", "language-js")
         .text(dsuUnion);

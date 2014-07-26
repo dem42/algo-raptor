@@ -1,28 +1,3 @@
-function bsearch(data, tf, h, l, m)
-{
-    h = data.length-1;
-    l = 0;
-
-    data.sort(function(a,b) { return a.val - b.val;});
-
-    while (l < h)
-    {
-	m = Math.floor((h + l)/2);
-	if (data[m].val < +tf)
-	    l = m + 1;
-	else
-	    h = m;
-    }
-    if (l == h && data[l].val == tf)
-    {
-	console.log("found");
-    }
-    else
-    {
-	console.log("not found");
-    }
-}
-
 (function chart() {
 
     var margin = { left: 10, top: 10, right: 10, bottom: 10},
@@ -33,8 +8,34 @@ function bsearch(data, tf, h, l, m)
     N = 15,
     Y = 50;
     var cbs = {};
-    arrow = false;
-    svg = null;
+    var arrow = false;
+    var svg = null;
+
+    function bsearch(data, tf, h, l, m)
+    {
+	h = data.length-1;
+	l = 0;
+
+	data.sort(function(a,b) { return a.val - b.val;});
+
+	while (l < h)
+	{
+	    m = Math.floor((h + l)/2);
+	    if (data[m].val < +tf)
+		l = m + 1;
+	    else
+		h = m;
+	}
+	if (l == h && data[l].val == tf)
+	{
+	    console.log("found");
+	}
+	else
+	{
+	    console.log("not found");
+	}
+    }
+
     /* callback called right after entering the function
      * it initializes the data
      */
@@ -47,8 +48,8 @@ function bsearch(data, tf, h, l, m)
     cbs[6] = function(data) { 
 	var animation_duration = 1000;
 	var initial_delay = 1000;
-	this.cumulative_delay = initial_delay;
-	Algorithm.highlightRow("bs-code", 6, this.cumulative_delay, animation_duration + initial_delay);
+	this.AlgorithmContext.cumulative_delay = initial_delay;
+	this.AlgorithmContext.highlightRow(6, this.AlgorithmContext.cumulative_delay, animation_duration + initial_delay);
 
 	svg = d3.select("#bsearch-tab .graphics").append("svg")
 	    .attr("width", width)
@@ -88,7 +89,7 @@ function bsearch(data, tf, h, l, m)
 	    .attr("height",30)
 	    .attr("xlink:href", "arrow2.svg");
 	
-	this.cumulative_delay += animation_duration;
+	this.AlgorithmContext.cumulative_delay += animation_duration;
     };
     /*callback called inside every iteration
      * updates the arrow pointer
@@ -96,42 +97,39 @@ function bsearch(data, tf, h, l, m)
     cbs[10] = function(data, tf, h, l, m) { 
 	var animation_duration = 1000;
 	var initial_delay = 1000;
-	Algorithm.highlightRow("bs-code", 10, this.cumulative_delay, animation_duration + initial_delay);
-	this.cumulative_delay += initial_delay;
-	arrow.style("display","block").transition().delay(this.cumulative_delay).duration(animation_duration).attr("x",2*w*m-3);
-	this.cumulative_delay += animation_duration;
+	this.AlgorithmContext.highlightRow(10, this.AlgorithmContext.cumulative_delay, animation_duration + initial_delay);
+	this.AlgorithmContext.cumulative_delay += initial_delay;
+	arrow.style("display","block").transition().delay(this.AlgorithmContext.cumulative_delay).duration(animation_duration).attr("x",2*w*m-3);
+	this.AlgorithmContext.cumulative_delay += animation_duration;
     };
     /*callback called after a match was found
      */
     cbs[18] = function(data, tf, h, l, m) { 
 	var animation_duration = 1000;
 	var initial_delay = 1000;
-	Algorithm.highlightRow("bs-code", 18, this.cumulative_delay, animation_duration + initial_delay);
-	this.cumulative_delay += initial_delay;
-	arrow.style("display","block").transition().delay(this.cumulative_delay).duration(animation_duration).attr("x",2*w*l-3);
+	this.AlgorithmContext.highlightRow(18, this.AlgorithmContext.cumulative_delay, animation_duration + initial_delay);
+	this.AlgorithmContext.cumulative_delay += initial_delay;
+	arrow.style("display","block").transition().delay(this.AlgorithmContext.cumulative_delay).duration(animation_duration).attr("x",2*w*l-3);
 	svg.append("text")
-	    .attr("dy", "20px")
+	    .attr("dy", "100px")
 	    .attr("class", "not-found-label")
-	    .transition().delay(this.cumulative_delay).duration(animation_duration).text("Found!");
-	this.cumulative_delay += animation_duration;
+	    .transition().delay(this.AlgorithmContext.cumulative_delay).duration(animation_duration).text("Found!");
+	this.AlgorithmContext.cumulative_delay += animation_duration;
     };
     /*callback called if a match was NOT found
      */
     cbs[22] = function(data, tf, h, l, m) { 
 	var animation_duration = 1000;
 	var initial_delay = 1000;
-	Algorithm.highlightRow("bs-code", 22, this.cumulative_delay, animation_duration + initial_delay);
-	this.cumulative_delay += initial_delay;
+	this.AlgorithmContext.highlightRow(22, this.AlgorithmContext.cumulative_delay, animation_duration + initial_delay);
+	this.AlgorithmContext.cumulative_delay += initial_delay;
 	svg.append("text")
-	    .attr("dy", "20px")
+	    .attr("dy", "100px")
 	    .attr("class", "not-found-label")
-	    .transition().delay(this.cumulative_delay).duration(animation_duration).text("Not Found!");
-	this.cumulative_delay += animation_duration;
+	    .transition().delay(this.AlgorithmContext.cumulative_delay).duration(animation_duration).text("Not Found!");
+	this.AlgorithmContext.cumulative_delay += animation_duration;
     };
 
-    /* create an Algorithm instance wired with callbacks */
-    var balgo = new Algorithm(bsearch,cbs);
-    
     /*setup the data*/	 
     var data = new Array(N);
 
@@ -150,6 +148,9 @@ function bsearch(data, tf, h, l, m)
 	inputs[j].value = Math.floor(Math.random()*99);
     }
 
+    /* create an Algorithm instance wired with callbacks */
+    var balgo = new Algorithm(bsearch, cbs, "bs-code");
+    
     d3.select(".options").append("span")
 	.text("Find value : ");
 
@@ -165,16 +166,11 @@ function bsearch(data, tf, h, l, m)
 
     d3.select("#bsearch-tab .code")
 	.append("pre")
-    //to get line numbering use .attr("class", "prettyprint lang-js linenums:1 highlight:10")
 	.attr("class", "prettyprint lang-js linenums:1")
     	.attr("id", "bs-code")
 	.append("code")
 	.attr("class", "language-js")
 	.text(balgo.toString());
-    /*calls google-prettify to make the code look nice
-      called automatically with new loader script
-      prettyPrint();
-    */
     
     /*the function that starts the simulation*/
     var kickoff = function kickOff() {

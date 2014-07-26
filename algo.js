@@ -13,18 +13,38 @@
  *
  * @author mpapanek
  */
-function Algorithm(func, callbacks)
+function Algorithm(func, callbacks, codeContainerId)
 {
     this.func = func;
     this.param = func.toString().match(/\(([^\(\)]*)\)/);
     this.callbacks = callbacks;
 
-    /* 
-     * this delay counter can be accessed from within the callbacks.
-     * It is meant to be used to sync the visualization transitions
-     * this means you would say d3.select(..).transition().delay(this.cumulative_delay).duration(animation_duration)
+    /*
+     * Algorithm context which stores functions and variables accessible from inside the callbacks. 
      */
-    this.callbacks["cumulative_delay"] = 0;
+    this.AlgorithmContext = {
+	// animation duration for row highlights
+	default_animation_duration : 100,
+	// callback html code row highlighting function
+	highlightRow : function(rowNumber, startDelay, durationOfHighlight) {
+	    var rowToHighlightSelector = "#" + codeContainerId + " li:nth-child(" + rowNumber +")";
+	    setTimeout(function() {
+		$(rowToHighlightSelector).toggleClass("highlighted-row");
+	    }, startDelay);
+	    setTimeout(function() {
+		$(rowToHighlightSelector).toggleClass("highlighted-row");
+	    }, startDelay + durationOfHighlight);
+	},
+	/*
+	 * This delay counter can be accessed from within the callbacks.
+	 * It is meant to be used to sync the visualization transitions
+	 * this means you would say d3.select(..).transition().delay(this.cumulative_delay).duration(animation_duration)
+	 */
+	cumulative_delay : 0,
+    };
+
+    this.callbacks["AlgorithmContext"] = this.AlgorithmContext;
+    this.codeContainerId = codeContainerId;
 }
 /* statics */
 Algorithm.paramArg = function(N) {
@@ -38,15 +58,7 @@ Algorithm.paramArg = function(N) {
     return res;
 };
 
-Algorithm.highlightRow = function(codeTagId, rowNumber, startDelay, durationOfHighlight) {
-    var rowToHighlightSelector = "#" + codeTagId + " li:nth-child(" + rowNumber +")";
-    setTimeout(function() {
-	$(rowToHighlightSelector).toggleClass("highlighted-row");
-    }, startDelay);
-    setTimeout(function() {
-	$(rowToHighlightSelector).toggleClass("highlighted-row");
-    }, startDelay + durationOfHighlight);
-};
+//Algorithm.highlightRow = 
 
 /* methods .. passed to all objects of this class and called using the instance */
 /**
