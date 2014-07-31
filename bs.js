@@ -11,27 +11,24 @@
     var arrow = false;
     var svg = null;
 
-    function bsearch(data, tf, h, l, m)
-    {
-	h = data.length-1;
-	l = 0;
+    function bsearch(data, key) {
+	var high = data.length-1;
+	var low = 0;
+	var mid = 0;
 
 	data.sort(function(a,b) { return a.val - b.val;});
 
-	while (l < h)
-	{
-	    m = Math.floor((h + l)/2);
-	    if (data[m].val < +tf)
-		l = m + 1;
-	    else
-		h = m;
+	while (low < high) {
+	    mid = Math.floor((high + low)/2);
+	    if (data[mid].val < +key) {
+		low = mid + 1;
+	    } else {
+		high = mid;
+	    }
 	}
-	if (l == h && data[l].val == tf)
-	{
+	if (low == high && data[low].val == key) {
 	    console.log("found");
-	}
-	else
-	{
+	} else {
 	    console.log("not found");
 	}
     }
@@ -39,17 +36,15 @@
     /* callback called right after entering the function
      * it initializes the data
      */
-    cbs[2] = function(data) { 
+    cbs[0] = function(data) { 
 	data.forEach(function (v,i) { v.old_i = i; });
+	return 0;
     };
     /* callback called after the array has been sorted
      * it draws the data
      */
-    cbs[6] = function(data) { 
+    cbs[5] = function(data) { 
 	var animation_duration = 1000;
-	var initial_delay = 1000;
-	this.AlgorithmContext.cumulative_delay = initial_delay;
-	this.AlgorithmContext.highlightRow(6, this.AlgorithmContext.cumulative_delay, animation_duration + initial_delay);
 
 	svg = d3.select("#bsearch-tab .graphics").append("svg")
 	    .attr("width", width)
@@ -76,7 +71,7 @@
 	    .text(function(d) { return d.val; });
 
 	/*interpolating works with transforms too .. so cool -> move to new spot*/
-	gs.transition().delay(initial_delay).duration(animation_duration).attr("transform", function(d, i) {
+	gs.transition().delay(this.AlgorithmContext.cumulative_delay).duration(animation_duration).attr("transform", function(d, i) {
 	    return "translate(" + 2*w*i + "," + Y + ")";
 	});
 
@@ -89,45 +84,36 @@
 	    .attr("height",30)
 	    .attr("xlink:href", "arrow2.svg");
 	
-	this.AlgorithmContext.cumulative_delay += animation_duration;
+	return animation_duration;
     };
     /*callback called inside every iteration
      * updates the arrow pointer
      */
-    cbs[10] = function(data, tf, h, l, m) { 
+    cbs[8] = function(mid) { 
 	var animation_duration = 1000;
-	var initial_delay = 1000;
-	this.AlgorithmContext.highlightRow(10, this.AlgorithmContext.cumulative_delay, animation_duration + initial_delay);
-	this.AlgorithmContext.cumulative_delay += initial_delay;
-	arrow.style("display","block").transition().delay(this.AlgorithmContext.cumulative_delay).duration(animation_duration).attr("x",2*w*m-3);
-	this.AlgorithmContext.cumulative_delay += animation_duration;
+	arrow.style("display","block").transition().delay(this.AlgorithmContext.cumulative_delay).duration(animation_duration).attr("x",2*w*mid-3);
+	return animation_duration;
     };
     /*callback called after a match was found
      */
-    cbs[18] = function(data, tf, h, l, m) { 
+    cbs[16] = function(low) { 
 	var animation_duration = 1000;
-	var initial_delay = 1000;
-	this.AlgorithmContext.highlightRow(18, this.AlgorithmContext.cumulative_delay, animation_duration + initial_delay);
-	this.AlgorithmContext.cumulative_delay += initial_delay;
-	arrow.style("display","block").transition().delay(this.AlgorithmContext.cumulative_delay).duration(animation_duration).attr("x",2*w*l-3);
+	arrow.style("display","block").transition().delay(this.AlgorithmContext.cumulative_delay).duration(animation_duration).attr("x",2*w*low-3);
 	svg.append("text")
 	    .attr("dy", "100px")
 	    .attr("class", "not-found-label")
 	    .transition().delay(this.AlgorithmContext.cumulative_delay).duration(animation_duration).text("Found!");
-	this.AlgorithmContext.cumulative_delay += animation_duration;
+	return animation_duration;
     };
     /*callback called if a match was NOT found
      */
-    cbs[22] = function(data, tf, h, l, m) { 
+    cbs[18] = function() { 
 	var animation_duration = 1000;
-	var initial_delay = 1000;
-	this.AlgorithmContext.highlightRow(22, this.AlgorithmContext.cumulative_delay, animation_duration + initial_delay);
-	this.AlgorithmContext.cumulative_delay += initial_delay;
 	svg.append("text")
 	    .attr("dy", "100px")
 	    .attr("class", "not-found-label")
 	    .transition().delay(this.AlgorithmContext.cumulative_delay).duration(animation_duration).text("Not Found!");
-	this.AlgorithmContext.cumulative_delay += animation_duration;
+	return animation_duration;
     };
 
     /*setup the data*/	 
