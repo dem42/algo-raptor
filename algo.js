@@ -59,7 +59,7 @@ function Algorithm(func, callbacks, codeContainerId)
 	 * It is meant to be used to sync the visualization transitions
 	 * this means you would say d3.select(..).transition().delay(this.cumulative_delay).duration(animation_duration)
 	 */
-	cumulative_delay : 1000,
+	cumulative_delay : 1000
     };
 
     this.handleRow = function(row_num, animation_duration) {
