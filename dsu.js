@@ -68,18 +68,19 @@
 		var findInClosure = function(node, data) {
 		    return dsuFind.run(node, data);
 		}
+		dsuUnion.resetCumulativeDelay();
 		dsuUnion.run(selected1, selected2, data, findInClosure);
 		console.log(data);
 		selected.forEach(function (d) {d.obj.setAttribute("class", "node")});
 		selected = [];
-	    }, 500);
+	    }, 200);
 	}
     }
 
     /**
      * tree rendering function, called to draw a d3 tree hierarchy 
      */
-    function drawTreeFun(data, i, child) {
+    function drawTreeFun(delay, data, i, child) {
 
 	var animation_duration = 1600;
 
@@ -98,11 +99,13 @@
 	    .data(links, function (d) { return d.source.name + "-to-" + d.target.name })
 	
 	movers.transition()
+	    .delay(delay)
 	    .duration(animation_duration)
 	    .attr("transform", "translate(" + data.order*treew + ",0)");
 
 	movers.select(".link")
 	    .transition()
+	    .delay(delay)
 	    .duration(animation_duration)
 	    .attr("d", diagonal)
 
@@ -116,12 +119,13 @@
 	    .attr("class", "link")
 	    .attr("id", function(d) { return "from-" + d.source.name + "-to-" + d.target.name; })
 	    .transition()
-	    .delay(animation_duration)
+	    .delay(delay + animation_duration)
 	    .attr("d", diagonal);
 
 	var mover_nodes = svg.selectAll(".node")
 	    .data(nodes, function(d) { return d.name; })
 	    .transition()
+	    .delay(delay)
 	    .duration(animation_duration)
 	    .attr("transform", function(d) {return "translate(" + (d.x + data.order*treew) + "," + d.y + ")";});
 
@@ -139,7 +143,7 @@
 	    .attr("cy", 0)
 	    .attr("r", "0px")
 	    .transition() //transitioning from 0em to 2em
-	    .delay(animation_duration)
+	    .delay(delay + animation_duration)
 	    .duration(animation_duration)
 //	    .each("start", function() { d3.select(this).attr("r", "0em"); }) //this gives them a start value which is needed for the animation
 	    .attr("r", "20px");
@@ -152,7 +156,7 @@
 	    .text(function(d) { return d.name; })
 	    .attr("font-size", "0pt")
 	    .transition()
-	    .delay(2*animation_duration)
+	    .delay(delay + 2*animation_duration)
 	    .attr("font-size", "12pt")
 
 	// in svg the order of elements defines the z-index 
@@ -160,7 +164,7 @@
 	setTimeout(function() {
 	    svg.select("#node-" + data.name).moveToFront();
 	    if (child != undefined) svg.select("#node-" + child.name).moveToFront();
-	}, animation_duration + 10);
+	}, delay + animation_duration + 10);
 
 	console.log("after draw tree fun", data, i);
 
@@ -170,14 +174,14 @@
     function push(obj, elem) {
 	(obj.children = obj.children || []).push(elem);
     }
-    function cleanup(winner, winner_num, loser, loser_num) {
+    function cleanup(delay, winner, winner_num, loser, loser_num) {
 	//remove_merged_nodes([winner_num,loser_num]);
 	push(winner, loser);
-	drawTreeFun(winner, winner_num, loser);
+	drawTreeFun(delay, winner, winner_num, loser);
 	var loser_order = loser.order;
 	var new_node = {"name": next_num, "rank": 0, "root": next_num, "children": [], "order": loser_order};
 	data.push(new_node);
-	var animation_duration = drawTreeFun(new_node, next_num);
+	var animation_duration = drawTreeFun(delay, new_node, next_num);
 	next_num++;
 
 	return animation_duration;
@@ -206,9 +210,19 @@
     console.log("data", data);
 
 
+    cbsFind[1] = function(a, data) {
+	console.log("in find with a=",a,"and root =",data[a].root,"#from-" + data[a].root + "-to-" + a);
+	setTimeout(function() {
+	    d3.select("#from-" + data[a].root + "-to-" + a).classed("highlight-elem", true);
+	}, this.AlgorithmContext.cumulative_delay + 200);
+	return 200;
+    }
     cbsFind[2] = function(a, data) {
 	console.log("in find with a=",a,"and root =",data[a].root);
-	return 100;
+	setTimeout(function() {
+	    d3.select("#node-" + a + " circle").classed("highlight-elem", true);
+	}, this.AlgorithmContext.cumulative_delay + 200);
+	return 200;
     }
     cbsUnion[2] = function(r1,r2,a,b) {
 	console.log("for a=",a,"parent=",r1,"for b=",b,"parent=",r2);  
@@ -216,21 +230,27 @@
     }
     cbsUnion[7] = function(b, r1, r2, data) {
 	console.log("the new root of ", r2," is ",r1);
-	return cleanup(data[r1], r1, data[r2], r2);
+	return cleanup(this.AlgorithmContext.cumulative_delay, data[r1], r1, data[r2], r2);
     }
     cbsUnion[11] = function(a, r2, r1, data) {
 	console.log("the new root of ", r1," is ",r2);
-	return cleanup(data[r2], r2, data[r1], r1);
+	return cleanup(this.AlgorithmContext.cumulative_delay, data[r2], r2, data[r1], r1);
     }
-    cbsUnion[19] = function(r2, r1, data) {
+    cbsUnion[18] = function(r2, r1, data) {
 	console.log("the new root of ", r1," is ",r2);
-	return cleanup(data[r2], r2, data[r1], r1);
+	return cleanup(this.AlgorithmContext.cumulative_delay, data[r2], r2, data[r1], r1);
     }
-    cbsUnion[24] = function(r1, r2, data) {
+    cbsUnion[23] = function(r1, r2, data) {
 	console.log("the new root of ", r2," is ",r1);
-	return cleanup(data[r1], r1, data[r2], r2);
+	return cleanup(this.AlgorithmContext.cumulative_delay, data[r1], r1, data[r2], r2);
     }
-
+    cbsUnion[27] = function(r1, r2) {
+	setTimeout(function() {
+	    d3.selectAll(".link").classed("highlight-elem", false);
+	    d3.selectAll("circle").classed("highlight-elem", false);
+	}, this.AlgorithmContext.cumulative_delay);
+	return this.AlgorithmContext.default_animation_duration;
+    }
     // this object determines the behaviour of the algorighm code
     var algorithmContext = {
 	// animation duration for row highlights
@@ -271,7 +291,7 @@
 
     data.forEach(function(d) { d.rank = 0;});
     data.forEach(function(d, i) {
-	drawTreeFun(d, i);
+	drawTreeFun(100, d, i);
     });
 
 }());

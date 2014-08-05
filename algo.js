@@ -77,14 +77,15 @@ Algorithm.paramArg = function(N) {
     }
     return res;
 };
-
-//Algorithm.highlightRow = 
-
 /* methods .. passed to all objects of this class and called using the instance */
 /**
  * decorates the string representation of a function
  * with callbacks on the provided lines
  */
+Algorithm.prototype.resetCumulativeDelay = function() {
+    this.AlgorithmContext.cumulative_delay = 0;
+}
+
 Algorithm.prototype.addDebugging = function(fstr) {
     var lmp = {}, i, nfun, tokens;
     if (typeof(fstr) != "string")

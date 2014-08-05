@@ -56,3 +56,7 @@
 li.highlighted-row {
     background: #B80000;
 }
+
+.highlight-elem {
+    stroke: red;
+}
