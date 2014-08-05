@@ -149,16 +149,16 @@
     /* create an Algorithm instance wired with callbacks */
     var balgo = new Algorithm(bsearch, cbs, "bs-code", algorithmContext);
     
-    d3.select(".options").append("span")
+    d3.select("#bsearch-tab .options").append("span")
 	.text("Find value : ");
 
-    d3.select(".options").append("input")
+    d3.select("#bsearch-tab .options").append("input")
 	.attr("id", "find")
 	.attr("type","text")
 	.attr("class","input-box")
 	.attr("maxlength", 2);
 
-    d3.select(".options").append("button")
+    d3.select("#bsearch-tab .options").append("button")
 	.on("click", function(d) { kickoff(); })
 	.text("start");
 

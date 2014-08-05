@@ -29,77 +29,96 @@
 	<ul class="nav navbar-nav" role="tablist" id="algoTabs">
 	  <li><a href="#bsearch-tab" role="tab" data-toggle="tab">Binary Search</a></li>
 	  <li class="active"><a href="#dsu-tab" role="tab" data-toggle="tab">Disjoint Set Union</a></li>
+	  <li><a href="#quicksort-tab" role="tab" data-toggle="tab">Quicksort</a></li>
 	</ul>
       </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
   </nav>
 
   <div class="container-fluid">
-  <div class="tab-content">
-    <!-- binary search tab -->
-    <div class="tab-pane" id="bsearch-tab">
-      <div class="row">
-	<div class="col-md-6">
-	  <div class="row controls">
-	    <div class="col-md-12">
-	      <div class="panel panel-default">
-		<div class="panel-heading">Controls:</div>
-		<div class="panel-body">
-		  <div class="forms"></div>
-		  <div class="options"></div>
+    <div class="tab-content">
+      <!-- binary search tab -->
+      <div class="tab-pane" id="bsearch-tab">
+	<div class="row">
+	  <div class="col-md-6">
+	    <div class="row controls">
+	      <div class="col-md-12">
+		<div class="panel panel-default">
+		  <div class="panel-heading">Controls:</div>
+		  <div class="panel-body">
+		    <div class="forms"></div>
+		    <div class="options"></div>
+		  </div>
+		</div>
+	      </div>
+	    </div>
+	    <div class="row">
+	      <div class="col-md-12">
+		<div class="panel panel-default">
+		  <div class="panel-heading">Visualization Goes Here:</div>
+		  <div class="panel-body graphics"></div>
 		</div>
 	      </div>
 	    </div>
 	  </div>
-	  <div class="row">
-	    <div class="col-md-12">
-	      <div class="panel panel-default">
-		<div class="panel-heading">Visualization Goes Here:</div>
-		<div class="panel-body graphics"></div>
-	      </div>
+	  <div class="col-md-6">
+	    <div class="panel panel-default">
+	      <div class="panel-heading">Code</div>
+	      <div class="panel-body code"></div>
 	    </div>
 	  </div>
 	</div>
-	<div class="col-md-6">
-	  <div class="panel panel-default">
-	    <div class="panel-heading">Code</div>
-	    <div class="panel-body code"></div>
+      </div>
+      
+      <!-- dsu tab -->
+      <div class="tab-pane active" id="dsu-tab">
+	<div class="row">
+	  <div class="col-md-8">
+	    <div class="panel panel-default">
+	      <div class="panel-heading">Tree Nodes</div>
+	      <div class="panel-body graphics"></div>
+	    </div>
+	  </div>
+	  <div class="col-md-4">
+	    <div class="panel panel-default">
+	      <div class="panel-heading">Code</div>
+	      <div class="panel-body code"></div>
+	    </div>
 	  </div>
 	</div>
       </div>
-    </div>
-    
-    <!-- dsu tab -->
-    <div class="tab-pane active" id="dsu-tab">
-      <div class="row">
-	<div class="col-md-8">
-	  <div class="panel panel-default">
-	    <div class="panel-heading">Tree Nodes</div>
-	    <div class="panel-body graphics"></div>
+      <!-- quicksort tab -->
+      <div class="tab-pane" id="quicksort-tab">
+	<div class="row">
+	  <div class="col-md-4">
+	    <div class="panel panel-default">
+	      <div class="panel-heading">Button!</div>
+	      <div class="panel-body options"></div>
+	    </div>
 	  </div>
-	</div>
-	<div class="col-md-4">
-	  <div class="panel panel-default">
-	    <div class="panel-heading">Code</div>
-	    <div class="panel-body code"></div>
+	  <div class="col-md-8">
+	    <div class="panel panel-default">
+	      <div class="panel-heading">Code</div>
+	      <div class="panel-body code"></div>
+	    </div>
 	  </div>
+	  <div class="code"></div>
 	</div>
-	<div class="code"></div>
       </div>
     </div>
-  </div>
 
-  </div>
-  <!-- bootstrap css script which contains all plugins -->
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-  <script>
-    $(function () {
-    $('#algoTabs a:last').tab('show')
-    })
-  </script>
-  <!-- algorithm visualization d3 scripts -->
-  <script src="bs.js"></script>
-  <script src="dsu.js"></script>
-  
+</div>
+<!-- bootstrap css script which contains all plugins -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script>
+  $(function () {
+  $('#algoTabs a:last').tab('show')
+  })
+</script>
+<!-- algorithm visualization d3 scripts -->
+<script src="bs.js"></script>
+<script src="dsu.js"></script>
+<script src="quicksort.js"></script>
+
 </body>
 </html>
