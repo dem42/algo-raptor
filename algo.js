@@ -38,11 +38,11 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
     this.found_vars = args;
     console.log("in build vars : ", args);
 
-    this.AlgorithmContext = algorithmContext;
-
     /*
      * Algorithm context which stores functions and variables accessible from inside the callbacks. 
      */
+    this.AlgorithmContext = algorithmContext;
+
     function highlightRow(rowNumber, startDelay, durationOfHighlight) {
 	var rowToHighlightSelector = "#" + codeContainerId + " li:nth-child(" + (rowNumber + 1) +")";
 	setTimeout(function() {
