@@ -13,7 +13,7 @@
  *
  * @author mpapanek
  */
-function Algorithm(func, callbacks, codeContainerId)
+function Algorithm(func, callbacks, codeContainerId, algorithmContext)
 {
     this.func = func;
     this.param = func.toString().match(/\(([^\(\)]*)\)/);
@@ -38,37 +38,28 @@ function Algorithm(func, callbacks, codeContainerId)
     this.found_vars = args;
     console.log("in build vars : ", args);
 
+    this.AlgorithmContext = algorithmContext;
+
     /*
      * Algorithm context which stores functions and variables accessible from inside the callbacks. 
      */
-    this.AlgorithmContext = {
-	// animation duration for row highlights
-	default_animation_duration : 500,
-	// callback html code row highlighting function
-	highlightRow : function(rowNumber, startDelay, durationOfHighlight) {
-	    var rowToHighlightSelector = "#" + codeContainerId + " li:nth-child(" + (rowNumber + 1) +")";
-	    setTimeout(function() {
-		$(rowToHighlightSelector).toggleClass("highlighted-row");
-	    }, startDelay);
-	    setTimeout(function() {
-		$(rowToHighlightSelector).toggleClass("highlighted-row");
-	    }, startDelay + durationOfHighlight);
-	},
-	/*
-	 * This delay counter can be accessed from within the callbacks.
-	 * It is meant to be used to sync the visualization transitions
-	 * this means you would say d3.select(..).transition().delay(this.cumulative_delay).duration(animation_duration)
-	 */
-	cumulative_delay : 1000,
+    function highlightRow(rowNumber, startDelay, durationOfHighlight) {
+	var rowToHighlightSelector = "#" + codeContainerId + " li:nth-child(" + (rowNumber + 1) +")";
+	setTimeout(function() {
+	    $(rowToHighlightSelector).toggleClass("highlighted-row");
+	}, startDelay);
+	setTimeout(function() {
+	    $(rowToHighlightSelector).toggleClass("highlighted-row");
+	}, startDelay + durationOfHighlight);
     };
 
     this.handleRow = function(row_num, animation_duration) {
 	
 	var highlight_start_time = this.AlgorithmContext.cumulative_delay;
-	this.AlgorithmContext.highlightRow(row_num, highlight_start_time, animation_duration);
+	highlightRow(row_num, highlight_start_time, animation_duration);
 
 	this.AlgorithmContext.cumulative_delay = highlight_start_time + animation_duration;
-	console.log("called for row", row_num, "and animation duration", animation_duration);
+	console.log("In", codeContainerId, ", called for row", row_num, "and animation duration", animation_duration);
 
     }
 
@@ -141,8 +132,6 @@ Algorithm.prototype.run = function() {
     var self = this;
 
     console.log(c);
-
-    this.AlgorithmContext.cumulative_delay = 1000;
 
     return eval(c);
 }

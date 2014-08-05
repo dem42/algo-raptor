@@ -38,7 +38,7 @@
      */
     cbs[0] = function(data) { 
 	data.forEach(function (v,i) { v.old_i = i; });
-	return 0;
+	return 1000;
     };
     /* callback called after the array has been sorted
      * it draws the data
@@ -134,8 +134,20 @@
 	inputs[j].value = Math.floor(Math.random()*99);
     }
 
+
+    // this object determines the behaviour of the algorighm code
+    var algorithmContext = {
+	// animation duration for row highlights
+	default_animation_duration : 500,
+	/*
+	 * This delay counter can be accessed from within the callbacks.
+	 * It is meant to be used to sync the visualization transitions
+	 * this means you would say d3.select(..).transition().delay(this.cumulative_delay).duration(animation_duration)
+	 */
+	cumulative_delay : 0
+    };
     /* create an Algorithm instance wired with callbacks */
-    var balgo = new Algorithm(bsearch, cbs, "bs-code");
+    var balgo = new Algorithm(bsearch, cbs, "bs-code", algorithmContext);
     
     d3.select(".options").append("span")
 	.text("Find value : ");

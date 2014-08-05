@@ -163,6 +163,8 @@
 	}, animation_duration + 10);
 
 	console.log("after draw tree fun", data, i);
+
+	return 2*animation_duration;
     }
 
     function push(obj, elem) {
@@ -175,8 +177,10 @@
 	var loser_order = loser.order;
 	var new_node = {"name": next_num, "rank": 0, "root": next_num, "children": [], "order": loser_order};
 	data.push(new_node);
-	drawTreeFun(new_node, next_num);
+	var animation_duration = drawTreeFun(new_node, next_num);
 	next_num++;
+
+	return animation_duration;
     }
 
     var cbsFind = {};
@@ -202,31 +206,45 @@
     console.log("data", data);
 
 
-    cbsFind[3] = function(a, data) {
+    cbsFind[2] = function(a, data) {
 	console.log("in find with a=",a,"and root =",data[a].root);
+	return 100;
     }
-    cbsUnion[3] = function(r1,r2,a,b) {
+    cbsUnion[2] = function(r1,r2,a,b) {
 	console.log("for a=",a,"parent=",r1,"for b=",b,"parent=",r2);  
+	return 100;
     }
-    cbsUnion[8] = function(b, r1, r2, data) {
+    cbsUnion[7] = function(b, r1, r2, data) {
 	console.log("the new root of ", r2," is ",r1);
-	cleanup(data[r1], r1, data[r2], r2);
+	return cleanup(data[r1], r1, data[r2], r2);
     }
-    cbsUnion[12] = function(a, r2, r1, data) {
+    cbsUnion[11] = function(a, r2, r1, data) {
 	console.log("the new root of ", r1," is ",r2);
-	cleanup(data[r2], r2, data[r1], r1);
+	return cleanup(data[r2], r2, data[r1], r1);
     }
-    cbsUnion[20] = function(r2, r1, data) {
+    cbsUnion[19] = function(r2, r1, data) {
 	console.log("the new root of ", r1," is ",r2);
-	cleanup(data[r2], r2, data[r1], r1);
+	return cleanup(data[r2], r2, data[r1], r1);
     }
-    cbsUnion[25] = function(r1, r2, data) {
+    cbsUnion[24] = function(r1, r2, data) {
 	console.log("the new root of ", r2," is ",r1);
-	cleanup(data[r1], r1, data[r2], r2);
+	return cleanup(data[r1], r1, data[r2], r2);
     }
 
-    var dsuFind = new Algorithm(find, cbsFind, "dsu-find-code");
-    var dsuUnion = new Algorithm(union, cbsUnion, "dsu-union-code");
+    // this object determines the behaviour of the algorighm code
+    var algorithmContext = {
+	// animation duration for row highlights
+	default_animation_duration : 500,
+	/*
+	 * This delay counter can be accessed from within the callbacks.
+	 * It is meant to be used to sync the visualization transitions
+	 * this means you would say d3.select(..).transition().delay(this.cumulative_delay).duration(animation_duration)
+	 */
+	cumulative_delay : 0
+    };
+
+    var dsuFind = new Algorithm(find, cbsFind, "dsu-find-code", algorithmContext);
+    var dsuUnion = new Algorithm(union, cbsUnion, "dsu-union-code", algorithmContext);
 
 
 
