@@ -9,7 +9,8 @@
     function quicksort(data, left, right, swap_function) {
 	
 	console.log(data, left, right);
-	if (left >= right) {
+	if (left >= right) 
+	{
 	    return;
 	}
 
@@ -37,6 +38,9 @@
     var q_callbacks = [];
 
     var qual_algo = new Algorithm(quicksort, q_callbacks, "quicksort-code", algo_context);
+
+    console.log(qual_algo.decorated());
+
     var swap_algo = new Algorithm(swap_function, [], "swap_function-code", algo_context);
 
     d3.select("#quicksort-tab .code")

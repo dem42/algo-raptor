@@ -53,14 +53,20 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
 	}, startDelay + durationOfHighlight);
     };
 
-    this.handleRow = function(row_num, animation_duration) {
+    this.preRowExecute = function(row_num) {
+	//console.log("in pre exec for row ", row_num, codeContainerId);
+	var highlight_start_time = this.AlgorithmContext.cumulative_delay;
+	highlightRow(row_num, highlight_start_time, this.AlgorithmContext.default_animation_duration);
+	this.AlgorithmContext.cumulative_delay += this.AlgorithmContext.default_animation_duration;
+    }
+
+    this.postRowExecute = function(row_num, animation_duration) {
 	
 	var highlight_start_time = this.AlgorithmContext.cumulative_delay;
 	highlightRow(row_num, highlight_start_time, animation_duration);
 
 	this.AlgorithmContext.cumulative_delay = highlight_start_time + animation_duration;
 	console.log("In", codeContainerId, ", called for row", row_num, "and animation duration", animation_duration);
-
     }
 
     this.callbacks["AlgorithmContext"] = this.AlgorithmContext;
@@ -96,11 +102,15 @@ Algorithm.prototype.addDebugging = function(fstr) {
     tokens = fstr.split("\n");
     for (i=0;i<tokens.length;i++)
     {
+	if (i > 0 && $.trim(tokens[i]).indexOf("{") != 0 && $.trim(tokens[i]).indexOf("else") != 0) {
+	    nfun += "self.preRowExecute(" + i + ");";
+	}
+
    	nfun += tokens[i];
 	if (i < tokens.length-1 && ($.trim(tokens[i+1]).indexOf("{") != 0) && ($.trim(tokens[i+1]).indexOf("else") != 0)) { 
 	    // add the handle row function to every row except for the first and last
 	    // this function will deal with row highlighting and var printing
-	    nfun += "self.handleRow(" + i;
+	    nfun += "self.postRowExecute(" + i;
 	    if (i in this.callbacks)
 	    {
 		var fun_param = this.callbacks[i].toString().match(/\(([^\(\)]*)\)/);
@@ -108,7 +118,7 @@ Algorithm.prototype.addDebugging = function(fstr) {
 	    }
 	    else
 	    {
-		nfun += ", " + this.AlgorithmContext.default_animation_duration;
+		nfun += ", " + 0;
 	    }
 	    nfun += ", " + this.found_vars + ");";
 
