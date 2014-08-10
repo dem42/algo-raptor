@@ -102,7 +102,7 @@ Algorithm.prototype.addDebugging = function(fstr) {
     tokens = fstr.split("\n");
     for (i=0;i<tokens.length;i++)
     {
-	if (i > 0 && $.trim(tokens[i]).indexOf("{") != 0 && $.trim(tokens[i]).indexOf("else") != 0) {
+	if (i > 0 && $.trim(tokens[i]) != "" && $.trim(tokens[i]).indexOf("{") != 0 && $.trim(tokens[i]).indexOf("else") != 0) {
 	    nfun += "self.preRowExecute(" + i + ");";
 	}
 
