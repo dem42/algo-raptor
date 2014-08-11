@@ -68,8 +68,7 @@
 		var findInClosure = function(node, data) {
 		    return dsuFind.run(node, data);
 		}
-		dsuUnion.resetCumulativeDelay();
-		dsuUnion.run(selected1, selected2, data, findInClosure);
+		dsuUnion.startAnimation(selected1, selected2, data, findInClosure);
 		console.log(data);
 		selected.forEach(function (d) {d.obj.setAttribute("class", "node")});
 		selected = [];

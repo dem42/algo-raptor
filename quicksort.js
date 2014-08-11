@@ -134,14 +134,17 @@
 
 	return 100;
     }
-    q_callbacks[8] = function() {
-	return 200;
-    }
     q_callbacks[16] = function() {
 	setTimeout(function() {
 	    svg.selectAll("#pivot-rect").remove();
 	}, this.AlgorithmContext.cumulative_delay);
 	return 100;
+    }
+    // we are going to do the animation inside swap and return the length of that
+    // animation in the post swap callbacks to correctly animate the delay
+    var swapping_animation_duration = 200;
+    q_callbacks[8] = q_callbacks[12] = q_callbacks[16] = function() {
+	return swapping_animation_duration;
     }
 
     var qual_algo = new Algorithm(quicksort, q_callbacks, "quicksort-code", algo_context);
@@ -150,6 +153,8 @@
     swap_callbacks[0] = function(data, i, j) {
 	var gi = d3.select("#q-g-" + data[i].old_idx)
 	var gj = d3.select("#q-g-" + data[j].old_idx)
+
+	
 
 	//console.log("In swap with", i, j);
 	return 0;
@@ -167,7 +172,7 @@
     
     d3.select("#quicksort-tab .options").append("button")
 	.on("click", function(d) {
-	    qual_algo.run(data, 0, data.length, function(data, i, j) { return swap_algo.run(data, i, j); });
+	    qual_algo.startAnimation(data, 0, data.length, function(data, i, j) { return swap_algo.run(data, i, j); });
 	    console.log("hello");
 	    
 	})

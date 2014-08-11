@@ -84,14 +84,20 @@ Algorithm.paramArg = function(N) {
     return res;
 };
 /* methods .. passed to all objects of this class and called using the instance */
+
 /**
- * decorates the string representation of a function
- * with callbacks on the provided lines
+ * Resets the cumulative delay back to zero
+ *
+ * This should be called before every new animation session
  */
 Algorithm.prototype.resetCumulativeDelay = function() {
     this.AlgorithmContext.cumulative_delay = 0;
 }
 
+/**
+ * decorates the string representation of a function
+ * with callbacks on the provided lines
+ */
 Algorithm.prototype.addDebugging = function(fstr) {
     var lmp = {}, i, nfun, tokens;
     if (typeof(fstr) != "string")
@@ -136,6 +142,18 @@ Algorithm.prototype.toString = function(){
 Algorithm.prototype.decorated = function() {
     return this.addDebugging(this.func);
 }
+
+/**
+ * Start algorithm animation
+ */
+Algorithm.prototype.startAnimation = function() {
+    this.AlgorithmContext.cumulative_delay = 0;
+    this.run.apply(this, arguments);
+}
+
+/** 
+ * Execute the function with using animating the algorithm using the cumulative delay 
+ */
 Algorithm.prototype.run = function() {
     var N = this.getParams().length;
     var c = "("+this.decorated()+")("+Algorithm.paramArg(N)+");";

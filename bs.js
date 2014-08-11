@@ -177,7 +177,6 @@
 	d3.selectAll(".forms .input-box").each(function(v, i, a) {
 	    data[i] = { val: this.value};
 	});
-	balgo.resetCumulativeDelay();
-	balgo.run(data,tf,lo,hi,m);
+	balgo.startAnimation(data,tf,lo,hi,m);
     }
 }());
