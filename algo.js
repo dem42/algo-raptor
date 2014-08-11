@@ -36,8 +36,6 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
 	}
     }
     this.found_vars = args;
-    console.log("in build vars : ", args);
-
     /*
      * Algorithm context which stores functions and variables accessible from inside the callbacks. 
      */
@@ -66,7 +64,6 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
 	highlightRow(row_num, highlight_start_time, animation_duration);
 
 	this.AlgorithmContext.cumulative_delay = highlight_start_time + animation_duration;
-	console.log("In", codeContainerId, ", called for row", row_num, "and animation duration", animation_duration);
     }
 
     this.callbacks["AlgorithmContext"] = this.AlgorithmContext;
@@ -83,17 +80,9 @@ Algorithm.paramArg = function(N) {
     }
     return res;
 };
+/********************************************************************************/
 /* methods .. passed to all objects of this class and called using the instance */
-
-/**
- * Resets the cumulative delay back to zero
- *
- * This should be called before every new animation session
- */
-Algorithm.prototype.resetCumulativeDelay = function() {
-    this.AlgorithmContext.cumulative_delay = 0;
-}
-
+/********************************************************************************/
 /**
  * decorates the string representation of a function
  * with callbacks on the provided lines
@@ -133,12 +122,22 @@ Algorithm.prototype.addDebugging = function(fstr) {
     }
     return nfun;
 }
+/**
+ * Returns the number of parameters of the original function
+ */
 Algorithm.prototype.getParams = function(){
     return this.param[1].split(",");
 }
+/**
+ * Returns the string representation of the original undecorated function
+ */
 Algorithm.prototype.toString = function(){
     return this.func.toString();
 }
+/**
+ * Returns a string representation of the decorated function. 
+ * A decorated function is one that has callbacks, preExecuteRow and postExecuteRows inserted in its source code
+ */
 Algorithm.prototype.decorated = function() {
     return this.addDebugging(this.func);
 }
@@ -159,13 +158,8 @@ Algorithm.prototype.run = function() {
     var c = "("+this.decorated()+")("+Algorithm.paramArg(N)+");";
     //preserve this for the eval inside var self
     var self = this;
-
-    console.log(c);
-
+    //console.log(c);
     return eval(c);
-}
-Algorithm.prototype.callback = function() {
-    console.log("called");
 }
 /////////////////////////////////////////////////////////////////
 // Algorithm class end ///

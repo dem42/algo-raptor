@@ -1,6 +1,7 @@
 (function chart() {
 
     function swap_function(data, i, j) {
+	if (i == j) return;
 	var tmp = data[i];
 	data[i] = data[j];
 	data[j] = tmp;
@@ -8,7 +9,7 @@
 
     function quicksort(data, left, right, swap_function) {
 
-	if (left >= right) {
+	console.log("right", right, "left", left); if (left >= right) {
 	    return;
 	}
 
@@ -30,7 +31,8 @@
     /*************************/
     /**  Initialize svg   ****/
     /*************************/
-    var data = [2,4,5,3,8,6,2].map(function(d, i) {
+    var data = [2,4,5,3]
+	.map(function(d, i) {
 	return {val : d, old_idx: i};
     });
     console.log(data);
@@ -107,7 +109,7 @@
     /**  Setup algorithms ****/
     /*************************/
     var algo_context = {
-	default_animation_duration : 500,
+	default_animation_duration : 200,
 	cumulative_delay : 0
     };
 
@@ -134,16 +136,18 @@
 
 	return 100;
     }
+    var swapping_animation_duration = 8000;
     q_callbacks[16] = function() {
+	console.log("in pivot with cum_del", this.AlgorithmContext.cumulative_delay);
 	setTimeout(function() {
+	    console.log("in pivot rec remove");
 	    svg.selectAll("#pivot-rect").remove();
 	}, this.AlgorithmContext.cumulative_delay);
-	return 100;
+	return swapping_animation_duration;
     }
     // we are going to do the animation inside swap and return the length of that
     // animation in the post swap callbacks to correctly animate the delay
-    var swapping_animation_duration = 200;
-    q_callbacks[8] = q_callbacks[12] = q_callbacks[16] = function() {
+    q_callbacks[8] = q_callbacks[12] = function() {
 	return swapping_animation_duration;
     }
 
@@ -151,15 +155,40 @@
 
     var swap_callbacks = [];
     swap_callbacks[0] = function(data, i, j) {
+
+	if (i == j) return;
+	var delay = this.AlgorithmContext.getCumulativeDelay();
+
 	var gi = d3.select("#q-g-" + data[i].old_idx)
 	var gj = d3.select("#q-g-" + data[j].old_idx)
 
+	var trns1 = gi.attr("transform").match("([0-9]+) ([0-9]+)");
+	var trns2 = gj.attr("transform").match("([0-9]+) ([0-9]+)");
+	gi.transition().delay(delay).duration(200).attr("transform", "translate(" + trns1[1] + " " + 0 + ")");
+	gj.transition().delay(delay).duration(200).attr("transform", "translate(" + trns2[1] + " " + (2*trns2[2]) + ")");
 	
+	gi.transition().delay(delay + 200).duration(200).attr("transform", "translate(" + trns2[1] + " " + 0 + ")");
+	gj.transition().delay(delay + 200).duration(200).attr("transform", "translate(" + trns1[1] + " " + (2*trns2[2]) + ")");
 
-	//console.log("In swap with", i, j);
-	return 0;
+	
+	gi.transition().delay(delay + 400).duration(200).attr("transform", "translate(" + trns2[1] + " " + trns1[2] + ")");
+	gj.transition().delay(delay + 400).duration(200).attr("transform", "translate(" + trns1[1] + " " + trns2[2] + ")");
+
+
+	console.log("In swap with", i, data[i].old_idx, j, data[j].old_idx);
+	return 500;
     }
-    var swap_algo = new Algorithm(swap_function, swap_callbacks, "swap_function-code", {default_animation_duration: 0, cumulative_delay: 0});
+
+    // the swap context has no cumulative delay of its own
+    // but it provides a function to fetch the cumulative delay of the quicksort
+    var swap_context = {
+	default_animation_duration: 0, 
+	cumulative_delay: 0, 
+	getCumulativeDelay: function() { 
+	    return algo_context.cumulative_delay; 
+	}
+    }
+    var swap_algo = new Algorithm(swap_function, swap_callbacks, "swap_function-code", swap_context);
 
     d3.select("#quicksort-tab .code")
 	.append("pre")
@@ -172,9 +201,10 @@
     
     d3.select("#quicksort-tab .options").append("button")
 	.on("click", function(d) {
-	    qual_algo.startAnimation(data, 0, data.length, function(data, i, j) { return swap_algo.run(data, i, j); });
-	    console.log("hello");
-	    
+	    qual_algo.startAnimation(data, 0, data.length, function(data, i, j) {
+		return swap_algo.run(data, i, j); 
+	    });
+	    console.log(data.map(function(d) { return d.val; }));
 	})
 	.text("start");
 
