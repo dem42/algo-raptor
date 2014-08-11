@@ -9,7 +9,7 @@
 
     function quicksort(data, left, right, swap_function) {
 
-	console.log("right", right, "left", left); if (left >= right) {
+	if (left >= right) {
 	    return;
 	}
 
@@ -31,7 +31,7 @@
     /*************************/
     /**  Initialize svg   ****/
     /*************************/
-    var data = [2,4,5,3]
+    var data = [2,4,5,3,8,12,2,5]
 	.map(function(d, i) {
 	return {val : d, old_idx: i};
     });
@@ -136,11 +136,9 @@
 
 	return 100;
     }
-    var swapping_animation_duration = 8000;
+    var swapping_animation_duration = 3000;
     q_callbacks[16] = function() {
-	console.log("in pivot with cum_del", this.AlgorithmContext.cumulative_delay);
 	setTimeout(function() {
-	    console.log("in pivot rec remove");
 	    svg.selectAll("#pivot-rect").remove();
 	}, this.AlgorithmContext.cumulative_delay);
 	return swapping_animation_duration;
@@ -155,6 +153,7 @@
 
     var swap_callbacks = [];
     swap_callbacks[0] = function(data, i, j) {
+	var step_duration = 1000;
 
 	if (i == j) return;
 	var delay = this.AlgorithmContext.getCumulativeDelay();
@@ -162,21 +161,27 @@
 	var gi = d3.select("#q-g-" + data[i].old_idx)
 	var gj = d3.select("#q-g-" + data[j].old_idx)
 
-	var trns1 = gi.attr("transform").match("([0-9]+) ([0-9]+)");
-	var trns2 = gj.attr("transform").match("([0-9]+) ([0-9]+)");
-	gi.transition().delay(delay).duration(200).attr("transform", "translate(" + trns1[1] + " " + 0 + ")");
-	gj.transition().delay(delay).duration(200).attr("transform", "translate(" + trns2[1] + " " + (2*trns2[2]) + ")");
-	
-	gi.transition().delay(delay + 200).duration(200).attr("transform", "translate(" + trns2[1] + " " + 0 + ")");
-	gj.transition().delay(delay + 200).duration(200).attr("transform", "translate(" + trns1[1] + " " + (2*trns2[2]) + ")");
+	var trns1 = [sumUpTo(data, i), maxi_width];
+	var trns2 = [sumUpTo(data, j), maxi_width];
 
-	
-	gi.transition().delay(delay + 400).duration(200).attr("transform", "translate(" + trns2[1] + " " + trns1[2] + ")");
-	gj.transition().delay(delay + 400).duration(200).attr("transform", "translate(" + trns1[1] + " " + trns2[2] + ")");
+	console.log("moving", data[i].old_idx, trns1[0], 0);
+	console.log("moving", data[j].old_idx, trns2[0], 2*trns2[1]);
+	gi.transition().delay(delay).duration(step_duration).attr("transform", "translate(" + trns1[0] + " " + 0 + ")");
+	gj.transition().delay(delay).duration(step_duration).attr("transform", "translate(" + trns2[0] + " " + (2*trns2[1]) + ")");
 
+	console.log("moving", data[i].old_idx, trns2[0], 0);
+	console.log("moving", data[j].old_idx, trns1[0], 2*trns2[1]);	
+	gi.transition().delay(delay + step_duration).duration(step_duration).attr("transform", "translate(" + trns2[0] + " " + 0 + ")");
+	gj.transition().delay(delay + step_duration).duration(step_duration).attr("transform", "translate(" + trns1[0] + " " + (2*trns2[1]) + ")");
 
-	console.log("In swap with", i, data[i].old_idx, j, data[j].old_idx);
-	return 500;
+	console.log("moving", data[i].old_idx, trns2[0], trns1[1]);
+	console.log("moving", data[j].old_idx, trns1[0], trns2[1]);
+	gi.transition().delay(delay + 2*step_duration).duration(step_duration).attr("transform", "translate(" + trns2[0] + " " + trns1[1] + ")");
+	gj.transition().delay(delay + 2*step_duration).duration(step_duration).attr("transform", "translate(" + trns1[0] + " " + trns2[1] + ")");
+
+	console.log("done-------------------");
+
+	return 3*step_duration;
     }
 
     // the swap context has no cumulative delay of its own
