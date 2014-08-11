@@ -90,15 +90,16 @@
     svg.selectAll(".circle")
 	.data(data)
 	.enter()
+	.append("g")
+	.attr("id", function(d, i) { return "q-g-" + i; })
+	.attr("transform", function(d, i) { return "translate(" + sumUpTo(data, i) + " " + maxi_width + ")"; })
 	.append("circle")
 	.attr("id", function(d, i) { return "q-circle-" + i; })
 	.attr("class", "quicksort-circle")
 	.attr("fill", function(d, i) { return "url(#gradient-" + i +")";})
 	.attr("r", function(d) {
-	    return computeWidth(d.val) + "px";
-	})
-	.attr("cx", function(d, i) { return sumUpTo(data, i) + "px"; })
-	.attr("cy", maxi_width + "px");
+	    return computeWidth(d.val);
+	});
 
 
 
@@ -116,14 +117,44 @@
     }
     q_callbacks[6] = function(pivot, data) {
 	
-	var pi = data[pivot];
-	//d3.select("#
-	
-	return 1;
+	var pi = data[pivot].old_idx;
+	var g = d3.select("#q-g-" + pi)
+	var radius = g.select(".quicksort-circle").attr("r");
+
+	setTimeout(function() {
+	    g.append("rect")
+		.attr("id", "pivot-rect")
+		.attr("fill", "none")
+		.attr("stroke", "red")
+		.attr("width", 2*radius)
+		.attr("height", 2*radius)
+		.attr("x", -radius)
+		.attr("y", -radius);
+	    }, this.AlgorithmContext.cumulative_delay);
+
+	return 100;
+    }
+    q_callbacks[8] = function() {
+	return 200;
+    }
+    q_callbacks[16] = function() {
+	setTimeout(function() {
+	    svg.selectAll("#pivot-rect").remove();
+	}, this.AlgorithmContext.cumulative_delay);
+	return 100;
     }
 
     var qual_algo = new Algorithm(quicksort, q_callbacks, "quicksort-code", algo_context);
-    var swap_algo = new Algorithm(swap_function, [], "swap_function-code", algo_context);
+
+    var swap_callbacks = [];
+    swap_callbacks[0] = function(data, i, j) {
+	var gi = d3.select("#q-g-" + data[i].old_idx)
+	var gj = d3.select("#q-g-" + data[j].old_idx)
+
+	//console.log("In swap with", i, j);
+	return 0;
+    }
+    var swap_algo = new Algorithm(swap_function, swap_callbacks, "swap_function-code", {default_animation_duration: 0, cumulative_delay: 0});
 
     d3.select("#quicksort-tab .code")
 	.append("pre")
@@ -132,13 +163,6 @@
 	.append("code")
         .attr("class", "language-js")
         .text(qual_algo);
-    d3.select("#quicksort-tab .code")
-	.append("pre")
-        .attr("class", "prettyprint lang-js linenums:1")
-	.attr("id", "swap_function-code")
-	.append("code")
-        .attr("class", "language-js")
-        .text(swap_algo);
 
     
     d3.select("#quicksort-tab .options").append("button")
