@@ -56,7 +56,7 @@
      */
     var selected = [];
     function selectNode(svgObj, d) {
-	svgObj.setAttribute("class", "node selected");
+	svgObj.setAttribute("class", "node highlight-elem");
 	selected.push({"data":d, "obj":svgObj});
 	if (selected.length == 2) {
 	    setTimeout(function() { 	    
@@ -70,7 +70,7 @@
 		}
 		dsuUnion.startAnimation(selected1, selected2, data, findInClosure);
 		console.log(data);
-		selected.forEach(function (d) {d.obj.setAttribute("class", "node")});
+		//selected.forEach(function (d) {d.obj.setAttribute("class", "node")});
 		selected = [];
 	    }, 200);
 	}
@@ -144,7 +144,6 @@
 	    .transition() //transitioning from 0em to 2em
 	    .delay(delay + animation_duration)
 	    .duration(animation_duration)
-//	    .each("start", function() { d3.select(this).attr("r", "0em"); }) //this gives them a start value which is needed for the animation
 	    .attr("r", "20px");
 
 	var texts = svgNodes.append("text")
@@ -219,7 +218,7 @@
     cbsFind[2] = function(a, data) {
 	console.log("in find with a=",a,"and root =",data[a].root);
 	setTimeout(function() {
-	    d3.select("#node-" + a + " circle").classed("highlight-elem", true);
+	    d3.select("#node-" + a).classed("highlight-elem", true);
 	}, this.AlgorithmContext.cumulative_delay + 200);
 	return 200;
     }
@@ -246,7 +245,7 @@
     cbsUnion[27] = function(r1, r2) {
 	setTimeout(function() {
 	    d3.selectAll(".link").classed("highlight-elem", false);
-	    d3.selectAll("circle").classed("highlight-elem", false);
+	    d3.selectAll(".node").classed("highlight-elem", false);
 	}, this.AlgorithmContext.cumulative_delay);
 	return this.AlgorithmContext.default_animation_duration;
     }
