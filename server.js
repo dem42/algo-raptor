@@ -17,7 +17,7 @@ app.get('/test', function(req, res) {
 
 app.get('/visualizations', function(req, res) {
     res.setHeader("Content-type", "text/json; charset=utf-8");
-    fs.readdir(".", function(err, files) {
+    fs.readdir("visualizations", function(err, files) {
 	console.log(files);
 	console.log(JSON.stringify(files));
 	res.send(JSON.stringify(files));

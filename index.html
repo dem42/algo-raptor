@@ -32,14 +32,13 @@
 	  <li class="active"><a href="#bsearch-tab" role="tab" data-toggle="tab">Binary Search</a></li>
 	  <li><a href="#dsu-tab" role="tab" data-toggle="tab">Disjoint Set Union</a></li>
 	  <li><a href="#quicksort-tab" role="tab" data-toggle="tab">Quicksort</a></li>
-	  <li><a href="#dynamic-tab" role="tab" data-toggle="tab">Dynamic</a></li>
 	</ul>
       </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
   </nav>
 
   <div class="container-fluid">
-    <div class="tab-content">
+    <div class="tab-content" id="algoContainer">
       <!-- binary search tab -->
       <div class="tab-pane active" id="bsearch-tab">
 	<div class="row">
@@ -120,37 +119,17 @@
 	  <div class="code"></div>
 	</div>
       </div>
-      <!-- dynamic tab -->
-      <div class="tab-pane" id="dynamic-tab">
-	<div class="row">
-	  <div class="col-md-12">
-	    <button onclick="$.getScript('dynamic.js')">hello</button>
-	  </div>
-	</div>
-      </div>
 
 
     </div>
   </div>
   <!-- bootstrap css script which contains all plugins -->
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-  <script>
-    $(function () {
-      $("#algoTabs a:first").tab("show");
-      setTimeout(function() {
-         
-        $.ajax("visualizations").done(function(data) {
-            console.log(data);
-        });
-
-      }, 5000);
-    });
-  </script>
-  <!-- algorithm visualization d3 scripts -->
+  <script src="main.js"></script>
+  <!-- algorithm visualization d3 scripts 
   <script src="visualizations/bs.js"></script>
   <script src="visualizations/dsu.js"></script>
   <script src="visualizations/quicksort.js"></script>
-  <link rel="stylesheet" type="text/css" href="visualizations/quicksort.css">
-
+  -->
 </body>
 </html>
