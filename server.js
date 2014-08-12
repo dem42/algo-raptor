@@ -1,10 +1,28 @@
 var fs = require('fs');
 var http = require('http');
-var port = 80;
+var express = require('express');
 
-http.createServer(function(request, response) {
-    response.writeHead(200);
-    response.end("Hello");
-}).listen(port);
+var app = express();
+app.set('port', 8989);
 
-console.log("Server running on", port, "...");
+app.get('/', function(req, res) {
+    res.send("Hello");
+});
+
+app.get('/test', function(req, res) {
+    res.send("<html><body><b>Hello Again</b></body></html>");
+});
+
+app.get('/visualizations', function(req, res) {
+    res.setHeader("Content-type", "text/json; charset=utf-8");
+    fs.readdir(".", function(err, files) {
+	console.log(files);
+	console.log(JSON.stringify(files));
+	res.send(JSON.stringify(files));
+    });
+});
+
+// start the node js server using expess.js for request handling
+http.createServer(app).listen(app.get('port'), function() {
+    console.log("Server running on", app.get('port'), "...");
+});

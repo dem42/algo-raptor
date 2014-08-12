@@ -82,7 +82,7 @@
 	    .attr("x",0)
 	    .attr("width",30)
 	    .attr("height",30)
-	    .attr("xlink:href", "arrow2.svg");
+	    .attr("xlink:href", "assets/arrow2.svg");
 	
 	return animation_duration;
     };
