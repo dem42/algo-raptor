@@ -179,4 +179,4 @@
 	});
 	balgo.startAnimation(data,tf,lo,hi,m);
     }
-}());
+})();

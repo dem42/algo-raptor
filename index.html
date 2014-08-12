@@ -1,20 +1,22 @@
 <!DOCTYPE html>
 <html lang="en"
-      <meta charset="utf-8">
-      <!-- this script kicks off the code prettification with a "desert" skin -->
-      <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=desert"></script>
-      <script src="http://d3js.org/d3.v3.min.js"></script>
+<head>
+  <meta charset="utf-8">
+  <!-- this script kicks off the code prettification with a "desert" skin -->
+  <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=desert"></script>
+  <script src="http://d3js.org/d3.v3.min.js"></script>
 
-      <!-- jquery .. consider trimming -->
-      <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+  <!-- jquery .. consider trimming -->
+  <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
 
-      <!-- our algo code -->
-      <link rel="stylesheet" href="algo.css" type="text/css">
-      <script src="algo.js"></script>
+  <!-- our algo code -->
+  <link rel="stylesheet" href="algo.css" type="text/css">
+  <script src="algo.js"></script>
 
-      <!-- bootstrap css -->
-      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+  <!-- bootstrap css -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+</head>
 <body style="padding-top: 60px">
   <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container-fluid">
@@ -27,9 +29,10 @@
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 
 	<ul class="nav navbar-nav" role="tablist" id="algoTabs">
-	  <li><a href="#bsearch-tab" role="tab" data-toggle="tab">Binary Search</a></li>
-	  <li class="active"><a href="#dsu-tab" role="tab" data-toggle="tab">Disjoint Set Union</a></li>
+	  <li class="active"><a href="#bsearch-tab" role="tab" data-toggle="tab">Binary Search</a></li>
+	  <li><a href="#dsu-tab" role="tab" data-toggle="tab">Disjoint Set Union</a></li>
 	  <li><a href="#quicksort-tab" role="tab" data-toggle="tab">Quicksort</a></li>
+	  <li><a href="#dynamic-tab" role="tab" data-toggle="tab">Dynamic</a></li>
 	</ul>
       </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
@@ -38,7 +41,7 @@
   <div class="container-fluid">
     <div class="tab-content">
       <!-- binary search tab -->
-      <div class="tab-pane" id="bsearch-tab">
+      <div class="tab-pane active" id="bsearch-tab">
 	<div class="row">
 	  <div class="col-md-6">
 	    <div class="row controls">
@@ -71,7 +74,7 @@
       </div>
       
       <!-- dsu tab -->
-      <div class="tab-pane active" id="dsu-tab">
+      <div class="tab-pane" id="dsu-tab">
 	<div class="row">
 	  <div class="col-md-8">
 	    <div class="panel panel-default">
@@ -117,21 +120,33 @@
 	  <div class="code"></div>
 	</div>
       </div>
-    </div>
+      <!-- dynamic tab -->
+      <div class="tab-pane" id="dynamic-tab">
+	<div class="row">
+	  <div class="col-md-12">
+	    <button onclick="$.getScript('dynamic.js')">hello</button>
+	  </div>
+	</div>
+      </div>
 
-</div>
-<!-- bootstrap css script which contains all plugins -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-<script>
-  $(function () {
-  $('#algoTabs a:last').tab('show')
-  })
-</script>
-<!-- algorithm visualization d3 scripts -->
-<script src="bs.js"></script>
-<script src="dsu.js"></script>
-<script src="quicksort.js"></script>
-<link rel="stylesheet" type="text/css" href="quicksort.css">
+
+    </div>
+  </div>
+  <!-- bootstrap css script which contains all plugins -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+  <script>
+    $(function () {
+      $("#algoTabs a:first").tab("show");
+      setTimeout(function() {
+       $("#algoTabs").append("<li><a>Test</a></li>");
+      }, 5000);
+    });
+  </script>
+  <!-- algorithm visualization d3 scripts -->
+  <script src="bs.js"></script>
+  <script src="dsu.js"></script>
+  <script src="quicksort.js"></script>
+  <link rel="stylesheet" type="text/css" href="quicksort.css">
 
 </body>
 </html>
