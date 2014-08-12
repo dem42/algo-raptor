@@ -1,9 +1,11 @@
 var fs = require('fs');
+var path = require('path');
 var http = require('http');
 var express = require('express');
 
 var app = express();
 app.set('port', 8989);
+app.use(express.static(path.join(__dirname, '.')));
 
 app.get('/', function(req, res) {
     res.send("Hello");

@@ -138,7 +138,11 @@
     $(function () {
       $("#algoTabs a:first").tab("show");
       setTimeout(function() {
-       $("#algoTabs").append("<li><a>Test</a></li>");
+         
+        $.ajax("visualizations").done(function(data) {
+            console.log(data);
+        });
+
       }, 5000);
     });
   </script>
