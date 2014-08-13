@@ -7,7 +7,7 @@
 	.append("div").attr("class", "tab-pane").attr("id", "dynamic-tab")
         .append("div").attr("class", "row")
     row0.append("div").attr("class", "col-md-12")
-        .append("button").attr("onclick", function() { window.alert("hello"); });
+        .append("button").on("click", function() { window.alert("hello"); });
 
     console.log("downloaded here ");
 }());
