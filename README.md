@@ -1,14 +1,14 @@
-algoviz
+Algoviz
 =======
 
 The idea of the algoviz project is to create visualizations of famous algorithms in d3.
 
-Stepping through visualizations is an excellent and quick way to learn how an algorithm works and having seen the algorithm in action 
-helps in remembering it.
+Stepping through visualizations is an excellent and quick way to learn how an algorithm works. Furthermore, having seen the algorithm in action helps in remembering it.
 
 
-How to start
-============
+How do I use it?
+----------------
+
 Download vagrant and virtual box and run
     
     vagrant init
