@@ -1,5 +1,39 @@
 (function chart() {
+    /*******************************/
+    /*      Setup the panels       */
+    /*******************************/
+    console.log("downloaded quicksort");
 
+    d3.select("#algoTabs").append("li").append("a").attr("href", "#quicksort-tab").attr("role", "tab").attr("data-toggle", "tab")
+	.text("Quicksort");
+ 
+    var row0 = d3.select("#algoContainer")
+	.append("div").attr("class", "tab-pane").attr("id", "quicksort-tab")
+	.append("div").attr("class", "row")
+    var leftPanel = row0.append("div").attr("class", "col-md-6")
+    var controlsPanel = leftPanel.append("div").attr("class", "row")
+	.append("div").attr("class", "col-md-12")
+	.append("div").attr("class", "panel panel-default");
+    controlsPanel.append("div").attr("class", "panel-heading").text("Controls:");
+    controlsPanel.append("div").attr("class", "panel-body")
+	.append("div").attr("class", "options");
+
+    
+    var visPanel = leftPanel.append("div").attr("class", "row")
+	.append("div").attr("class", "col-md-12")
+	.append("div").attr("class", "panel panel-default");
+    visPanel.append("div").attr("class", "panel-heading").text("Sorting");
+    visPanel.append("div").attr("class", "panel-body graphics");
+
+    var codePanel = row0.append("div").attr("class", "col-md-6")
+	.append("div").attr("class", "panel panel-default");
+    codePanel.append("div").attr("class", "panel-heading").text("Code");
+    codePanel.append("div").attr("class", "panel-body code");
+
+
+    /*******************************/
+    /*      Define the functions   */
+    /*******************************/
     function swap_function(data, i, j) {
 	if (i == j) return;
 	var tmp = data[i];

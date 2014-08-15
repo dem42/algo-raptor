@@ -1,4 +1,29 @@
 (function chart() {
+    /*******************************/
+    /*      Setup the panels       */
+    /*******************************/
+    console.log("downloaded dsu");
+
+
+    d3.select("#algoTabs").append("li").append("a").attr("href", "#dsu-tab").attr("role", "tab").attr("data-toggle", "tab")
+	.text("Disjoint Set Union");
+ 
+    var row0 = d3.select("#algoContainer")
+	.append("div").attr("class", "tab-pane").attr("id", "dsu-tab")
+	.append("div").attr("class", "row")
+    var treeNodesPanel = row0.append("div").attr("class", "col-md-8")
+	.append("div").attr("class", "panel panel-default");
+    treeNodesPanel.append("div").attr("class", "panel-heading").text("Tree Nodes");
+    treeNodesPanel.append("div").attr("class", "panel-body graphics");
+     var codePanel = row0.append("div").attr("class", "col-md-4")
+	.append("div").attr("class", "panel panel-default");
+    codePanel.append("div").attr("class", "panel-heading").text("Code");
+    codePanel.append("div").attr("class", "panel-body code");
+
+    
+    /*******************************/
+    /*      Setup the svg stuff    */
+    /*******************************/
     var margin = { left: 10, top: 30, right: 10, bottom: 100};
     var height = 450;
     var width = 1600;
@@ -284,8 +309,9 @@
 
     /*calls google-prettify to make the code look nice
       called automatically
-    prettyPrint();
     */
+    //$(function(){prettyPrint()});
+    
 
     data.forEach(function(d) { d.rank = 0;});
     data.forEach(function(d, i) {

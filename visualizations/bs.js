@@ -1,5 +1,40 @@
 (function chart() {
+    /*******************************/
+    /*      Setup the panels       */
+    /*******************************/
+    console.log("downloaded bs");
 
+    d3.select("#algoTabs").append("li").append("a").attr("href", "#bsearch-tab").attr("role", "tab").attr("data-toggle", "tab")
+	.text("Binary Search");
+ 
+    var row0 = d3.select("#algoContainer")
+	.append("div").attr("class", "tab-pane").attr("id", "bsearch-tab")
+	.append("div").attr("class", "row")
+    var leftPanel = row0.append("div").attr("class", "col-md-6")
+    var controlsPanel = leftPanel.append("div").attr("class", "row controls")
+	.append("div").attr("class", "col-md-12")
+	.append("div").attr("class", "panel panel-default");
+    controlsPanel.append("div").attr("class", "panel-heading").text("Controls:");
+    var leftPanelBody = controlsPanel.append("div").attr("class", "panel-body");
+    leftPanelBody.append("div").attr("class", "forms");
+    leftPanelBody.append("div").attr("class", "options");
+
+    
+    var visPanel = leftPanel.append("div").attr("class", "row")
+	.append("div").attr("class", "col-md-12")
+	.append("div").attr("class", "panel panel-default");
+    visPanel.append("div").attr("class", "panel-heading").text("Visualization Goes Here:");
+    visPanel.append("div").attr("class", "panel-body graphics");
+
+    var codePanel = row0.append("div").attr("class", "col-md-6")
+	.append("div").attr("class", "panel panel-default");
+    codePanel.append("div").attr("class", "panel-heading").text("Code");
+    codePanel.append("div").attr("class", "panel-body code");
+
+    
+    /*******************************/
+    /*      Setup the svg stuff    */
+    /*******************************/
     var margin = { left: 10, top: 10, right: 10, bottom: 10},
     height = 150,
     width = 800,
