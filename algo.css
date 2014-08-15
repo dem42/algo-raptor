@@ -1,3 +1,17 @@
+.aviz-footer {
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+}
+
+.aviz-footer-list {
+    list-style: none;
+    display: inline-block;
+}
+
+.aviz-footer-list li {
+    display: inline;
+}
+
 .input-box {
     border: steelBlue 1px solid;
     width: 20px;
@@ -68,4 +82,8 @@ li.highlighted-row {
 
 .highlight-elem {
     stroke: red;
+}
+
+.jumbotron {
+    font-size: 21px;
 }
