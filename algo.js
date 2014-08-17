@@ -113,7 +113,7 @@ Algorithm.prototype.addDebugging = function(fstr) {
 	    }
 	    else
 	    {
-		nfun += ", " + 0;
+		nfun += ", " + ((i == 0) ? this.AlgorithmContext.default_animation_duration : 0);
 	    }
 	    nfun += ", " + this.found_vars + ");";
 

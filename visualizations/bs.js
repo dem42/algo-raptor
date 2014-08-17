@@ -73,7 +73,7 @@
      */
     cbs[0] = function(data) { 
 	data.forEach(function (v,i) { v.old_i = i; });
-	return 1000;
+	return this.AlgorithmContext.default_animation_duration;
     };
     /* callback called after the array has been sorted
      * it draws the data
