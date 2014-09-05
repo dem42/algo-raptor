@@ -4,8 +4,7 @@
     /*******************************/
     console.log("downloaded bs");
 
-    d3.select("#algoTabs").append("li").append("a").attr("href", "#bsearch-tab").attr("role", "tab").attr("data-toggle", "tab")
-	.text("Binary Search");
+    AlgorithmUtils.insertIntoHeaderList("#bsearch-tab", "Binary Search", "search-1-binary");
  
     var row0 = d3.select("#algoContainer")
 	.append("div").attr("class", "tab-pane").attr("id", "bsearch-tab")

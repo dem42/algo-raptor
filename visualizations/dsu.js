@@ -4,9 +4,7 @@
     /*******************************/
     console.log("downloaded dsu");
 
-
-    d3.select("#algoTabs").append("li").append("a").attr("href", "#dsu-tab").attr("role", "tab").attr("data-toggle", "tab")
-	.text("Disjoint Set Union");
+    AlgorithmUtils.insertIntoHeaderList("#dsu-tab", "Disjoint Set Union", "graphs-1-dsu");
  
     var row0 = d3.select("#algoContainer")
 	.append("div").attr("class", "tab-pane").attr("id", "dsu-tab")

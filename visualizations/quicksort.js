@@ -4,8 +4,7 @@
     /*******************************/
     console.log("downloaded quicksort");
 
-    d3.select("#algoTabs").append("li").append("a").attr("href", "#quicksort-tab").attr("role", "tab").attr("data-toggle", "tab")
-	.text("Quicksort");
+    AlgorithmUtils.insertIntoHeaderList("#quicksort-tab", "Quicksort", "sorting-1-quicksort");
  
     var row0 = d3.select("#algoContainer")
 	.append("div").attr("class", "tab-pane").attr("id", "quicksort-tab")
