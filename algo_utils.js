@@ -17,12 +17,15 @@ AlgorithmUtils.insertIntoHeaderList = function(tabId, headerText, listItemId) {
 	    otherAlgos.push(d);
 	}
     });
+    otherAlgos.sort();
     var indexInAlgos = otherAlgos.indexOf(listItemId);
     var listItem = null;
     if (indexInAlgos == otherAlgos.length - 1) {
+	console.log(tabId, "is last", otherAlgos);
 	listItem = d3.select("#algoTabs").append("li");	
     }
     else {
+	console.log(tabId, "goes before", otherAlgos[indexInAlgos + 1], otherAlgos);
 	listItem = d3.select("#algoTabs").insert("li", "#" + otherAlgos[indexInAlgos + 1]);
     }
 

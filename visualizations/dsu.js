@@ -79,21 +79,20 @@
      */
     var selected = [];
     function selectNode(svgObj, d) {
+	//this is used to determine whether nodes can be selected or not
+	if (d3.selectAll(".node.highlight-elem").size() >= 2) {
+	    return;
+	}
 	svgObj.setAttribute("class", "node highlight-elem");
 	selected.push({"data":d, "obj":svgObj});
 	if (selected.length == 2) {
 	    setTimeout(function() { 	    
-		console.log("kickoff");
-		console.log(selected[0].data, data);
-		console.log(selected[1].data, data);
 		var selected1 = selected[0].data.name;
 		var selected2 = selected[1].data.name;
 		var findInClosure = function(node, data) {
 		    return dsuFind.run(node, data);
 		}
 		dsuUnion.startAnimation(selected1, selected2, data, findInClosure);
-		console.log(data);
-		//selected.forEach(function (d) {d.obj.setAttribute("class", "node")});
 		selected = [];
 	    }, 200);
 	}
@@ -105,8 +104,6 @@
     function drawTreeFun(delay, data, i, child) {
 
 	var animation_duration = 1600;
-
-	console.log("in draw tree fun", data, i);
 
 	var tree = d3.layout.tree().size([treew - margin.right, height - margin.bottom])
 	    .children(function(d) {
@@ -187,8 +184,6 @@
 	    if (child != undefined) svg.select("#node-" + child.name).moveToFront();
 	}, delay + animation_duration + 10);
 
-	console.log("after draw tree fun", data, i);
-
 	return 2*animation_duration;
     }
 
@@ -228,41 +223,32 @@
 	    d.children = [];
 	}
     });
-    console.log("data", data);
-
 
     cbsFind[1] = function(a, data) {
-	console.log("in find with a=",a,"and root =",data[a].root,"#from-" + data[a].root + "-to-" + a);
 	setTimeout(function() {
 	    d3.select("#from-" + data[a].root + "-to-" + a).classed("highlight-elem", true);
 	}, this.AlgorithmContext.cumulative_delay + 200);
 	return 200;
     }
     cbsFind[2] = function(a, data) {
-	console.log("in find with a=",a,"and root =",data[a].root);
 	setTimeout(function() {
 	    d3.select("#node-" + a).classed("highlight-elem", true);
 	}, this.AlgorithmContext.cumulative_delay + 200);
 	return 200;
     }
     cbsUnion[2] = function(r1,r2,a,b) {
-	console.log("for a=",a,"parent=",r1,"for b=",b,"parent=",r2);  
 	return 100;
     }
     cbsUnion[7] = function(b, r1, r2, data) {
-	console.log("the new root of ", r2," is ",r1);
 	return cleanup(this.AlgorithmContext.cumulative_delay, data[r1], r1, data[r2], r2);
     }
     cbsUnion[11] = function(a, r2, r1, data) {
-	console.log("the new root of ", r1," is ",r2);
 	return cleanup(this.AlgorithmContext.cumulative_delay, data[r2], r2, data[r1], r1);
     }
     cbsUnion[18] = function(r2, r1, data) {
-	console.log("the new root of ", r1," is ",r2);
 	return cleanup(this.AlgorithmContext.cumulative_delay, data[r2], r2, data[r1], r1);
     }
     cbsUnion[23] = function(r1, r2, data) {
-	console.log("the new root of ", r2," is ",r1);
 	return cleanup(this.AlgorithmContext.cumulative_delay, data[r1], r1, data[r2], r2);
     }
     cbsUnion[27] = function(r1, r2) {
