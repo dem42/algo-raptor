@@ -8,6 +8,7 @@
  
     var row0 = d3.select("#algoContainer")
 	.append("div").attr("class", "tab-pane").attr("id", "dsu-tab")
+        .append("div").attr("class", "container-fluid")
 	.append("div").attr("class", "row")
     var treeNodesPanel = row0.append("div").attr("class", "col-md-8")
 	.append("div").attr("class", "panel panel-default");

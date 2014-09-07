@@ -8,6 +8,7 @@
  
     var row0 = d3.select("#algoContainer")
 	.append("div").attr("class", "tab-pane").attr("id", "bsearch-tab")
+        .append("div").attr("class", "container-fluid")
 	.append("div").attr("class", "row")
     var leftPanel = row0.append("div").attr("class", "col-md-6")
     var controlsPanel = leftPanel.append("div").attr("class", "row controls")
