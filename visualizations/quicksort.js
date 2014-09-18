@@ -142,9 +142,9 @@
 	    });
 	svg.selectAll(".circle-group").each(function(d, i) { d.x_off = sumUpTo(data, i); d.y_off = maxi_width;})
 	    .append("text")
-	    .attr("transform", function(d) { return "scale(" + (computeWidth(d.val) / mini_width) + ")"; })
-	    .attr("dx", function(d) { return (computeWidth(d.val) / mini_width) * -1.75; })
-	    .attr("dy", function(d) { return (computeWidth(d.val) / mini_width) * 0.75; })
+	    .style("font-size", function(d) { return ((computeWidth(d.val) / mini_width) * 100) + "%"; })
+	    .attr("dx", function(d) { return ((d.val > 9 ? 2 : 1)*-0.30) + "em"; })
+	    .attr("dy", function(d) { return "0.22em"; })
 	    .text(function(d) { return d.val; });
 
 	
