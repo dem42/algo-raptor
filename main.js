@@ -14,7 +14,7 @@ $(function () {
 		// on a work queue and will be processed when the browser is ready
 		// that means we don't have to worry about race conditions between multiple visualizations scripts 
 		$.getScript("visualizations/" + data[i], function( data, textStatus, jqxhr ) {
-		    console.debug( "Load was performed", textStatus ); // Success
+		    console.debug( "Download of algo:", textStatus ); // Success
 		});
 	    }
         }

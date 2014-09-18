@@ -40,38 +40,44 @@
 	data[i] = data[j];
 	data[j] = tmp;
     }
-
     function quicksort(data, left, right, swap_function) {
-
-	if (left >= right) {
+	if (right <= left) {
 	    return;
 	}
 
-	var pivot = Math.floor((left + right)/2);
-	var sorted_end = left + 1;
-	swap_function(data, left, pivot);
-
-	for (var i=left+1;i<right;++i) {
-	    if (data[i].val <= data[left].val) {
-		swap_function(data, sorted_end, i);
-		sorted_end++;
+	var pivot = Math.floor(left + (right - left)/2);
+	var new_left = left;
+	var new_right = right;
+	while (new_left <= new_right) {
+	    while (data[new_left].val < data[pivot].val) {
+		new_left = new_left + 1;
+	    }
+	    while (data[new_right].val > data[pivot].val) {
+		new_right = new_right - 1;
+	    }
+	    if (new_left < new_right) {
+		swap_function(data, new_left, new_right);
+	    }
+	    if (new_left <= new_right) {
+		new_left = new_left + 1;
+		new_right = new_right - 1;
 	    }
 	}
-	swap_function(data, left, sorted_end-1);
-	quicksort(data, left, sorted_end-1, swap_function);
-	quicksort(data, sorted_end, right, swap_function);
+	quicksort(data, left, (new_right >= left) ? new_right : left, swap_function);
+	quicksort(data, (new_left <= right) ? new_left : left, right, swap_function);
     }
 
     /*************************/
     /**  Initialize svg   ****/
     /*************************/
-    var data = [2,4,5,3,8,12,2,5]
-	.map(function(d, i) {
+    var sequence_to_sort = [9,4,5,3,8,12];
+    // create data which includes an old index that is used to identify the circle group an element belongs to
+    var data = sequence_to_sort.map(function(d, i) {
 	return {val : d, old_idx: i};
-    });
-    console.log(data);
+    });;
+	
     var margin = { left: 10, top: 30, right: 10, bottom: 100};
-    var height = 450;
+    var height = 1050;
     var width = 1600;
     var svg = d3.select("#quicksort-tab .graphics").append("svg")
 	.attr("width", width)
@@ -88,12 +94,7 @@
 	return elem * (smallestCircle / mini);
     }
     function sumUpTo(array, index) {
-	var sum = 0;
-	var N = array.length;
-	for (var i = 0; i < index && i < N; ++i) {
-	    sum += 2*computeWidth(array[i].val) + gap;
-	}
-	return sum + gap + computeWidth(array[index].val);
+	return (index * (2*maxi_width + gap) + maxi_width);
     }
     function randomColor() { 
 	var letters = '0123456789ABCDEF'.split('');
@@ -104,54 +105,71 @@
 	return color; 
     }
 
-    var widthSum = 0;
-    svg.append("defs").selectAll(".gradients")
-	.data(data)
-	.enter()
-	.append("radialGradient")
-	.attr("class", "gradients")
-	.attr("id", function(d, i) { return "gradient-" + i; })
-	.attr("fx", "25%")
-	.attr("fy", "25%")
-	.append("stop")
-	.attr("offset", "5%")
-	.attr("stop-color", randomColor);
+    var init_circles = function(data) {
+	svg.append("defs").selectAll(".gradients")
+	    .data(data)
+	    .enter()
+	    .append("radialGradient")
+	    .attr("class", "gradients")
+	    .attr("id", function(d, i) { return "gradient-" + i; })
+	    .attr("fx", "25%")
+	    .attr("fy", "25%")
+	    .append("stop")
+	    .attr("offset", "5%")
+	    .attr("stop-color", randomColor);
 
-    svg.selectAll(".gradients")
-    	.append("stop")
-	.attr("offset", "95%")
-	.attr("stop-color", "black");
+	svg.selectAll(".gradients")
+    	    .append("stop")
+	    .attr("offset", "95%")
+	    .attr("stop-color", "black");
 
 
-    svg.selectAll(".circle")
-	.data(data)
-	.enter()
-	.append("g")
-	.attr("id", function(d, i) { return "q-g-" + i; })
-	.attr("transform", function(d, i) { return "translate(" + sumUpTo(data, i) + " " + maxi_width + ")"; })
-	.append("circle")
-	.attr("id", function(d, i) { return "q-circle-" + i; })
-	.attr("class", "quicksort-circle")
-	.attr("fill", function(d, i) { return "url(#gradient-" + i +")";})
-	.attr("r", function(d) {
-	    return computeWidth(d.val);
+	svg.selectAll(".circle")
+	    .data(data)
+	    .enter()
+	    .append("g")
+	    .attr("class", "circle-group")
+	    .attr("id", function(d, i) { return "q-g-" + i; })
+	    .attr("transform", function(d, i) { return "translate(" + sumUpTo(data, i) + " " + maxi_width + ")"; })
+	    .append("circle")
+	    .attr("id", function(d, i) { return "q-circle-" + i; })
+	    .attr("class", "quicksort-circle")
+	    .attr("fill", function(d, i) { return "url(#gradient-" + i +")";})
+	    .attr("r", function(d) {
+		return computeWidth(d.val);
+	    });
+	svg.selectAll(".circle-group").each(function(d, i) {
+	    d.x_off = sumUpTo(data, i);
+	    d.y_off = maxi_width;
 	});
-
-
+    }
+    // now call the initialization
+    init_circles(data);
 
     /*************************/
     /**  Setup algorithms ****/
     /*************************/
-    var algo_context = {
-	default_animation_duration : 200,
-	cumulative_delay : 0
-    };
-
     var q_callbacks = [];
-    q_callbacks[0] = function() {
+    q_callbacks[0] = function(data, left, right) {
+	setTimeout(function() {
+	    d3.selectAll("text.left-text").remove();
+	    d3.selectAll("text.right-text").remove();
+	}, this.AlgorithmContext.cumulative_delay);
+	for (var i=left; i<=right; i++) {
+	    var gi = d3.select("#q-g-" + data[i].old_idx);
+	    var dat = gi.datum();
+	    console.log("Moving ", i, "to", dat.x_off, dat.y_off + 2.5 * maxi_width);
+	    gi.transition()
+		.duration(this.AlgorithmContext.default_animation_duration)
+		.delay(this.AlgorithmContext.cumulative_delay)
+		.attr("transform", "translate(" + dat.x_off + ", " + (dat.y_off + 2.5*maxi_width) + ")");
+	    dat.y_off = 2.5 * maxi_width + dat.y_off;
+	}
+
 	return this.AlgorithmContext.default_animation_duration;
     }
-    q_callbacks[6] = function(pivot, data) {
+    // pivot animation
+    q_callbacks[5] = function(pivot, data) {
 	
 	var pi = data[pivot].old_idx;
 	var g = d3.select("#q-g-" + pi)
@@ -168,22 +186,98 @@
 		.attr("y", -radius);
 	    }, this.AlgorithmContext.cumulative_delay);
 
-	return 100;
+	return this.AlgorithmContext.default_animation_duration;
     }
-    var swapping_animation_duration = 3000;
-    q_callbacks[16] = function() {
+    // left animation
+    function updateLeft(data, new_left) {
+	console.log(data, new_left);
+	if (new_left >= data.length) {
+	    return 0;
+	}
+	var new_left_i = data[new_left].old_idx;
+	var g = d3.select("#q-g-" + new_left_i);
+	var radius = g.select("circle").attr("r");
+	setTimeout(function() {
+	    d3.selectAll("g.left")
+		.classed("left", false)
+		.select("text.left-text")
+		.remove();
+
+	    g.append("text")
+	        .attr("class", "left-text")
+		.attr("dx", -radius)
+		.attr("dy", -radius)
+		.text("Left");
+	    g.classed("left", true);
+	}, this.AlgorithmContext.cumulative_delay);
+	return this.AlgorithmContext.default_animation_duration;
+    };
+    q_callbacks[6] = q_callbacks[10] = q_callbacks[19] = function(data, new_left) {
+	return updateLeft.apply(this, arguments);
+    };
+    //right animation
+    function updateRight(data, new_right) {
+	if (new_right < 0) {
+	    return 0;
+	}
+	var new_right_i = data[new_right].old_idx;
+	var g = d3.select("#q-g-" + new_right_i);
+	var radius = g.select("circle").attr("r");
+	setTimeout(function() {
+	    d3.selectAll("g.right")
+		.classed("right", false)
+		.select("text.right-text")
+		.remove();
+
+	    g.append("text")
+	        .attr("class", "right-text")
+		.attr("dx", radius)
+		.attr("dy", radius)
+		.text("Right");
+	    g.classed("right", true);
+	}, this.AlgorithmContext.cumulative_delay);
+	return this.AlgorithmContext.default_animation_duration;
+    };
+    q_callbacks[7] = q_callbacks[13] = q_callbacks[20] = function(data, new_right) {
+	return updateRight.apply(this, arguments);
+    }
+    // end of while cleanup
+    q_callbacks[22] = function() {
 	setTimeout(function() {
 	    svg.selectAll("#pivot-rect").remove();
 	}, this.AlgorithmContext.cumulative_delay);
-	return swapping_animation_duration;
+	return 10;
+    };
+
+    // move subarray back
+    q_callbacks[24] = q_callbacks[1] = function(data, left, right) {
+	for (var i=left; i<=right; i++) {
+	    var gi = d3.select("#q-g-" + data[i].old_idx);
+	    var dat = gi.datum();
+	    gi.transition()
+		.duration(this.AlgorithmContext.default_animation_duration)
+		.delay(this.AlgorithmContext.cumulative_delay)
+		.attr("transform", "translate(" + dat.x_off + ", " + (dat.y_off - 2.5*maxi_width) + ")");
+	    dat.y_off = dat.y_off - 2.5 * maxi_width;
+	}
+	return this.AlgorithmContext.default_animation_duration;
     }
     // we are going to do the animation inside swap and return the length of that
     // animation in the post swap callbacks to correctly animate the delay
-    q_callbacks[8] = q_callbacks[12] = function() {
+    var swapping_animation_duration = 3000;
+    q_callbacks[16] = function(data, new_left, new_right) {
+	var self = this;
+	updateLeft.call(self, data, new_left);
+	updateRight.call(self, data, new_right);
 	return swapping_animation_duration;
     }
-
+    var algo_context = {
+	default_animation_duration : 300,
+	cumulative_delay : 0
+    };
     var qual_algo = new Algorithm(quicksort, q_callbacks, "quicksort-code", algo_context);
+
+    console.log(qual_algo.decorated());
 
     var swap_callbacks = [];
     swap_callbacks[0] = function(data, i, j) {
@@ -195,25 +289,39 @@
 	var gi = d3.select("#q-g-" + data[i].old_idx)
 	var gj = d3.select("#q-g-" + data[j].old_idx)
 
-	var trns1 = [sumUpTo(data, i), maxi_width];
-	var trns2 = [sumUpTo(data, j), maxi_width];
+	var di = gi.datum();
+	var dj = gj.datum();
 
-	console.log("moving", data[i].old_idx, trns1[0], 0);
-	console.log("moving", data[j].old_idx, trns2[0], 2*trns2[1]);
-	gi.transition().delay(delay).duration(step_duration).attr("transform", "translate(" + trns1[0] + " " + 0 + ")");
-	gj.transition().delay(delay).duration(step_duration).attr("transform", "translate(" + trns2[0] + " " + (2*trns2[1]) + ")");
+	var trns1 = [di.x_off, di.y_off];
+	var trns2 = [dj.x_off, dj.y_off];
+	setTimeout(function() {
+	console.log("moving", data[i].old_idx, trns1[0], trns1[1] - maxi_width);
+	console.log("moving", data[j].old_idx, trns2[0], trns2[1] + maxi_width);
+	    }, delay + step_duration);
+	gi.transition().delay(delay).duration(step_duration).attr("transform", "translate(" + trns1[0] + " " + (trns1[1] - maxi_width) + ")");
+	gj.transition().delay(delay).duration(step_duration).attr("transform", "translate(" + trns2[0] + " " + (trns2[1] + maxi_width) + ")");
 
-	console.log("moving", data[i].old_idx, trns2[0], 0);
-	console.log("moving", data[j].old_idx, trns1[0], 2*trns2[1]);	
-	gi.transition().delay(delay + step_duration).duration(step_duration).attr("transform", "translate(" + trns2[0] + " " + 0 + ")");
-	gj.transition().delay(delay + step_duration).duration(step_duration).attr("transform", "translate(" + trns1[0] + " " + (2*trns2[1]) + ")");
+	setTimeout(function() {
+	console.log("moving", data[i].old_idx, trns2[0], trns1[1] - maxi_width);
+	console.log("moving", data[j].old_idx, trns1[0], trns2[1] + maxi_width);	
+	    }, delay + 2*step_duration);
+	gi.transition().delay(delay + step_duration).duration(step_duration).attr("transform", "translate(" + trns2[0] + " " + (trns1[1] - maxi_width) + ")");
+	gj.transition().delay(delay + step_duration).duration(step_duration).attr("transform", "translate(" + trns1[0] + " " + (trns2[1] + maxi_width) + ")");
 
+	setTimeout(function() {
 	console.log("moving", data[i].old_idx, trns2[0], trns1[1]);
 	console.log("moving", data[j].old_idx, trns1[0], trns2[1]);
+	    }, delay + 3*step_duration);
 	gi.transition().delay(delay + 2*step_duration).duration(step_duration).attr("transform", "translate(" + trns2[0] + " " + trns1[1] + ")");
 	gj.transition().delay(delay + 2*step_duration).duration(step_duration).attr("transform", "translate(" + trns1[0] + " " + trns2[1] + ")");
 
 	console.log("done-------------------");
+
+	di.x_off = trns2[0];
+	di.y_off = trns1[1];
+
+	dj.x_off = trns1[0];
+	dj.y_off = trns2[1];
 
 	return 3*step_duration;
     }
@@ -240,11 +348,34 @@
     
     d3.select("#quicksort-tab .options").append("button")
 	.on("click", function(d) {
-	    qual_algo.startAnimation(data, 0, data.length, function(data, i, j) {
+	    qual_algo.startAnimation(data, 0, data.length - 1, function(data, i, j) {
 		return swap_algo.run(data, i, j); 
 	    });
 	    console.log(data.map(function(d) { return d.val; }));
 	})
-	.text("start");
+	.text("Sort");
 
+    Array.prototype.shuffle = function() {
+	var N = this.length;
+	for (var i = 0, j = N - 1, x = 0; j >= 0; j--) {
+	    i = Math.floor(Math.random() * (j+1));
+	    x = this[j]; 
+	    this[j] = this[i];
+	    this[i] = x;
+	}
+    };
+    
+    d3.select("#quicksort-tab .options").append("button")
+	.attr("style", "margin-left: 10px")
+        .on("click", function(d) {
+	    sequence_to_sort.shuffle();
+	    sequence_to_sort.forEach(function(d, i) {
+		data[i].val = d;
+		data[i].old_idx = i;
+	    });
+	    d3.selectAll(".circle-group").remove();
+	    d3.selectAll("defs").remove();
+	    init_circles(data);
+	})
+    .text("Shuffle Data");
 })();
