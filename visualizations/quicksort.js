@@ -44,15 +44,15 @@
 	if (right <= left) {
 	    return;
 	}
-
 	var pivot = Math.floor(left + (right - left)/2);
+	var pivot_value = data[pivot].val;
 	var new_left = left;
 	var new_right = right;
 	while (new_left <= new_right) {
-	    while (data[new_left].val < data[pivot].val) {
+	    while (data[new_left].val < pivot_value) {
 		new_left = new_left + 1;
 	    }
-	    while (data[new_right].val > data[pivot].val) {
+	    while (data[new_right].val > pivot_value) {
 		new_right = new_right - 1;
 	    }
 	    if (new_left < new_right) {
@@ -70,7 +70,7 @@
     /*************************/
     /**  Initialize svg   ****/
     /*************************/
-    var sequence_to_sort = [9,4,5,3,8,12];
+    var sequence_to_sort = [12, 8, 9, 4, 3, 5];
     // create data which includes an old index that is used to identify the circle group an element belongs to
     var data = sequence_to_sort.map(function(d, i) {
 	return {val : d, old_idx: i};
@@ -89,6 +89,7 @@
     var mini = Math.min.apply(null, data.map(function(d) {return d.val;}));
     var maxi = Math.max.apply(null, data.map(function(d) {return d.val;}));
     var maxi_width = computeWidth(maxi);
+    var mini_width = computeWidth(mini);
     var gap = 15;
     function computeWidth(elem) {
 	return elem * (smallestCircle / mini);
@@ -112,16 +113,17 @@
 	    .append("radialGradient")
 	    .attr("class", "gradients")
 	    .attr("id", function(d, i) { return "gradient-" + i; })
-	    .attr("fx", "25%")
-	    .attr("fy", "25%")
+	    .attr("fx", "50%")
+	    .attr("fy", "50%")
+	    .attr("r", "70%")
 	    .append("stop")
-	    .attr("offset", "5%")
-	    .attr("stop-color", randomColor);
+	    .attr("offset", "25%")
+	    .attr("stop-color", "white");
 
 	svg.selectAll(".gradients")
     	    .append("stop")
-	    .attr("offset", "95%")
-	    .attr("stop-color", "black");
+	    .attr("offset", "75%")
+	    .attr("stop-color", randomColor);
 
 
 	svg.selectAll(".circle")
@@ -138,10 +140,14 @@
 	    .attr("r", function(d) {
 		return computeWidth(d.val);
 	    });
-	svg.selectAll(".circle-group").each(function(d, i) {
-	    d.x_off = sumUpTo(data, i);
-	    d.y_off = maxi_width;
-	});
+	svg.selectAll(".circle-group").each(function(d, i) { d.x_off = sumUpTo(data, i); d.y_off = maxi_width;})
+	    .append("text")
+	    .attr("transform", function(d) { return "scale(" + (computeWidth(d.val) / mini_width) + ")"; })
+	    .attr("dx", function(d) { return (computeWidth(d.val) / mini_width) * -1.75; })
+	    .attr("dy", function(d) { return (computeWidth(d.val) / mini_width) * 0.75; })
+	    .text(function(d) { return d.val; });
+
+	
     }
     // now call the initialization
     init_circles(data);
@@ -158,7 +164,6 @@
 	for (var i=left; i<=right; i++) {
 	    var gi = d3.select("#q-g-" + data[i].old_idx);
 	    var dat = gi.datum();
-	    console.log("Moving ", i, "to", dat.x_off, dat.y_off + 2.5 * maxi_width);
 	    gi.transition()
 		.duration(this.AlgorithmContext.default_animation_duration)
 		.delay(this.AlgorithmContext.cumulative_delay)
@@ -169,7 +174,7 @@
 	return this.AlgorithmContext.default_animation_duration;
     }
     // pivot animation
-    q_callbacks[5] = function(pivot, data) {
+    q_callbacks[4] = function(pivot, data) {
 	
 	var pi = data[pivot].old_idx;
 	var g = d3.select("#q-g-" + pi)
@@ -190,7 +195,6 @@
     }
     // left animation
     function updateLeft(data, new_left) {
-	console.log(data, new_left);
 	if (new_left >= data.length) {
 	    return 0;
 	}
@@ -277,8 +281,6 @@
     };
     var qual_algo = new Algorithm(quicksort, q_callbacks, "quicksort-code", algo_context);
 
-    console.log(qual_algo.decorated());
-
     var swap_callbacks = [];
     swap_callbacks[0] = function(data, i, j) {
 	var step_duration = 1000;
@@ -294,28 +296,14 @@
 
 	var trns1 = [di.x_off, di.y_off];
 	var trns2 = [dj.x_off, dj.y_off];
-	setTimeout(function() {
-	console.log("moving", data[i].old_idx, trns1[0], trns1[1] - maxi_width);
-	console.log("moving", data[j].old_idx, trns2[0], trns2[1] + maxi_width);
-	    }, delay + step_duration);
 	gi.transition().delay(delay).duration(step_duration).attr("transform", "translate(" + trns1[0] + " " + (trns1[1] - maxi_width) + ")");
 	gj.transition().delay(delay).duration(step_duration).attr("transform", "translate(" + trns2[0] + " " + (trns2[1] + maxi_width) + ")");
 
-	setTimeout(function() {
-	console.log("moving", data[i].old_idx, trns2[0], trns1[1] - maxi_width);
-	console.log("moving", data[j].old_idx, trns1[0], trns2[1] + maxi_width);	
-	    }, delay + 2*step_duration);
 	gi.transition().delay(delay + step_duration).duration(step_duration).attr("transform", "translate(" + trns2[0] + " " + (trns1[1] - maxi_width) + ")");
 	gj.transition().delay(delay + step_duration).duration(step_duration).attr("transform", "translate(" + trns1[0] + " " + (trns2[1] + maxi_width) + ")");
 
-	setTimeout(function() {
-	console.log("moving", data[i].old_idx, trns2[0], trns1[1]);
-	console.log("moving", data[j].old_idx, trns1[0], trns2[1]);
-	    }, delay + 3*step_duration);
 	gi.transition().delay(delay + 2*step_duration).duration(step_duration).attr("transform", "translate(" + trns2[0] + " " + trns1[1] + ")");
 	gj.transition().delay(delay + 2*step_duration).duration(step_duration).attr("transform", "translate(" + trns1[0] + " " + trns2[1] + ")");
-
-	console.log("done-------------------");
 
 	di.x_off = trns2[0];
 	di.y_off = trns1[1];
@@ -348,10 +336,11 @@
     
     d3.select("#quicksort-tab .options").append("button")
 	.on("click", function(d) {
+	    console.log("Before", data.map(function(d) { return d.val; }));
 	    qual_algo.startAnimation(data, 0, data.length - 1, function(data, i, j) {
 		return swap_algo.run(data, i, j); 
 	    });
-	    console.log(data.map(function(d) { return d.val; }));
+	    console.log("After", data.map(function(d) { return d.val; }));
 	})
 	.text("Sort");
 
