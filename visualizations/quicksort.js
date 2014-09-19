@@ -146,8 +146,6 @@
 	    .attr("dx", function(d) { return ((d.val > 9 ? 2 : 1)*-0.30) + "em"; })
 	    .attr("dy", function(d) { return "0.22em"; })
 	    .text(function(d) { return d.val; });
-
-	
     }
     // now call the initialization
     init_circles(data);
@@ -161,6 +159,9 @@
 	    d3.selectAll("text.left-text").remove();
 	    d3.selectAll("text.right-text").remove();
 	}, this.AlgorithmContext.cumulative_delay);
+	if (left == 0 && right == data.length - 1) {
+	    return this.AlgorithmContext.default_animation_duration; // we don't want to move the entire array down, only subarrays
+	}
 	for (var i=left; i<=right; i++) {
 	    var gi = d3.select("#q-g-" + data[i].old_idx);
 	    var dat = gi.datum();
@@ -255,6 +256,9 @@
 
     // move subarray back
     q_callbacks[24] = q_callbacks[1] = function(data, left, right) {
+	if (left == 0 && right == data.length - 1) {
+	    return this.AlgorithmContext.default_animation_duration; // we don't want to move the entire array up, only subarrays
+	}
 	for (var i=left; i<=right; i++) {
 	    var gi = d3.select("#q-g-" + data[i].old_idx);
 	    var dat = gi.datum();

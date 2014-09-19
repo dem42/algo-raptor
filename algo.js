@@ -18,13 +18,14 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
     this.func = func;
     this.param = func.toString().match(/\(([^\(\)]*)\)/);
     this.callbacks = callbacks;
+    this.var_map = {};
 
     var tokens = func.toString().split("\n");
     var LN = tokens.length;
     var result = undefined;
     var args = this.param[1].split(",");
     
-    var var_pat = /\s+var\s+([a-zA-Z_$][0-9a-zA-Z_$]*)\s+=/;
+    var var_pat = /\s*var\s+([a-zA-Z_$][0-9a-zA-Z_$]*)\s*=/;
     var _found_vars = args.length;
     for (var i=0; i < LN; i++) {
 	// direct eval uses the global context
@@ -32,6 +33,7 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
 	var result = trimmed.match(var_pat);
 	if (result != null) {
 	    args += "," + result[1];
+	    this.var_map[_found_vars] = {"row_num" : i, "name" : result[1]};
 	    _found_vars++;
 	}
     }
@@ -41,8 +43,12 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
      */
     this.AlgorithmContext = algorithmContext;
 
+    function getRowToHighlightSelector(rowNumber, codeContainerId) {
+	return "#" + codeContainerId + " li:nth-child(" + (rowNumber + 1) +")";
+    }
+
     function highlightRow(rowNumber, startDelay, durationOfHighlight) {
-	var rowToHighlightSelector = "#" + codeContainerId + " li:nth-child(" + (rowNumber + 1) +")";
+	var rowToHighlightSelector = getRowToHighlightSelector(rowNumber, codeContainerId);
 	setTimeout(function() {
 	    $(rowToHighlightSelector).toggleClass("highlighted-row");
 	}, startDelay);
@@ -58,15 +64,47 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
 	this.AlgorithmContext.cumulative_delay += this.AlgorithmContext.default_animation_duration;
     }
 
-    this.postRowExecute = function(row_num, animation_duration) {
+    this.postRowExecute = function(row_num, animation_duration, var_array) {
 	
+	if (animation_duration == undefined) {
+	    animation_duration = this.AlgorithmContext.default_animation_duration;
+	}
+
 	var highlight_start_time = this.AlgorithmContext.cumulative_delay;
 	highlightRow(row_num, highlight_start_time, animation_duration);
 
 	this.AlgorithmContext.cumulative_delay = highlight_start_time + animation_duration;
+
+	var selfie = this;
+	var_array.forEach(function(var_elem, idx) {
+	    if (selfie.var_map[idx] == undefined) {
+		return;
+	    }
+	    var rowToHighlightSelector = getRowToHighlightSelector(selfie.var_map[idx].row_num, codeContainerId);
+	    if (var_elem == undefined) {
+		setTimeout(function() {
+		    var comment_span = d3.select(rowToHighlightSelector).select("code").select("span.com");
+		    if (comment_span.empty()) {
+			comment_span.remove();
+		    }
+		}, selfie.AlgorithmContext.cumulative_delay);
+	    }
+	    else {
+		setTimeout(function() {
+		    var code = d3.select(rowToHighlightSelector).select("code");
+		    var comment_span = code.select("span.com");
+		    if (comment_span.empty()) {
+			code.append("span").attr("class", "com");
+		    }
+		    code.select("span.com").text("  //" + selfie.var_map[idx].name + " = " + var_elem);
+		}, selfie.AlgorithmContext.cumulative_delay);
+	    }
+	});
     }
 
+    // variables that are used in callbacks must be set here
     this.callbacks["AlgorithmContext"] = this.AlgorithmContext;
+    this.callbacks["var_map"] = this.var_map;
     this.codeContainerId = codeContainerId;
 }
 /* statics */
@@ -115,7 +153,7 @@ Algorithm.prototype.addDebugging = function(fstr) {
 	    {
 		nfun += ", " + ((i == 0) ? this.AlgorithmContext.default_animation_duration : 0);
 	    }
-	    nfun += ", " + this.found_vars + ");";
+	    nfun += ", [" + this.found_vars + "]);";
 
 	}
 	nfun += "\n";

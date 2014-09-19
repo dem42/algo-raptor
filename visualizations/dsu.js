@@ -39,14 +39,15 @@
 
     // the dsu find and union functions
     function find(a, data) {
-	while(data[a].root != a) {
-	    a = data[a].root;
+	var ptr = a;
+	while(data[ptr].root != ptr) {
+	    ptr = data[a].root;
 	}
-	return a;
+	return ptr;
     }
     function union (a, b, data, find_function) {
-	r1 = find_function(a, data);
-	r2 = find_function(b, data);
+	var r1 = find_function(a, data);
+	var r2 = find_function(b, data);
 	if(r1 !== r2)
 	{
 	    if(data[r1].rank > data[r2].rank)
@@ -225,13 +226,13 @@
 	}
     });
 
-    cbsFind[1] = function(a, data) {
+    cbsFind[2] = function(ptr, data) {
 	setTimeout(function() {
 	    d3.select("#from-" + data[a].root + "-to-" + a).classed("highlight-elem", true);
 	}, this.AlgorithmContext.cumulative_delay + 200);
 	return 200;
     }
-    cbsFind[2] = function(a, data) {
+    cbsFind[3] = function(ptr, data) {
 	setTimeout(function() {
 	    d3.select("#node-" + a).classed("highlight-elem", true);
 	}, this.AlgorithmContext.cumulative_delay + 200);
