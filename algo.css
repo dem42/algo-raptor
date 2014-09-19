@@ -67,6 +67,17 @@ pre.prettyprint {
     stroke-width: 1.5px;
 }
 
+.cmp_result text {
+    fill: red;
+    stroke: red;
+    stroke-width: 1.5px;
+    font-size: 35px;
+}
+
+.node .node-rank {
+    stroke-width: 1px;
+}
+
 .node.selected {
     fill: white;
     stroke: red;

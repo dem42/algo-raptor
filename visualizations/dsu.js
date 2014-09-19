@@ -10,11 +10,11 @@
 	.append("div").attr("class", "tab-pane").attr("id", "dsu-tab")
         .append("div").attr("class", "container-fluid")
 	.append("div").attr("class", "row")
-    var treeNodesPanel = row0.append("div").attr("class", "col-md-8")
+    var treeNodesPanel = row0.append("div").attr("class", "col-md-7")
 	.append("div").attr("class", "panel panel-default");
     treeNodesPanel.append("div").attr("class", "panel-heading").text("Tree Nodes");
     treeNodesPanel.append("div").attr("class", "panel-body graphics");
-     var codePanel = row0.append("div").attr("class", "col-md-4")
+     var codePanel = row0.append("div").attr("class", "col-md-5")
 	.append("div").attr("class", "panel panel-default");
     codePanel.append("div").attr("class", "panel-heading").text("Code");
     codePanel.append("div").attr("class", "panel-body code");
@@ -23,10 +23,11 @@
     /*******************************/
     /*      Setup the svg stuff    */
     /*******************************/
-    var margin = { left: 10, top: 30, right: 10, bottom: 100};
+    var margin = { left: 0, top: 30, right: 10, bottom: 100};
     var height = 450;
-    var width = 1600;
+    var width = 1400;
     var treew = 200;
+    var nodeRadius = 20;
     var svg = d3.select("#dsu-tab .graphics").append("svg")
 	.attr("width", width)
 	.attr("height", height)
@@ -34,8 +35,21 @@
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
-    var data = [{"name": 0}, {"name": 1}, {"name": 2}, {"name": 3}, {"name": 4}, {"name": 5}, {"name": 6}];
-    var next_num = 7;
+    var coin_image_src = new Image();
+    coin_image_src.src = "assets/coin_flip.gif";
+    var coin_image = d3.select("#dsu-tab .graphics").select("svg").append("g").attr("class", "coin")	
+	.append("image")
+	.attr("x", -110 + margin.left)
+	.attr("y", -110 + margin.top)
+	.attr("width", 220)
+	.attr("height", 220)
+	.attr("display", "none");
+
+    var next_num = 6;
+    var data = [];
+    for (var j = 0; j < next_num; j++) {
+	data.push({"name": j});
+    }
 
     // the dsu find and union functions
     function find(a, data) {
@@ -48,26 +62,20 @@
     function union (a, b, data, find_function) {
 	var r1 = find_function(a, data);
 	var r2 = find_function(b, data);
-	if(r1 !== r2)
-	{
-	    if(data[r1].rank > data[r2].rank)
-	    {
+	if(r1 !== r2) {
+	    if(data[r1].rank > data[r2].rank) {
 		data[r2].root = r1; 
 	    }
-	    else if(data[r1].rank < data[r2].rank)
-	    {
+	    else if(data[r1].rank < data[r2].rank) {
 		data[r1].root = r2;
 	    }
-	    else
-	    {
+	    else {
 		var prob = Math.random();
-		if(prob > 0.5) 
-		{
+		if(prob > 0.5) {
 		    data[r1].root = r2;
 		    data[r2].rank++;
 		}
-		else
-		{
+		else {
 		    data[r2].root = r1;
 		    data[r1].rank++;  
 		}
@@ -105,7 +113,7 @@
      */
     function drawTreeFun(delay, data, i, child) {
 
-	var animation_duration = 1600;
+	var animation_duration = 1000;
 
 	var tree = d3.layout.tree().size([treew - margin.right, height - margin.bottom])
 	    .children(function(d) {
@@ -158,7 +166,6 @@
             .attr("transform", function(d) {return "translate(" + (d.x + data.order*treew) + "," + d.y + ")";})
 	    .on("click", function(d) {selectNode(this, d);});
 	
-
 	var circles = svgNodes.append("circle")
 	    .attr("cx", 0)
 	    .attr("cy", 0)
@@ -166,9 +173,10 @@
 	    .transition() //transitioning from 0em to 2em
 	    .delay(delay + animation_duration)
 	    .duration(animation_duration)
-	    .attr("r", "20px");
+	    .attr("r", nodeRadius + "px");
 
 	var texts = svgNodes.append("text")
+	    .attr("class", "node-name")
             .attr("dx", function(d) {var num = ("" + d.name).length; return (num * -5) + "px";})
             .attr("dy", "5px")
 	    .attr("onmousedown", "return false;")
@@ -177,7 +185,19 @@
 	    .attr("font-size", "0pt")
 	    .transition()
 	    .delay(delay + 2*animation_duration)
-	    .attr("font-size", "12pt")
+	    .attr("font-size", "12pt");
+
+	var rankInfos = svgNodes.append("text")
+	    .attr("class", "node-rank")
+            .attr("dx", (nodeRadius) + "px")
+            .attr("dy", (-nodeRadius) + "px")
+	    .attr("onmousedown", "return false;")
+	    .style("cursor", "not-allowed")
+	    .text(function(d) { return "Rank = " + d.rank; })
+	    .attr("font-size", "0pt")
+	    .transition()
+	    .delay(delay + 2*animation_duration)
+	    .attr("font-size", "8pt");
 
 	// in svg the order of elements defines the z-index 
 	// we added a moveToFront function to d3.selection that changes the order of elements
@@ -241,19 +261,83 @@
     cbsUnion[2] = function(r1,r2,a,b) {
 	return 100;
     }
-    cbsUnion[7] = function(b, r1, r2, data) {
+    cbsUnion[3] = function(data, r1, r2) {
+	d3.select("#node-" + r1).select(".node-rank").transition().delay(this.AlgorithmContext.cumulative_delay)
+	    .attr("dx","-30px")
+	    .attr("dy","60px")
+	    .style("font-size", "26px");
+	d3.select("#node-" + r2).select(".node-rank").transition().delay(this.AlgorithmContext.cumulative_delay)
+	    .attr("dx","-30px")
+	    .attr("dy","60px")
+	    .style("font-size", "26px");
+    }
+    cbsUnion[5] = function(b, r1, r2, data) {
+	d3.select("#node-" + r2).select(".node-rank").transition().delay(this.AlgorithmContext.cumulative_delay).remove();
 	return cleanup(this.AlgorithmContext.cumulative_delay, data[r1], r1, data[r2], r2);
     }
-    cbsUnion[11] = function(a, r2, r1, data) {
+    cbsUnion[8] = function(a, r2, r1, data) {
+	d3.select("#node-" + r1).select(".node-rank").transition().delay(this.AlgorithmContext.cumulative_delay).remove();
 	return cleanup(this.AlgorithmContext.cumulative_delay, data[r2], r2, data[r1], r1);
     }
-    cbsUnion[18] = function(r2, r1, data) {
+    cbsUnion[13] = function(r2, r1, data) {
 	return cleanup(this.AlgorithmContext.cumulative_delay, data[r2], r2, data[r1], r1);
     }
-    cbsUnion[23] = function(r1, r2, data) {
+    cbsUnion[14] = cbsUnion[18] = function(r2, r1, data) {
+	var a = r1, b = r2;
+	if (data[r2].rank > data[r1].rank) {
+	    a = r2;
+	    b = r1;
+	}
+	d3.select("#node-" + a).select(".node-rank").transition().delay(this.AlgorithmContext.cumulative_delay).text("Rank = " + data[a].rank);
+	d3.select("#node-" + b).select(".node-rank").transition().delay(this.AlgorithmContext.cumulative_delay).remove();
+	return 0;
+    }
+    cbsUnion[4] = cbsUnion[7] = cbsUnion[11] = function(data, r2, r1, prob) {
+
+	var animation_duration = 4*this.AlgorithmContext.default_animation_duration;
+	var transition_duration = this.AlgorithmContext.default_animation_duration;
+
+	var xoff = ((data[r1].x + data[r1].order*treew) + (data[r2].x + data[r2].order*treew))/2 + 20;
+	var yoff = data[r1].y + 60;
+	var z1 = (data[r1].order < data[r2].order) ? r1 : r2;
+	var z2 = (data[r1].order < data[r2].order) ? r2 : r1;
+	var cmp_result = (data[z1].rank < data[z2].rank) ? 1 : (data[z1].rank > data[z2].rank) ? -1 : 0;
+	var selfie = this;
+	setTimeout(function() {
+	    if (cmp_result == 1) {
+		svg.append("g").attr("class", "cmp_result").attr("transform", "translate(" + xoff + "," + yoff + ")").append("text").text("<");
+	    }
+	    else if (cmp_result == -1) {
+		svg.append("g").attr("class", "cmp_result").attr("transform", "translate(" + xoff + "," + yoff + ")").append("text").text(">");
+	    }
+	    else {
+		coin_image.attr("xlink:href", coin_image_src.src).attr("transform", "translate(" + xoff + "," + yoff + ")").attr("display", "block");
+		setTimeout(function() {
+		    coin_image.attr("display", "none");
+		}, animation_duration);
+
+	    }
+	}, this.AlgorithmContext.cumulative_delay);
+
+
+	d3.select("#node-" + r1).select(".node-rank").transition().delay(this.AlgorithmContext.cumulative_delay + animation_duration).duration(transition_duration)
+	    .attr("dx", (nodeRadius) + "px")
+            .attr("dy", (-nodeRadius) + "px")
+	    .style("font-size", "8pt");
+	d3.select("#node-" + r2).select(".node-rank").transition().delay(this.AlgorithmContext.cumulative_delay + animation_duration).duration(transition_duration)
+	    .attr("dx", (nodeRadius) + "px")
+            .attr("dy", (-nodeRadius) + "px")
+	    .style("font-size", "8pt");
+	setTimeout(function() {
+	    d3.select("g.cmp_result").remove();
+	}, this.AlgorithmContext.cumulative_delay + animation_duration);
+
+	return animation_duration + transition_duration;
+    }
+    cbsUnion[17] = function(r1, r2, data) {
 	return cleanup(this.AlgorithmContext.cumulative_delay, data[r1], r1, data[r2], r2);
     }
-    cbsUnion[27] = function(r1, r2) {
+    cbsUnion[21] = function(r1, r2) {
 	setTimeout(function() {
 	    d3.selectAll(".link").classed("highlight-elem", false);
 	    d3.selectAll(".node").classed("highlight-elem", false);
