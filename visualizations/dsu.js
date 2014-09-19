@@ -41,7 +41,7 @@
     function find(a, data) {
 	var ptr = a;
 	while(data[ptr].root != ptr) {
-	    ptr = data[a].root;
+	    ptr = data[ptr].root;
 	}
 	return ptr;
     }
@@ -169,7 +169,7 @@
 	    .attr("r", "20px");
 
 	var texts = svgNodes.append("text")
-            .attr("dx", "-5px")
+            .attr("dx", function(d) {var num = ("" + d.name).length; return (num * -5) + "px";})
             .attr("dy", "5px")
 	    .attr("onmousedown", "return false;")
 	    .style("cursor", "not-allowed")
@@ -228,13 +228,13 @@
 
     cbsFind[2] = function(ptr, data) {
 	setTimeout(function() {
-	    d3.select("#from-" + data[a].root + "-to-" + a).classed("highlight-elem", true);
+	    d3.select("#from-" + data[ptr].root + "-to-" + ptr).classed("highlight-elem", true);
 	}, this.AlgorithmContext.cumulative_delay + 200);
 	return 200;
     }
     cbsFind[3] = function(ptr, data) {
 	setTimeout(function() {
-	    d3.select("#node-" + a).classed("highlight-elem", true);
+	    d3.select("#node-" + ptr).classed("highlight-elem", true);
 	}, this.AlgorithmContext.cumulative_delay + 200);
 	return 200;
     }
