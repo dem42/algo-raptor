@@ -70,7 +70,7 @@
     /*************************/
     /**  Initialize svg   ****/
     /*************************/
-    var sequence_to_sort = [12, 8, 9, 4, 3, 5];
+    var sequence_to_sort = [12, 8, 9, 4, 3, 5, 10, 5];
     // create data which includes an old index that is used to identify the circle group an element belongs to
     var data = sequence_to_sort.map(function(d, i) {
 	return {val : d, old_idx: i};
