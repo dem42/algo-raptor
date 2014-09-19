@@ -1,0 +1,10 @@
+.not-found-label {
+    fill: #f00;
+}
+
+.input-box {
+    border: steelBlue 1px solid;
+    width: 20px;
+    margin: 10px;
+    text-align: center;
+}

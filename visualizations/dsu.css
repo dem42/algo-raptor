@@ -1,0 +1,32 @@
+.link {
+    fill: none;
+    stroke: #ccc;
+    stroke-width: 1.5px;
+}
+
+.node {
+    fill: white;
+    stroke: steelBlue;
+    stroke-width: 1.5px;
+}
+
+.cmp_result text {
+    fill: red;
+    stroke: red;
+    stroke-width: 1.5px;
+    font-size: 35px;
+}
+
+.node .node-rank {
+    stroke-width: 1px;
+}
+
+.node.selected {
+    fill: white;
+    stroke: red;
+    stroke-width: 1.5px;
+}
+
+.highlight-elem {
+    stroke: red;
+}

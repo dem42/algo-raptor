@@ -15,7 +15,8 @@ $(function () {
 		// these get script functions will be processed one at a time by the browser because they will be tasks
 		// on a work queue and will be processed when the browser is ready
 		// that means we don't have to worry about race conditions between multiple visualizations scripts 
-		$.getScript("visualizations/" + data[i], function( data, textStatus, jqxhr ) {
+		$('head').append('<link rel="stylesheet" href="visualizations/' + data[i] + '.css" type="text/css" />');
+		$.getScript("visualizations/" + data[i] + ".js", function( data, textStatus, jqxhr ) {
 		    console.debug( "Download of algo:", textStatus ); // Success
 		});
 	    }

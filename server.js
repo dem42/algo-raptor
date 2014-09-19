@@ -2,6 +2,7 @@ var fs = require('fs');
 var path = require('path');
 var http = require('http');
 var express = require('express');
+var _ = require('underscore');
 
 var app = express();
 app.set('port', 8989);
@@ -18,9 +19,16 @@ app.get('/test', function(req, res) {
 app.get('/visualizations', function(req, res) {
     res.setHeader("Content-type", "text/json; charset=utf-8");
     fs.readdir("visualizations", function(err, files) {
-	console.log(files);
-	console.log(JSON.stringify(files));
-	res.send(JSON.stringify(files));
+	var myset = Object.create(null);
+	_.each(files, function(f) { myset[f.replace("~","").replace(".js","").replace(".css", "")] = true });
+	var filtered_files = [];
+	for (file in myset) {
+	    filtered_files.push(file);
+	}
+	
+	console.log(filtered_files);
+	console.log(JSON.stringify(filtered_files));
+	res.send(JSON.stringify(filtered_files));
     });
 });
 

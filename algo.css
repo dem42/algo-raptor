@@ -12,23 +12,12 @@
     display: inline;
 }
 
-.input-box {
-    border: steelBlue 1px solid;
-    width: 20px;
-    margin: 10px;
-    text-align: center;
-}
-
 .svg-input-box {
     stroke: steelBlue;
     fill: none;
     width: 20px;
     margin: 10px;
     text-align: center;
-}
-
-.not-found-label {
-    fill: #f00;
 }
 
 .controls {
@@ -55,44 +44,11 @@ pre.prettyprint {
     font-family: sans-serif;
 }
 
-.link {
-    fill: none;
-    stroke: #ccc;
-    stroke-width: 1.5px;
-}
-
-.node {
-    fill: white;
-    stroke: steelBlue;
-    stroke-width: 1.5px;
-}
-
-.cmp_result text {
-    fill: red;
-    stroke: red;
-    stroke-width: 1.5px;
-    font-size: 35px;
-}
-
-.node .node-rank {
-    stroke-width: 1px;
-}
-
-.node.selected {
-    fill: white;
-    stroke: red;
-    stroke-width: 1.5px;
-}
-
 /* Fix to make pretty-print print all line numbers */
 .prettyprint ol.linenums > li { list-style-type: decimal; }
 
 li.highlighted-row {
     background: #FFFF7F;
-}
-
-.highlight-elem {
-    stroke: red;
 }
 
 .jumbotron {
