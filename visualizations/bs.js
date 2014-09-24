@@ -72,7 +72,6 @@
      * it initializes the data
      */
     cbs[0] = function(data) { 
-	data.forEach(function (v,i) { v.old_i = i; });
 	return this.AlgorithmContext.default_animation_duration;
     };
     /* callback called after the array has been sorted
@@ -197,6 +196,10 @@
 	.on("click", function(d) { kickoff(); })
 	.text("start");
 
+    d3.select("#bsearch-tab .options").append("button")
+	.on("click", function(d) { balgo.runStack() })
+	.text("start");
+
     d3.select("#bsearch-tab .code")
 	.append("pre")
 	.attr("class", "prettyprint lang-js linenums:1")
@@ -212,6 +215,7 @@
 	d3.selectAll(".forms .input-box").each(function(v, i, a) {
 	    data[i] = { val: this.value};
 	});
+	data.forEach(function (v,i) { v.old_i = i; });
 	balgo.startAnimation(data,tf,lo,hi,m);
     }
 })();

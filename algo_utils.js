@@ -9,6 +9,23 @@ function AlgorithmUtils() {
 }
 
 // statics
+AlgorithmUtils.clone = function clone(obj) {
+    
+    if (obj == null || typeof obj != "object") {
+	// these are immutable and can be returned
+	return obj;
+    }
+
+    var cpy = obj.constructor();
+
+    for (prop in obj) {
+	if (obj.hasOwnProperty(prop)) {
+	    cpy[prop] = clone(obj[prop]);
+	}
+    }
+    return cpy;
+}
+
 AlgorithmUtils.insertIntoHeaderList = function(tabId, headerText, listItemId) {
 
     var otherAlgos = [listItemId];
@@ -21,11 +38,9 @@ AlgorithmUtils.insertIntoHeaderList = function(tabId, headerText, listItemId) {
     var indexInAlgos = otherAlgos.indexOf(listItemId);
     var listItem = null;
     if (indexInAlgos == otherAlgos.length - 1) {
-	console.log(tabId, "is last", otherAlgos);
 	listItem = d3.select("#algoTabs").append("li");	
     }
     else {
-	console.log(tabId, "goes before", otherAlgos[indexInAlgos + 1], otherAlgos);
 	listItem = d3.select("#algoTabs").insert("li", "#" + otherAlgos[indexInAlgos + 1]);
     }
 

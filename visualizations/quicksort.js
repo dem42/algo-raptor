@@ -254,6 +254,14 @@
 	return 10;
     };
 
+    function visualizeStack(data, left, right) {
+
+
+    }
+
+    q_callbacks[23] = function(data, left, right) {
+	visualizeStack.apply(this, arguments);
+    }
     // move subarray back
     q_callbacks[24] = q_callbacks[1] = function(data, left, right) {
 	if (left == 0 && right == data.length - 1) {
@@ -288,7 +296,6 @@
     var swap_callbacks = [];
     swap_callbacks[0] = function(data, i, j) {
 	var step_duration = 1000;
-
 	if (i == j) return;
 	var delay = this.AlgorithmContext.getCumulativeDelay();
 
@@ -342,7 +349,7 @@
 	.on("click", function(d) {
 	    console.log("Before", data.map(function(d) { return d.val; }));
 	    qual_algo.startAnimation(data, 0, data.length - 1, function(data, i, j) {
-		return swap_algo.run(data, i, j); 
+		return swap_algo.runWithSharedAnimationQueue(qual_algo, data, i, j); 
 	    });
 	    console.log("After", data.map(function(d) { return d.val; }));
 	})

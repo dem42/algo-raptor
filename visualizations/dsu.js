@@ -100,7 +100,7 @@
 		var selected1 = selected[0].data.name;
 		var selected2 = selected[1].data.name;
 		var findInClosure = function(node, data) {
-		    return dsuFind.run(node, data);
+		    return dsuFind.runWithSharedAnimationQueue(dsuUnion, node, data);
 		}
 		dsuUnion.startAnimation(selected1, selected2, data, findInClosure);
 		selected = [];
@@ -117,6 +117,13 @@
 
 	var tree = d3.layout.tree().size([treew - margin.right, height - margin.bottom])
 	    .children(function(d) {
+		// 		var children = [];
+		// if (d.children != undefined) {
+		//     for (var chid = 0; chid < d.children.length; chid++) {
+		// 	children.push(data_map[d.children[chid]]);
+		//     }
+		// }
+		// return children;
 		return d.children;
 	    });
 	var nodes = tree.nodes(data);
@@ -212,14 +219,16 @@
     function push(obj, elem) {
 	(obj.children = obj.children || []).push(elem);
     }
-    function cleanup(delay, winner, winner_num, loser, loser_num) {
+    function cleanup(delay, winner_num, loser_num) {
+	var winner = d3.select("#node-" + winner_num).datum();
+	var loser = d3.select("#node-" + loser_num).datum();
 	//remove_merged_nodes([winner_num,loser_num]);
 	push(winner, loser);
 	drawTreeFun(delay, winner, winner_num, loser);
 	var loser_order = loser.order;
 	var new_node = {"name": next_num, "rank": 0, "root": next_num, "children": [], "order": loser_order};
 	data.push(new_node);
-	var animation_duration = drawTreeFun(delay, new_node, next_num);
+	var animation_duration = drawTreeFun(delay, AlgorithmUtils.clone(new_node), next_num);
 	next_num++;
 
 	return animation_duration;
@@ -273,14 +282,14 @@
     }
     cbsUnion[5] = function(b, r1, r2, data) {
 	d3.select("#node-" + r2).select(".node-rank").transition().delay(this.AlgorithmContext.cumulative_delay).remove();
-	return cleanup(this.AlgorithmContext.cumulative_delay, data[r1], r1, data[r2], r2);
+	return cleanup(this.AlgorithmContext.cumulative_delay, r1, r2);
     }
     cbsUnion[8] = function(a, r2, r1, data) {
 	d3.select("#node-" + r1).select(".node-rank").transition().delay(this.AlgorithmContext.cumulative_delay).remove();
-	return cleanup(this.AlgorithmContext.cumulative_delay, data[r2], r2, data[r1], r1);
+	return cleanup(this.AlgorithmContext.cumulative_delay, r2, r1);
     }
     cbsUnion[13] = function(r2, r1, data) {
-	return cleanup(this.AlgorithmContext.cumulative_delay, data[r2], r2, data[r1], r1);
+	return cleanup(this.AlgorithmContext.cumulative_delay, r2, r1);
     }
     cbsUnion[14] = cbsUnion[18] = function(r2, r1, data) {
 	var a = r1, b = r2;
@@ -297,10 +306,13 @@
 	var animation_duration = 4*this.AlgorithmContext.default_animation_duration;
 	var transition_duration = this.AlgorithmContext.default_animation_duration;
 
-	var xoff = ((data[r1].x + data[r1].order*treew) + (data[r2].x + data[r2].order*treew))/2 + 20;
-	var yoff = data[r1].y + 60;
-	var z1 = (data[r1].order < data[r2].order) ? r1 : r2;
-	var z2 = (data[r1].order < data[r2].order) ? r2 : r1;
+	var data_r1 = d3.select("#node-" + r1).datum();
+	var data_r2 = d3.select("#node-" + r2).datum();
+
+	var xoff = ((data_r1.x + data_r1.order*treew) + (data_r2.x + data_r2.order*treew))/2 + 20;
+	var yoff = data_r1.y + 60;
+	var z1 = (data_r1.order < data_r2.order) ? r1 : r2;
+	var z2 = (data_r1.order < data_r2.order) ? r2 : r1;
 	var cmp_result = (data[z1].rank < data[z2].rank) ? 1 : (data[z1].rank > data[z2].rank) ? -1 : 0;
 	var selfie = this;
 	setTimeout(function() {
@@ -335,9 +347,9 @@
 	return animation_duration + transition_duration;
     }
     cbsUnion[17] = function(r1, r2, data) {
-	return cleanup(this.AlgorithmContext.cumulative_delay, data[r1], r1, data[r2], r2);
+	return cleanup(this.AlgorithmContext.cumulative_delay, r1, r2);
     }
-    cbsUnion[21] = function(r1, r2) {
+    cbsUnion[21] = function(r1, r2, data) {
 	setTimeout(function() {
 	    d3.selectAll(".link").classed("highlight-elem", false);
 	    d3.selectAll(".node").classed("highlight-elem", false);
@@ -385,7 +397,7 @@
 
     data.forEach(function(d) { d.rank = 0;});
     data.forEach(function(d, i) {
-	drawTreeFun(100, d, i);
+	drawTreeFun(100, AlgorithmUtils.clone(d), i);
     });
 
 })();
