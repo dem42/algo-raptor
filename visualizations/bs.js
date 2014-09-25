@@ -1,13 +1,16 @@
 (function chart() {
+    var algorithmTabId = "bsearch-tab";
+    var algorithmName = "Binary Search";
+
     /*******************************/
     /*      Setup the panels       */
     /*******************************/
     console.log("downloaded bs");
 
-    AlgorithmUtils.insertIntoHeaderList("#bsearch-tab", "Binary Search", "search-1-binary");
+    AlgorithmUtils.insertIntoHeaderList("#" + algorithmTabId, algorithmName, "search-1-binary");
  
     var row0 = d3.select("#algoContainer")
-	.append("div").attr("class", "tab-pane").attr("id", "bsearch-tab")
+	.append("div").attr("class", "tab-pane").attr("id", algorithmTabId)
         .append("div").attr("class", "container-fluid")
 	.append("div").attr("class", "row")
     var leftPanel = row0.append("div").attr("class", "col-md-6")
@@ -18,8 +21,8 @@
 
     var leftPanelBody = controlsPanel.append("div").attr("class", "panel-body");
     var ops = leftPanelBody.append("div").attr("class", "options");
-    AlgorithmUtils.insertDefaultControls(ops);
-    AlgorithmUtils.insertCustomControls(ops, "Binary Search");
+    AlgorithmUtils.insertDefaultControls(ops, algorithmTabId);
+    AlgorithmUtils.insertCustomControls(ops, algorithmTabId, algorithmName);
     ops.append("div").attr("class", "forms");
     
 
@@ -84,7 +87,7 @@
     cbs[5] = function(data) { 
 	var animation_duration = 1000;
 
-	svg = d3.select("#bsearch-tab .graphics").append("svg")
+	svg = d3.select("#" + algorithmTabId + " .graphics").append("svg")
 	    .attr("width", width)
 	    .attr("height", height)
 	    .append("g")
@@ -187,20 +190,20 @@
     /* create an Algorithm instance wired with callbacks */
     var balgo = new Algorithm(bsearch, cbs, "bs-code", algorithmContext);
     
-    d3.select("#bsearch-tab .options").append("span")
+    d3.select("#" + algorithmTabId + " .options").append("span")
 	.text("Find value : ");
 
-    d3.select("#bsearch-tab .options").append("input")
+    d3.select("#" + algorithmTabId + " .options").append("input")
 	.attr("id", "find")
 	.attr("type","text")
 	.attr("class","input-box")
 	.attr("maxlength", 2);
 
-    d3.select("#bsearch-tab .options").append("button")
+    d3.select("#" + algorithmTabId + " .options").append("button")
 	.on("click", function(d) { kickoff(); })
 	.text("start");
 
-    d3.select("#bsearch-tab .code")
+    d3.select("#" + algorithmTabId + " .code")
 	.append("pre")
 	.attr("class", "prettyprint lang-js linenums:1")
     	.attr("id", "bs-code")

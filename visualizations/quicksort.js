@@ -1,13 +1,16 @@
 (function chart() {
+    var algorithmTabId = "quicksort-tab";
+    var algorithmName = "Quicksort";
+
     /*******************************/
     /*      Setup the panels       */
     /*******************************/
     console.log("downloaded quicksort");
 
-    AlgorithmUtils.insertIntoHeaderList("#quicksort-tab", "Quicksort", "sorting-1-quicksort");
+    AlgorithmUtils.insertIntoHeaderList("#" + algorithmTabId, algorithmName, "sorting-1-quicksort");
  
     var row0 = d3.select("#algoContainer")
-	.append("div").attr("class", "tab-pane").attr("id", "quicksort-tab")
+	.append("div").attr("class", "tab-pane").attr("id", algorithmTabId)
         .append("div").attr("class", "container-fluid")
 	.append("div").attr("class", "row")
     var leftPanel = row0.append("div").attr("class", "col-md-6")
@@ -17,8 +20,8 @@
     controlsPanel.append("div").attr("class", "panel-heading").text("Controls:");
     var ops = controlsPanel.append("div").attr("class", "panel-body")
 	.append("div").attr("class", "options");
-    AlgorithmUtils.insertDefaultControls(ops);
-    AlgorithmUtils.insertCustomControls(ops, "Quicksort");
+    AlgorithmUtils.insertDefaultControls(ops, algorithmTabId);
+    AlgorithmUtils.insertCustomControls(ops, algorithmTabId, algorithmName);
     
     var visPanel = leftPanel.append("div").attr("class", "row")
 	.append("div").attr("class", "col-md-12")
@@ -80,7 +83,7 @@
     var margin = { left: 10, top: 30, right: 10, bottom: 100};
     var height = 1050;
     var width = 1600;
-    var svg = d3.select("#quicksort-tab .graphics").append("svg")
+    var svg = d3.select("#" + algorithmTabId + " .graphics").append("svg")
 	.attr("width", width)
 	.attr("height", height)
 	.append("g")
@@ -337,7 +340,7 @@
     }
     var swap_algo = new Algorithm(swap_function, swap_callbacks, "swap_function-code", swap_context);
 
-    d3.select("#quicksort-tab .code")
+    d3.select("#" + algorithmTabId + " .code")
 	.append("pre")
         .attr("class", "prettyprint lang-js linenums:1")
 	.attr("id", "quicksort-code")
@@ -346,7 +349,7 @@
         .text(qual_algo);
 
     
-    d3.select("#quicksort-tab .options").append("button")
+    d3.select("#" + algorithmTabId + " .options").append("button")
 	.on("click", function(d) {
 	    console.log("Before", data.map(function(d) { return d.val; }));
 	    qual_algo.startAnimation(data, 0, data.length - 1, function(data, i, j) {
@@ -366,7 +369,7 @@
 	}
     };
     
-    d3.select("#quicksort-tab .options").append("button")
+    d3.select("#" + algorithmTabId + " .options").append("button")
 	.attr("style", "margin-left: 10px")
         .on("click", function(d) {
 	    sequence_to_sort.shuffle();

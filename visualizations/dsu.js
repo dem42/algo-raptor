@@ -1,13 +1,16 @@
 (function chart() {
+    var algorithmTabId = "dsu-tab";
+    var algorithmName = "Disjoint Set Union";
+
     /*******************************/
     /*      Setup the panels       */
     /*******************************/
     console.log("downloaded dsu");
 
-    AlgorithmUtils.insertIntoHeaderList("#dsu-tab", "Disjoint Set Union", "graphs-1-dsu");
+    AlgorithmUtils.insertIntoHeaderList("#" + algorithmTabId, algorithmName, "graphs-1-dsu");
  
     var row0 = d3.select("#algoContainer")
-	.append("div").attr("class", "tab-pane").attr("id", "dsu-tab")
+	.append("div").attr("class", "tab-pane").attr("id", algorithmTabId)
         .append("div").attr("class", "container-fluid")
 	.append("div").attr("class", "row")
 
@@ -18,7 +21,7 @@
     controlsPanel.append("div").attr("class", "panel-heading").text("Controls:");
     var ops = controlsPanel.append("div").attr("class", "panel-body")
 	.append("div").attr("class", "options");
-    AlgorithmUtils.insertDefaultControls(ops);
+    AlgorithmUtils.insertDefaultControls(ops, algorithmTabId);
 
     var treeNodesPanel = leftPanel.append("div").attr("class", "row")
 	.append("div").attr("class", "col-md-12")
@@ -39,7 +42,7 @@
     var width = 1400;
     var treew = 200;
     var nodeRadius = 20;
-    var svg = d3.select("#dsu-tab .graphics").append("svg")
+    var svg = d3.select("#" + algorithmTabId + " .graphics").append("svg")
 	.attr("width", width)
 	.attr("height", height)
 	.append("g")
@@ -48,7 +51,7 @@
 
     var coin_image_src = new Image();
     coin_image_src.src = "assets/coin_flip.gif";
-    var coin_image = d3.select("#dsu-tab .graphics").select("svg").append("g").attr("class", "coin")	
+    var coin_image = d3.select("#" + algorithmTabId + " .graphics").select("svg").append("g").attr("class", "coin")	
 	.append("image")
 	.attr("x", -110 + margin.left)
 	.attr("y", -110 + margin.top)
@@ -384,7 +387,7 @@
 
 
 
-    d3.select("#dsu-tab .code")
+    d3.select("#" + algorithmTabId + " .code")
 	.append("pre")
         .attr("class", "prettyprint lang-js linenums:1")
 	.attr("id", "dsu-find-code")
@@ -392,7 +395,7 @@
         .attr("class", "language-js")
         .text(dsuFind);
 
-    d3.select("#dsu-tab .code")
+    d3.select("#" + algorithmTabId + " .code")
 	.append("pre")
         .attr("class", "prettyprint lang-js linenums:1")
 	.attr("id", "dsu-union-code")
@@ -400,7 +403,7 @@
         .attr("class", "language-js")
         .text(dsuUnion);
 
-    AlgorithmUtils.attachAlgoToControls(dsuUnion);
+    AlgorithmUtils.attachAlgoToControls(dsuUnion, algorithmTabId);
 
     /*calls google-prettify to make the code look nice
       called automatically

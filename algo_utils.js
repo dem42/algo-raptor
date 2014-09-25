@@ -29,15 +29,15 @@ AlgorithmUtils.clone = function clone(obj) {
     return cpy;
 }
 
-AlgorithmUtils.insertCustomControls = function(controlsDiv, algorithmName) {
+AlgorithmUtils.insertCustomControls = function(controlsDiv, algorithmId, algorithmName) {
     controlsDiv.append("div").attr("class", "custom-controls-header").text(algorithmName + " Controls:");
 }
 
 // create and populate a section for standard algorithm controls
-AlgorithmUtils.insertDefaultControls = function(controlsDiv) {
+AlgorithmUtils.insertDefaultControls = function(controlsDiv, algorithmId) {
 
-    function appendButton(div, classname) {
-	var button = div.append("a").attr("href", "#").attr("class", "a-btn");
+    function appendButton(div, classname, algorithmName) {
+	var button = div.append("a").attr("href", "#").attr("class", "a-btn").attr("id", classname + "-of-" + algorithmId);
 	button.append("span").attr("class", "a-btn-icon").append("span").attr("class", classname);
     }
 
@@ -45,20 +45,23 @@ AlgorithmUtils.insertDefaultControls = function(controlsDiv) {
     var defaultControls = controlsDiv.append("div").attr("class", "default-controls");
     var exRadioDiv = defaultControls.append("div").attr("class", "execution-type-radios");
     exRadioDiv.append("p").attr("class", "controls-info-text").text("Choose how to execute the algorithm:");
-    appendButton(exRadioDiv, "play-btn");
-    appendButton(exRadioDiv, "next-btn");
+    appendButton(exRadioDiv, "play-btn", algorithmId);
+    appendButton(exRadioDiv, "next-btn", algorithmId);
 }
 
 // connect the algorithm to default control callbacks
-AlgorithmUtils.attachAlgoToControls = function(algorithm) {
+AlgorithmUtils.attachAlgoToControls = function(algorithm, algorithmId) {
     if (!Algorithm.prototype.isPrototypeOf(algorithm)) {
 	console.error("First argument to attachAlgoToControls must have a prototype of Algorithm");
 	return;
     }
 
-    // d3.select("#default-controls-next-btn").on("click", function() {
-    // 	algorithm.executeNextAnimationQueueItem();
-    // });
+    d3.select("#" + "play-btn" + algorithmId).on("click", function() {
+     	algorithm.executeNextAnimationQueueItem();
+    });
+    d3.select("#" + "next-btn" + algorithmId).on("click", function() {
+     	algorithm.executeNextAnimationQueueItem();
+    });
 }
 
 // create an item for the algorithm in the list of all available algorithms 
