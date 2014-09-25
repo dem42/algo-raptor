@@ -69,6 +69,18 @@ li.highlighted-row {
     padding-top: 15px;
 }
 
+.controls-info-text {
+    font-style: italic;
+    font-size: 11px;
+    padding-right: 15px;
+    padding-left: 3px;
+}
+
 .default-controls {
 
+}
+
+#default-controls-next-btn {
+    margin-top: 10px;
+    margin-right: 5px;
 }

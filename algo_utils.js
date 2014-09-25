@@ -37,6 +37,13 @@ AlgorithmUtils.insertCustomControls = function(controlsDiv, algorithmName) {
 AlgorithmUtils.insertDefaultControls = function(controlsDiv) {
     controlsDiv.append("div").attr("class", "controls-header").text("General Controls:");
     var defaultControls = controlsDiv.append("div").attr("class", "default-controls");
+    var exRadioDiv = defaultControls.append("div").attr("class", "execution-type-radios");
+    exRadioDiv.append("p").attr("class", "controls-info-text").text("Choose how to execute the algorithm:");
+    var form = exRadioDiv.append("form");
+    form.append("input").attr("type", "radio").attr("value", "continuous");
+    form.append("span").attr("class", "controls-info-text").text("Immediate Execution");
+    form.append("input").attr("type", "radio").attr("value", "step-by-step");
+    form.append("span").attr("class", "controls-info-text").text("Step by Step Exectuion");    
     defaultControls.append("button").attr("id", "default-controls-next-btn").text("Next step");
 }
 
