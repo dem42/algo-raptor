@@ -84,3 +84,96 @@ li.highlighted-row {
     margin-top: 10px;
     margin-right: 5px;
 }
+
+.ctrl-button {
+    outline: none;
+}
+
+
+
+/* control panel css3 animation */
+.a-btn{
+    background: linear-gradient(top, #80a9da 0%, #6f97c5 100%);
+    background: -webkit-linear-gradient(top, #80a9da 0%, #6f97c5 100%);
+    padding-right: 85px;
+    height: 65px;
+    display: inline-block;
+    position: relative;
+    box-shadow: 
+        0px 1px 1px rgba(255,255,255,0.8) inset, 
+        1px 1px 3px rgba(0,0,0,0.2);
+    -webkit-box-shadow: 
+    0px 1px 1px rgba(255,255,255,0.8) inset, 
+    1px 1px 3px rgba(0,0,0,0.2);
+    border-radius: 4px;
+    /*float: left;
+    clear: both;
+    */
+    margin: 10px 0px 0px 10px;
+    overflow: hidden;
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.a-btn-icon{
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    height: 100%;
+    width: 100%;
+    box-shadow: 1px 0px 1px rgba(255,255,255,0.4) inset;
+    -webkit-box-shadow: 1px 0px 1px rgba(255,255,255,0.4) inset;
+}
+.a-btn-icon span{
+    width: 55px;
+    height: 55px;
+    opacity: 0.8;
+    border-radius: 10px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin: -27px 0px 0px -27px;
+    box-shadow: 
+        0px 1px 1px rgba(255,255,255,0.3) inset, 
+        0px 1px 2px rgba(255,255,255,0.5)
+    -webkit-box-shadow: 
+        0px 1px 1px rgba(255,255,255,0.3) inset, 
+        0px 1px 2px rgba(255,255,255,0.5);
+    transition: all 0.1s ease-in-out;
+    -webkit-transition: all 0.1s ease-in-out;
+}
+
+.a-btn-icon span.next-btn {
+    background: transparent url('assets/control_icons_sprite.png');
+    background-position-x: 69px;
+    background-position-y: -20px;
+}
+
+.a-btn-icon span.play-btn {
+    background: transparent url('assets/control_icons_sprite.png');
+    background-position-x: 550px;
+    background-position-y: -20px;
+}
+
+.a-btn:hover{
+    box-shadow: 
+        0px 1px 1px rgba(255,255,255,0.8) inset, 
+        1px 1px 5px rgba(0,0,0,0.4); 
+}
+.a-btn:hover .a-btn-icon span{
+    opacity: 1;
+}
+
+
+.a-btn:active {
+    position:relative;
+    top:1px;
+    background: linear-gradient(top, #6f97c5 0%, #80a9da 100%);
+    background: -webkit-linear-gradient(top, #6f97c5 0%, #80a9da 100%);
+    box-shadow:1px 1px 2px rgba(0,0,0,0.4) inset;
+    -webkit-box-shadow:1px 1px 2px rgba(0,0,0,0.4) inset;
+    border-color: #a9db80;
+}
+.a-btn:active .a-btn-icon span{
+    transform: scale(1.1);
+    -webkit-transform: scale(1.1);
+}
