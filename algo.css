@@ -55,3 +55,20 @@ li.highlighted-row {
     margin-top: -10px;
     font-size: 21px;
 }
+
+.controls-header {
+    text-decoration: underline;
+    font-weight: bold;
+    padding-bottom: 10px;
+}
+
+.custom-controls-header {
+    text-decoration: underline;
+    font-weight: bold;
+    padding-bottom: 10px;
+    padding-top: 15px;
+}
+
+.default-controls {
+
+}

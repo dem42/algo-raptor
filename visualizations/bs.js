@@ -15,15 +15,19 @@
 	.append("div").attr("class", "col-md-12")
 	.append("div").attr("class", "panel panel-default");
     controlsPanel.append("div").attr("class", "panel-heading").text("Controls:");
+
     var leftPanelBody = controlsPanel.append("div").attr("class", "panel-body");
-    leftPanelBody.append("div").attr("class", "forms");
-    leftPanelBody.append("div").attr("class", "options");
+    var ops = leftPanelBody.append("div").attr("class", "options");
+    AlgorithmUtils.insertDefaultControls(ops);
+    AlgorithmUtils.insertCustomControls(ops, "Binary Search");
+    ops.append("div").attr("class", "forms");
+    
 
     
     var visPanel = leftPanel.append("div").attr("class", "row")
 	.append("div").attr("class", "col-md-12")
 	.append("div").attr("class", "panel panel-default");
-    visPanel.append("div").attr("class", "panel-heading").text("Visualization Goes Here:");
+    visPanel.append("div").attr("class", "panel-heading").text("Algorithm Visualization");
     visPanel.append("div").attr("class", "panel-body graphics");
 
     var codePanel = row0.append("div").attr("class", "col-md-6")
@@ -194,10 +198,6 @@
 
     d3.select("#bsearch-tab .options").append("button")
 	.on("click", function(d) { kickoff(); })
-	.text("start");
-
-    d3.select("#bsearch-tab .options").append("button")
-	.on("click", function(d) { balgo.runStack() })
 	.text("start");
 
     d3.select("#bsearch-tab .code")

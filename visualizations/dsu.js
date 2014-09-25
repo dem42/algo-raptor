@@ -10,9 +10,20 @@
 	.append("div").attr("class", "tab-pane").attr("id", "dsu-tab")
         .append("div").attr("class", "container-fluid")
 	.append("div").attr("class", "row")
-    var treeNodesPanel = row0.append("div").attr("class", "col-md-7")
+
+    var leftPanel = row0.append("div").attr("class", "col-md-7")
+    var controlsPanel = leftPanel.append("div").attr("class", "row")
+	.append("div").attr("class", "col-md-12")
 	.append("div").attr("class", "panel panel-default");
-    treeNodesPanel.append("div").attr("class", "panel-heading").text("Tree Nodes");
+    controlsPanel.append("div").attr("class", "panel-heading").text("Controls:");
+    var ops = controlsPanel.append("div").attr("class", "panel-body")
+	.append("div").attr("class", "options");
+    AlgorithmUtils.insertDefaultControls(ops);
+
+    var treeNodesPanel = leftPanel.append("div").attr("class", "row")
+	.append("div").attr("class", "col-md-12")
+	.append("div").attr("class", "panel panel-default");
+    treeNodesPanel.append("div").attr("class", "panel-heading").text("Algorithm Visualization");
     treeNodesPanel.append("div").attr("class", "panel-body graphics");
      var codePanel = row0.append("div").attr("class", "col-md-5")
 	.append("div").attr("class", "panel panel-default");
@@ -388,6 +399,8 @@
 	.append("code")
         .attr("class", "language-js")
         .text(dsuUnion);
+
+    AlgorithmUtils.attachAlgoToControls(dsuUnion);
 
     /*calls google-prettify to make the code look nice
       called automatically

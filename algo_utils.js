@@ -8,7 +8,10 @@
 function AlgorithmUtils() {
 }
 
+//////////////////////////////
 // statics
+//////////////////////////////
+// create a deep clone of obj
 AlgorithmUtils.clone = function clone(obj) {
     
     if (obj == null || typeof obj != "object") {
@@ -26,6 +29,30 @@ AlgorithmUtils.clone = function clone(obj) {
     return cpy;
 }
 
+AlgorithmUtils.insertCustomControls = function(controlsDiv, algorithmName) {
+    controlsDiv.append("div").attr("class", "custom-controls-header").text(algorithmName + " Controls:");
+}
+
+// create and populate a section for standard algorithm controls
+AlgorithmUtils.insertDefaultControls = function(controlsDiv) {
+    controlsDiv.append("div").attr("class", "controls-header").text("General Controls:");
+    var defaultControls = controlsDiv.append("div").attr("class", "default-controls");
+    defaultControls.append("button").attr("id", "default-controls-next-btn").text("Next step");
+}
+
+// connect the algorithm to default control callbacks
+AlgorithmUtils.attachAlgoToControls = function(algorithm) {
+    if (!Algorithm.prototype.isPrototypeOf(algorithm)) {
+	console.error("First argument to attachAlgoToControls must have a prototype of Algorithm");
+	return;
+    }
+
+    d3.select("#default-controls-next-btn").on("click", function() {
+	algorithm.executeNextAnimationQueueItem();
+    });
+}
+
+// create an item for the algorithm in the list of all available algorithms 
 AlgorithmUtils.insertIntoHeaderList = function(tabId, headerText, listItemId) {
 
     var otherAlgos = [listItemId];

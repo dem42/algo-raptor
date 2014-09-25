@@ -217,9 +217,9 @@ Algorithm.prototype.startAnimation = function() {
     this.run.apply(this, arguments);
 
     var self = this;
-    setTimeout(function() {
-	self.runStack();
-	}, 1000);
+    // setTimeout(function() {
+    // 	self.runStack();
+    // 	}, 1000);
 }
 
 /** 
@@ -248,6 +248,13 @@ Algorithm.prototype.runWithSharedAnimationQueue = function(algorithmToShareWith)
 Algorithm.prototype.runStack = function() {
     for (var i=0;i<this.animation_queue.length;i++) {
 	this.animation_queue[i].call(this);
+    }
+}
+
+Algorithm.prototype.executeNextAnimationQueueItem = function() {
+    if (this.animation_queue.length > 0) {
+	this.animation_queue[0].call(this);
+	this.animation_queue.shift();
     }
 }
 /////////////////////////////////////////////////////////////////

@@ -15,14 +15,15 @@
 	.append("div").attr("class", "col-md-12")
 	.append("div").attr("class", "panel panel-default");
     controlsPanel.append("div").attr("class", "panel-heading").text("Controls:");
-    controlsPanel.append("div").attr("class", "panel-body")
+    var ops = controlsPanel.append("div").attr("class", "panel-body")
 	.append("div").attr("class", "options");
-
+    AlgorithmUtils.insertDefaultControls(ops);
+    AlgorithmUtils.insertCustomControls(ops, "Quicksort");
     
     var visPanel = leftPanel.append("div").attr("class", "row")
 	.append("div").attr("class", "col-md-12")
 	.append("div").attr("class", "panel panel-default");
-    visPanel.append("div").attr("class", "panel-heading").text("Sorting");
+    visPanel.append("div").attr("class", "panel-heading").text("Algorithm Visualization");
     visPanel.append("div").attr("class", "panel-body graphics");
 
     var codePanel = row0.append("div").attr("class", "col-md-6")
