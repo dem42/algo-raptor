@@ -22,6 +22,8 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
     this.varname_map = {};
     this.funcName = func.toString().match(/function\s*(.*?)\s*\(/)[1];
     this.animation_queue = [];
+    // used by the runStack command to kick off the animation in continuous mode
+    this.running = false;
 
     var tokens = func.toString().split("\n");
     var LN = tokens.length;
@@ -64,14 +66,13 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
 		$(rowToHighlightSelector).toggleClass("highlighted-row");
 	    }, startDelay + durationOfHighlight);
 	}
+	return startDelay + durationOfHighlight;
     };
 
     this.preRowExecute = function(row_num) {
 	var self = this;
 	this.animation_queue.push(new AnimationFrame("pre", row_num, function() {
-	    var highlight_start_time = self.AlgorithmContext.cumulative_delay;
-	    highlightRow(row_num, highlight_start_time, self.AlgorithmContext.default_animation_duration);
-	    self.AlgorithmContext.cumulative_delay += self.AlgorithmContext.default_animation_duration;
+	    return highlightRow(row_num, 0, self.AlgorithmContext.default_animation_duration);
 	}));
     }
 
@@ -103,10 +104,7 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
 		animation_duration = selfie.AlgorithmContext.default_animation_duration;
 	    }
 
-	    var highlight_start_time = selfie.AlgorithmContext.cumulative_delay;
-	    highlightRow(row_num, highlight_start_time, animation_duration);
-
-	    selfie.AlgorithmContext.cumulative_delay = highlight_start_time + animation_duration;
+	    highlightRow(row_num, 0, animation_duration);
 
 	    var_array.forEach(function(var_elem, idx) {
 		if (selfie.var_map[idx] == undefined) {
@@ -119,7 +117,7 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
 			if (comment_span.empty()) {
 			    comment_span.remove();
 			}
-		    }, selfie.AlgorithmContext.cumulative_delay);
+		    }, animation_duration);
 		}
 		else {
 		    setTimeout(function() {
@@ -129,9 +127,10 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
 			    code.append("span").attr("class", "com");
 			}
 			code.select("span.com").text("  //" + selfie.var_map[idx].name + " = " + var_elem);
-		    }, selfie.AlgorithmContext.cumulative_delay);
+		    }, animation_duration);
 		}
 	    });
+	    return animation_duration;
 	}));
     }
 
@@ -213,8 +212,8 @@ Algorithm.prototype.getAnimationQueue = function() {
  * Start algorithm animation
  */
 Algorithm.prototype.startAnimation = function() {
+    this.running = false;
     this.animation_queue = []; // reset the animation queue
-    this.AlgorithmContext.cumulative_delay = 0;
     this.run.apply(this, arguments);
 
     var self = this;
@@ -224,7 +223,7 @@ Algorithm.prototype.startAnimation = function() {
 }
 
 /** 
- * Execute the function with using animating the algorithm using the cumulative delay 
+ * Execute the function with using animating the algorithm
  */
 Algorithm.prototype.run = function() {
     var N = this.getParams().length;
@@ -247,18 +246,28 @@ Algorithm.prototype.runWithSharedAnimationQueue = function(algorithmToShareWith)
 }
 
 Algorithm.prototype.runStack = function() {
-    for (var i=0;i<this.animation_queue.length;i++) {
-	this.animation_queue[i].animationFunction.call(this);
-    }
+    this.running = true;
+    this.__executeNextRow();
 }
 
 Algorithm.prototype.executeNextRow = function() {
     if (this.animation_queue.length > 0) {
+	this.__executeNextRow(this.animation_queue[0].rowNumber);
+    }
+}
+
+Algorithm.prototype.__executeNextRow = function(prevRowNum) {
+    if (this.animation_queue.length > 0) {
 	var rownum = this.animation_queue[0].rowNumber;
-	while (this.animation_queue.length > 0 && this.animation_queue[0].rowNumber == rownum) {
-	    this.animation_queue[0].animationFunction.call(this);
-	    this.animation_queue.shift();
+	if (!this.running && rownum != prevRowNum) {
+	    return;
 	}
+	var animation_duration = this.animation_queue[0].animationFunction.call(this);
+	this.animation_queue.shift();
+	var this_obj = this;
+	setTimeout(function() {
+	    this_obj.__executeNextRow(rownum);
+	}, animation_duration);
     }
 }
 
