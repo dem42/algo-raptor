@@ -159,10 +159,8 @@
     /*************************/
     var q_callbacks = [];
     q_callbacks[0] = function(data, left, right) {
-	setTimeout(function() {
-	    d3.selectAll("text.left-text").remove();
-	    d3.selectAll("text.right-text").remove();
-	}, this.AlgorithmContext.cumulative_delay);
+	d3.selectAll("text.left-text").remove();
+	d3.selectAll("text.right-text").remove();
 	if (left == 0 && right == data.length - 1) {
 	    return this.AlgorithmContext.default_animation_duration; // we don't want to move the entire array down, only subarrays
 	}
@@ -171,7 +169,6 @@
 	    var dat = gi.datum();
 	    gi.transition()
 		.duration(this.AlgorithmContext.default_animation_duration)
-		.delay(this.AlgorithmContext.cumulative_delay)
 		.attr("transform", "translate(" + dat.x_off + ", " + (dat.y_off + 2.5*maxi_width) + ")");
 	    dat.y_off = 2.5 * maxi_width + dat.y_off;
 	}
@@ -185,16 +182,14 @@
 	var g = d3.select("#q-g-" + pi)
 	var radius = g.select(".quicksort-circle").attr("r");
 
-	setTimeout(function() {
-	    g.append("rect")
-		.attr("id", "pivot-rect")
-		.attr("fill", "none")
-		.attr("stroke", "red")
-		.attr("width", 2*radius)
-		.attr("height", 2*radius)
-		.attr("x", -radius)
-		.attr("y", -radius);
-	    }, this.AlgorithmContext.cumulative_delay);
+	g.append("rect")
+	    .attr("id", "pivot-rect")
+	    .attr("fill", "none")
+	    .attr("stroke", "red")
+	    .attr("width", 2*radius)
+	    .attr("height", 2*radius)
+	    .attr("x", -radius)
+	    .attr("y", -radius);
 
 	return this.AlgorithmContext.default_animation_duration;
     }
@@ -206,19 +201,19 @@
 	var new_left_i = data[new_left].old_idx;
 	var g = d3.select("#q-g-" + new_left_i);
 	var radius = g.select("circle").attr("r");
-	setTimeout(function() {
-	    d3.selectAll("g.left")
-		.classed("left", false)
-		.select("text.left-text")
-		.remove();
 
-	    g.append("text")
-	        .attr("class", "left-text")
-		.attr("dx", -radius)
-		.attr("dy", -radius)
-		.text("Left");
-	    g.classed("left", true);
-	}, this.AlgorithmContext.cumulative_delay);
+	d3.selectAll("g.left")
+	    .classed("left", false)
+	    .select("text.left-text")
+	    .remove();
+
+	g.append("text")
+	    .attr("class", "left-text")
+	    .attr("dx", -radius)
+	    .attr("dy", -radius)
+	    .text("Left");
+	g.classed("left", true);
+
 	return this.AlgorithmContext.default_animation_duration;
     };
     q_callbacks[6] = q_callbacks[10] = q_callbacks[19] = function(data, new_left) {
@@ -232,19 +227,17 @@
 	var new_right_i = data[new_right].old_idx;
 	var g = d3.select("#q-g-" + new_right_i);
 	var radius = g.select("circle").attr("r");
-	setTimeout(function() {
-	    d3.selectAll("g.right")
-		.classed("right", false)
-		.select("text.right-text")
-		.remove();
+	d3.selectAll("g.right")
+	    .classed("right", false)
+	    .select("text.right-text")
+	    .remove();
 
-	    g.append("text")
-	        .attr("class", "right-text")
-		.attr("dx", radius)
-		.attr("dy", radius)
-		.text("Right");
-	    g.classed("right", true);
-	}, this.AlgorithmContext.cumulative_delay);
+	g.append("text")
+	    .attr("class", "right-text")
+	    .attr("dx", radius)
+	    .attr("dy", radius)
+	    .text("Right");
+	g.classed("right", true);
 	return this.AlgorithmContext.default_animation_duration;
     };
     q_callbacks[7] = q_callbacks[13] = q_callbacks[20] = function(data, new_right) {
@@ -252,9 +245,7 @@
     }
     // end of while cleanup
     q_callbacks[22] = function() {
-	setTimeout(function() {
-	    svg.selectAll("#pivot-rect").remove();
-	}, this.AlgorithmContext.cumulative_delay);
+	svg.selectAll("#pivot-rect").remove();
 	return 10;
     };
 
@@ -276,7 +267,6 @@
 	    var dat = gi.datum();
 	    gi.transition()
 		.duration(this.AlgorithmContext.default_animation_duration)
-		.delay(this.AlgorithmContext.cumulative_delay)
 		.attr("transform", "translate(" + dat.x_off + ", " + (dat.y_off - 2.5*maxi_width) + ")");
 	    dat.y_off = dat.y_off - 2.5 * maxi_width;
 	}
@@ -293,7 +283,6 @@
     }
     var algo_context = {
 	default_animation_duration : 300,
-	cumulative_delay : 0
     };
     var qual_algo = new Algorithm(quicksort, q_callbacks, "quicksort-code", algo_context);
     AlgorithmUtils.attachAlgoToControls(qual_algo, algorithmTabId);
@@ -302,7 +291,6 @@
     swap_callbacks[0] = function(data, i, j) {
 	var step_duration = 1000;
 	if (i == j) return;
-	var delay = this.AlgorithmContext.getCumulativeDelay();
 
 	var gi = d3.select("#q-g-" + data[i].old_idx)
 	var gj = d3.select("#q-g-" + data[j].old_idx)
@@ -312,14 +300,14 @@
 
 	var trns1 = [di.x_off, di.y_off];
 	var trns2 = [dj.x_off, dj.y_off];
-	gi.transition().delay(delay).duration(step_duration).attr("transform", "translate(" + trns1[0] + " " + (trns1[1] - maxi_width) + ")");
-	gj.transition().delay(delay).duration(step_duration).attr("transform", "translate(" + trns2[0] + " " + (trns2[1] + maxi_width) + ")");
+	gi.transition().duration(step_duration).attr("transform", "translate(" + trns1[0] + " " + (trns1[1] - maxi_width) + ")");
+	gj.transition().duration(step_duration).attr("transform", "translate(" + trns2[0] + " " + (trns2[1] + maxi_width) + ")");
 
-	gi.transition().delay(delay + step_duration).duration(step_duration).attr("transform", "translate(" + trns2[0] + " " + (trns1[1] - maxi_width) + ")");
-	gj.transition().delay(delay + step_duration).duration(step_duration).attr("transform", "translate(" + trns1[0] + " " + (trns2[1] + maxi_width) + ")");
+	gi.transition().delay(step_duration).duration(step_duration).attr("transform", "translate(" + trns2[0] + " " + (trns1[1] - maxi_width) + ")");
+	gj.transition().delay(step_duration).duration(step_duration).attr("transform", "translate(" + trns1[0] + " " + (trns2[1] + maxi_width) + ")");
 
-	gi.transition().delay(delay + 2*step_duration).duration(step_duration).attr("transform", "translate(" + trns2[0] + " " + trns1[1] + ")");
-	gj.transition().delay(delay + 2*step_duration).duration(step_duration).attr("transform", "translate(" + trns1[0] + " " + trns2[1] + ")");
+	gi.transition().delay(2*step_duration).duration(step_duration).attr("transform", "translate(" + trns2[0] + " " + trns1[1] + ")");
+	gj.transition().delay(2*step_duration).duration(step_duration).attr("transform", "translate(" + trns1[0] + " " + trns2[1] + ")");
 
 	di.x_off = trns2[0];
 	di.y_off = trns1[1];
@@ -327,17 +315,11 @@
 	dj.x_off = trns1[0];
 	dj.y_off = trns2[1];
 
-	return 3*step_duration;
+	return 0;
     }
 
-    // the swap context has no cumulative delay of its own
-    // but it provides a function to fetch the cumulative delay of the quicksort
     var swap_context = {
 	default_animation_duration: 0, 
-	cumulative_delay: 0, 
-	getCumulativeDelay: function() { 
-	    return algo_context.cumulative_delay; 
-	}
     }
     var swap_algo = new Algorithm(swap_function, swap_callbacks, "swap_function-code", swap_context);
 

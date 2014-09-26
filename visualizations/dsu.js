@@ -125,7 +125,7 @@
     /**
      * tree rendering function, called to draw a d3 tree hierarchy 
      */
-    function drawTreeFun(delay, data, i, child) {
+    function drawTreeFun(data, i, child) {
 
 	var animation_duration = 1000;
 
@@ -149,13 +149,11 @@
 	    .data(links, function (d) { return d.source.name + "-to-" + d.target.name })
 	
 	movers.transition()
-	    .delay(delay)
 	    .duration(animation_duration)
 	    .attr("transform", "translate(" + data.order*treew + ",0)");
 
 	movers.select(".link")
 	    .transition()
-	    .delay(delay)
 	    .duration(animation_duration)
 	    .attr("d", diagonal)
 
@@ -169,13 +167,12 @@
 	    .attr("class", "link")
 	    .attr("id", function(d) { return "from-" + d.source.name + "-to-" + d.target.name; })
 	    .transition()
-	    .delay(delay + animation_duration)
+	    .delay(animation_duration)
 	    .attr("d", diagonal);
 
 	var mover_nodes = svg.selectAll(".node")
 	    .data(nodes, function(d) { return d.name; })
 	    .transition()
-	    .delay(delay)
 	    .duration(animation_duration)
 	    .attr("transform", function(d) {return "translate(" + (d.x + data.order*treew) + "," + d.y + ")";});
 
@@ -192,7 +189,7 @@
 	    .attr("cy", 0)
 	    .attr("r", "0px")
 	    .transition() //transitioning from 0em to 2em
-	    .delay(delay + animation_duration)
+	    .delay(animation_duration)
 	    .duration(animation_duration)
 	    .attr("r", nodeRadius + "px");
 
@@ -205,7 +202,7 @@
 	    .text(function(d) { return d.name; })
 	    .attr("font-size", "0pt")
 	    .transition()
-	    .delay(delay + 2*animation_duration)
+	    .delay(2*animation_duration)
 	    .attr("font-size", "12pt");
 
 	var rankInfos = svgNodes.append("text")
@@ -217,7 +214,7 @@
 	    .text(function(d) { return "Rank = " + d.rank; })
 	    .attr("font-size", "0pt")
 	    .transition()
-	    .delay(delay + 2*animation_duration)
+	    .delay(2*animation_duration)
 	    .attr("font-size", "8pt");
 
 	// in svg the order of elements defines the z-index 
@@ -225,7 +222,7 @@
 	setTimeout(function() {
 	    svg.select("#node-" + data.name).moveToFront();
 	    if (child != undefined) svg.select("#node-" + child.name).moveToFront();
-	}, delay + animation_duration + 10);
+	}, animation_duration + 10);
 
 	return 2*animation_duration;
     }
@@ -233,16 +230,16 @@
     function push(obj, elem) {
 	(obj.children = obj.children || []).push(elem);
     }
-    function cleanup(delay, winner_num, loser_num) {
+    function cleanup(winner_num, loser_num) {
 	var winner = d3.select("#node-" + winner_num).datum();
 	var loser = d3.select("#node-" + loser_num).datum();
 	//remove_merged_nodes([winner_num,loser_num]);
 	push(winner, loser);
-	drawTreeFun(delay, winner, winner_num, loser);
+	drawTreeFun(winner, winner_num, loser);
 	var loser_order = loser.order;
 	var new_node = {"name": next_num, "rank": 0, "root": next_num, "children": [], "order": loser_order};
 	data.push(new_node);
-	var animation_duration = drawTreeFun(delay, AlgorithmUtils.clone(new_node), next_num);
+	var animation_duration = drawTreeFun(AlgorithmUtils.clone(new_node), next_num);
 	next_num++;
 
 	return animation_duration;
@@ -272,38 +269,38 @@
     cbsFind[2] = function(ptr, data) {
 	setTimeout(function() {
 	    d3.select("#from-" + data[ptr].root + "-to-" + ptr).classed("highlight-elem", true);
-	}, this.AlgorithmContext.cumulative_delay + 200);
-	return 200;
+	}, this.AlgorithmContext.default_animation_duration);
+	return this.AlgorithmContext.default_animation_duration;
     }
     cbsFind[3] = function(ptr, data) {
 	setTimeout(function() {
 	    d3.select("#node-" + ptr).classed("highlight-elem", true);
-	}, this.AlgorithmContext.cumulative_delay + 200);
-	return 200;
+	}, this.AlgorithmContext.default_animation_duration);
+	return this.AlgorithmContext.default_animation_duration;
     }
     cbsUnion[2] = function(r1,r2,a,b) {
-	return 100;
+	return this.AlgorithmContext.default_animation_duration;
     }
     cbsUnion[3] = function(data, r1, r2) {
-	d3.select("#node-" + r1).select(".node-rank").transition().delay(this.AlgorithmContext.cumulative_delay)
+	d3.select("#node-" + r1).select(".node-rank").transition()
 	    .attr("dx","-30px")
 	    .attr("dy","60px")
 	    .style("font-size", "26px");
-	d3.select("#node-" + r2).select(".node-rank").transition().delay(this.AlgorithmContext.cumulative_delay)
+	d3.select("#node-" + r2).select(".node-rank").transition()
 	    .attr("dx","-30px")
 	    .attr("dy","60px")
 	    .style("font-size", "26px");
     }
     cbsUnion[5] = function(b, r1, r2, data) {
-	d3.select("#node-" + r2).select(".node-rank").transition().delay(this.AlgorithmContext.cumulative_delay).remove();
-	return cleanup(this.AlgorithmContext.cumulative_delay, r1, r2);
+	d3.select("#node-" + r2).select(".node-rank").transition().remove();
+	return cleanup(r1, r2);
     }
     cbsUnion[8] = function(a, r2, r1, data) {
-	d3.select("#node-" + r1).select(".node-rank").transition().delay(this.AlgorithmContext.cumulative_delay).remove();
-	return cleanup(this.AlgorithmContext.cumulative_delay, r2, r1);
+	d3.select("#node-" + r1).select(".node-rank").transition().remove();
+	return cleanup(r2, r1);
     }
     cbsUnion[13] = function(r2, r1, data) {
-	return cleanup(this.AlgorithmContext.cumulative_delay, r2, r1);
+	return cleanup(r2, r1);
     }
     cbsUnion[14] = cbsUnion[18] = function(r2, r1, data) {
 	var a = r1, b = r2;
@@ -311,8 +308,8 @@
 	    a = r2;
 	    b = r1;
 	}
-	d3.select("#node-" + a).select(".node-rank").transition().delay(this.AlgorithmContext.cumulative_delay).text("Rank = " + data[a].rank);
-	d3.select("#node-" + b).select(".node-rank").transition().delay(this.AlgorithmContext.cumulative_delay).remove();
+	d3.select("#node-" + a).select(".node-rank").transition().text("Rank = " + data[a].rank);
+	d3.select("#node-" + b).select(".node-rank").transition().remove();
 	return 0;
     }
     cbsUnion[4] = cbsUnion[7] = cbsUnion[11] = function(data, r2, r1, prob) {
@@ -329,57 +326,47 @@
 	var z2 = (data_r1.order < data_r2.order) ? r2 : r1;
 	var cmp_result = (data[z1].rank < data[z2].rank) ? 1 : (data[z1].rank > data[z2].rank) ? -1 : 0;
 	var selfie = this;
-	setTimeout(function() {
-	    if (cmp_result == 1) {
-		svg.append("g").attr("class", "cmp_result").attr("transform", "translate(" + xoff + "," + yoff + ")").append("text").text("<");
-	    }
-	    else if (cmp_result == -1) {
-		svg.append("g").attr("class", "cmp_result").attr("transform", "translate(" + xoff + "," + yoff + ")").append("text").text(">");
-	    }
-	    else {
-		coin_image.attr("xlink:href", coin_image_src.src).attr("transform", "translate(" + xoff + "," + yoff + ")").attr("display", "block");
-		setTimeout(function() {
-		    coin_image.attr("display", "none");
-		}, animation_duration);
 
-	    }
-	}, this.AlgorithmContext.cumulative_delay);
+	if (cmp_result == 1) {
+	    svg.append("g").attr("class", "cmp_result").attr("transform", "translate(" + xoff + "," + yoff + ")").append("text").text("<");
+	}
+	else if (cmp_result == -1) {
+	    svg.append("g").attr("class", "cmp_result").attr("transform", "translate(" + xoff + "," + yoff + ")").append("text").text(">");
+	}
+	else {
+	    coin_image.attr("xlink:href", coin_image_src.src).attr("transform", "translate(" + xoff + "," + yoff + ")").attr("display", "block");
+	    setTimeout(function() {
+		coin_image.attr("display", "none");
+	    }, animation_duration);
 
+	}
 
-	d3.select("#node-" + r1).select(".node-rank").transition().delay(this.AlgorithmContext.cumulative_delay + animation_duration).duration(transition_duration)
+	d3.select("#node-" + r1).select(".node-rank").transition().delay(animation_duration).duration(transition_duration)
 	    .attr("dx", (nodeRadius) + "px")
             .attr("dy", (-nodeRadius) + "px")
 	    .style("font-size", "8pt");
-	d3.select("#node-" + r2).select(".node-rank").transition().delay(this.AlgorithmContext.cumulative_delay + animation_duration).duration(transition_duration)
+	d3.select("#node-" + r2).select(".node-rank").transition().delay(animation_duration).duration(transition_duration)
 	    .attr("dx", (nodeRadius) + "px")
             .attr("dy", (-nodeRadius) + "px")
 	    .style("font-size", "8pt");
 	setTimeout(function() {
 	    d3.select("g.cmp_result").remove();
-	}, this.AlgorithmContext.cumulative_delay + animation_duration);
+	}, animation_duration);
 
 	return animation_duration + transition_duration;
     }
     cbsUnion[17] = function(r1, r2, data) {
-	return cleanup(this.AlgorithmContext.cumulative_delay, r1, r2);
+	return cleanup(r1, r2);
     }
     cbsUnion[21] = function(r1, r2, data) {
-	setTimeout(function() {
-	    d3.selectAll(".link").classed("highlight-elem", false);
-	    d3.selectAll(".node").classed("highlight-elem", false);
-	}, this.AlgorithmContext.cumulative_delay);
+	d3.selectAll(".link").classed("highlight-elem", false);
+	d3.selectAll(".node").classed("highlight-elem", false);
 	return this.AlgorithmContext.default_animation_duration;
     }
     // this object determines the behaviour of the algorighm code
     var algorithmContext = {
 	// animation duration for row highlights
 	default_animation_duration : 500,
-	/*
-	 * This delay counter can be accessed from within the callbacks.
-	 * It is meant to be used to sync the visualization transitions
-	 * this means you would say d3.select(..).transition().delay(this.cumulative_delay).duration(animation_duration)
-	 */
-	cumulative_delay : 0
     };
 
     var dsuFind = new Algorithm(find, cbsFind, "dsu-find-code", algorithmContext);
@@ -413,7 +400,7 @@
 
     data.forEach(function(d) { d.rank = 0;});
     data.forEach(function(d, i) {
-	drawTreeFun(100, AlgorithmUtils.clone(d), i);
+	drawTreeFun(AlgorithmUtils.clone(d), i);
     });
 
 })();

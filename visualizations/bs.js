@@ -112,7 +112,7 @@
 	    .text(function(d) { return d.val; });
 
 	/*interpolating works with transforms too .. so cool -> move to new spot*/
-	gs.transition().delay(this.AlgorithmContext.cumulative_delay).duration(animation_duration).attr("transform", function(d, i) {
+	gs.transition().duration(animation_duration).attr("transform", function(d, i) {
 	    return "translate(" + 2*w*i + "," + Y + ")";
 	});
 
@@ -132,18 +132,18 @@
      */
     cbs[8] = function(mid) { 
 	var animation_duration = 1000;
-	arrow.style("display","block").transition().delay(this.AlgorithmContext.cumulative_delay).duration(animation_duration).attr("x",2*w*mid-3);
+	arrow.style("display","block").transition().duration(animation_duration).attr("x",2*w*mid-3);
 	return animation_duration;
     };
     /*callback called after a match was found
      */
     cbs[16] = function(low) { 
 	var animation_duration = 1000;
-	arrow.style("display","block").transition().delay(this.AlgorithmContext.cumulative_delay).duration(animation_duration).attr("x",2*w*low-3);
+	arrow.style("display","block").transition().duration(animation_duration).attr("x",2*w*low-3);
 	svg.append("text")
 	    .attr("dy", "100px")
 	    .attr("class", "not-found-label")
-	    .transition().delay(this.AlgorithmContext.cumulative_delay).duration(animation_duration).text("Found!");
+	    .transition().duration(animation_duration).text("Found!");
 	return animation_duration;
     };
     /*callback called if a match was NOT found
@@ -153,7 +153,7 @@
 	svg.append("text")
 	    .attr("dy", "100px")
 	    .attr("class", "not-found-label")
-	    .transition().delay(this.AlgorithmContext.cumulative_delay).duration(animation_duration).text("Not Found!");
+	    .transition().duration(animation_duration).text("Not Found!");
 	return animation_duration;
     };
 
@@ -180,12 +180,6 @@
     var algorithmContext = {
 	// animation duration for row highlights
 	default_animation_duration : 500,
-	/*
-	 * This delay counter can be accessed from within the callbacks.
-	 * It is meant to be used to sync the visualization transitions
-	 * this means you would say d3.select(..).transition().delay(this.cumulative_delay).duration(animation_duration)
-	 */
-	cumulative_delay : 0
     };
     /* create an Algorithm instance wired with callbacks */
     var balgo = new Algorithm(bsearch, cbs, "bs-code", algorithmContext);
