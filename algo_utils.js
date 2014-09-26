@@ -56,11 +56,11 @@ AlgorithmUtils.attachAlgoToControls = function(algorithm, algorithmId) {
 	return;
     }
 
-    d3.select("#" + "play-btn" + algorithmId).on("click", function() {
-     	algorithm.executeNextAnimationQueueItem();
+    d3.select("#" + "play-btn-of-" + algorithmId).on("click", function() {
+     	algorithm.runStack();
     });
-    d3.select("#" + "next-btn" + algorithmId).on("click", function() {
-     	algorithm.executeNextAnimationQueueItem();
+    d3.select("#" + "next-btn-of-" + algorithmId).on("click", function() {
+     	algorithm.executeNextRow();
     });
 }
 

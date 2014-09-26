@@ -296,6 +296,7 @@
 	cumulative_delay : 0
     };
     var qual_algo = new Algorithm(quicksort, q_callbacks, "quicksort-code", algo_context);
+    AlgorithmUtils.attachAlgoToControls(qual_algo, algorithmTabId);
 
     var swap_callbacks = [];
     swap_callbacks[0] = function(data, i, j) {
@@ -368,7 +369,7 @@
 	    this[i] = x;
 	}
     };
-    
+
     d3.select("#" + algorithmTabId + " .options").append("button")
 	.attr("style", "margin-left: 10px")
         .on("click", function(d) {

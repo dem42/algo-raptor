@@ -68,18 +68,18 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
 
     this.preRowExecute = function(row_num) {
 	var self = this;
-	this.animation_queue.push(function() {
+	this.animation_queue.push(new AnimationFrame("pre", row_num, function() {
 	    var highlight_start_time = self.AlgorithmContext.cumulative_delay;
 	    highlightRow(row_num, highlight_start_time, self.AlgorithmContext.default_animation_duration);
 	    self.AlgorithmContext.cumulative_delay += self.AlgorithmContext.default_animation_duration;
-	});
+	}));
     }
 
     this.postRowExecute = function(row_num, var_array0) {
 	
 	var var_array = AlgorithmUtils.clone(var_array0);
 	var selfie = this;
-	this.animation_queue.push(function() {
+	this.animation_queue.push(new AnimationFrame("post", row_num, function() {
 	    var animation_duration;
 	    if (row_num in selfie.callbacks)
 	    {
@@ -96,7 +96,7 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
 	    }
 	    else
 	    {
-		animation_duration = ((row_num == 0) ? selfie.AlgorithmContext.default_animation_duration : 0);
+		animation_duration = selfie.AlgorithmContext.default_animation_duration;
 	    }
 
 	    if (animation_duration == undefined) {
@@ -132,7 +132,7 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
 		    }, selfie.AlgorithmContext.cumulative_delay);
 		}
 	    });
-	});
+	}));
     }
 
     // variables that are used in callbacks must be set here
@@ -168,6 +168,7 @@ Algorithm.prototype.addDebugging = function(fstr) {
     tokens = fstr.split("\n");
     for (i=0;i<tokens.length;i++)
     {
+	// preExecute is for rows like if or while conditions that get evaluated to false
 	if (i > 0 && $.trim(tokens[i]) != "" && $.trim(tokens[i]).indexOf("{") != 0 && $.trim(tokens[i]).indexOf("else") != 0) {
 	    nfun += "self.preRowExecute(" + i + ");";
 	}
@@ -200,7 +201,7 @@ Algorithm.prototype.toString = function(){
  * Returns a string representation of the decorated function. 
  * A decorated function is one that has callbacks, preExecuteRow and postExecuteRows inserted in its source code
  */
-Algorithm.prototype.decorated = function() {
+Algorithm.prototype.getDecorated = function() {
     return this.addDebugging(this.func);
 }
 
@@ -227,7 +228,7 @@ Algorithm.prototype.startAnimation = function() {
  */
 Algorithm.prototype.run = function() {
     var N = this.getParams().length;
-    var c = "("+this.decorated()+")("+Algorithm.paramArg(N)+");";
+    var c = "("+this.getDecorated()+")("+Algorithm.paramArg(N)+");";
     //preserve this for the eval inside var self
     var self = this;
     //console.log(c);
@@ -247,16 +248,27 @@ Algorithm.prototype.runWithSharedAnimationQueue = function(algorithmToShareWith)
 
 Algorithm.prototype.runStack = function() {
     for (var i=0;i<this.animation_queue.length;i++) {
-	this.animation_queue[i].call(this);
+	this.animation_queue[i].animationFunction.call(this);
     }
 }
 
-Algorithm.prototype.executeNextAnimationQueueItem = function() {
+Algorithm.prototype.executeNextRow = function() {
     if (this.animation_queue.length > 0) {
-	this.animation_queue[0].call(this);
-	this.animation_queue.shift();
+	var rownum = this.animation_queue[0].rowNumber;
+	while (this.animation_queue.length > 0 && this.animation_queue[0].rowNumber == rownum) {
+	    this.animation_queue[0].animationFunction.call(this);
+	    this.animation_queue.shift();
+	}
     }
+}
+
+
+function AnimationFrame(type, rowNumber, animationFunction) {
+    this.type = type;
+    this.rowNumber = rowNumber;
+    this.animationFunction = animationFunction;
 }
 /////////////////////////////////////////////////////////////////
 // Algorithm class end ///
 /////////////////////////////////////////////////////////////////
+

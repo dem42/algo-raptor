@@ -189,6 +189,7 @@
     };
     /* create an Algorithm instance wired with callbacks */
     var balgo = new Algorithm(bsearch, cbs, "bs-code", algorithmContext);
+    AlgorithmUtils.attachAlgoToControls(balgo, algorithmTabId);
     
     d3.select("#" + algorithmTabId + " .options").append("span")
 	.text("Find value : ");
