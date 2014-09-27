@@ -15,6 +15,7 @@
  */
 function Algorithm(func, callbacks, codeContainerId, algorithmContext)
 {
+    this.codeContainerId = codeContainerId;
     this.func = func;
     this.param = func.toString().match(/\(([^\(\)]*)\)/);
     this.callbacks = callbacks;
@@ -24,6 +25,7 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
     this.animation_queue = [];
     // used by the runStack command to kick off the animation in continuous mode
     this.running = false;
+    this.runningCodeStack = [];
 
     var tokens = func.toString().split("\n");
     var LN = tokens.length;
@@ -56,7 +58,7 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
 	return "#" + codeContainerId + " li:nth-child(" + (rowNumber + 1) +")";
     }
 
-    function highlightRow(rowNumber, startDelay, durationOfHighlight) {
+    this.highlightRow = function highlightRow(codeContainerId, rowNumber, startDelay, durationOfHighlight) {
 	var rowToHighlightSelector = getRowToHighlightSelector(rowNumber, codeContainerId);
 	setTimeout(function() {
 	    $(rowToHighlightSelector).toggleClass("highlighted-row");
@@ -69,18 +71,22 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
 	return startDelay + durationOfHighlight;
     };
 
+    this.removeAllRowHighlighting = function(codeContainerId) {
+	d3.selectAll("#" + codeContainerId + " .highlighted-row").classed("highlighted-row", false);
+    };
+
     this.preRowExecute = function(row_num) {
 	var self = this;
-	this.animation_queue.push(new AnimationFrame("pre", row_num, function() {
-	    return highlightRow(row_num, 0, self.AlgorithmContext.default_animation_duration);
+	this.animation_queue.push(new AnimationFrame("pre", row_num, this.codeContainerId, function() {
+	    return self.AlgorithmContext.default_animation_duration;
 	}));
-    }
+    };
 
     this.postRowExecute = function(row_num, var_array0) {
 	
 	var var_array = AlgorithmUtils.clone(var_array0);
 	var selfie = this;
-	this.animation_queue.push(new AnimationFrame("post", row_num, function() {
+	this.animation_queue.push(new AnimationFrame("post", row_num, this.codeContainerId, function() {
 	    var animation_duration;
 	    if (row_num in selfie.callbacks)
 	    {
@@ -103,8 +109,6 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
 	    if (animation_duration == undefined) {
 		animation_duration = selfie.AlgorithmContext.default_animation_duration;
 	    }
-
-	    highlightRow(row_num, 0, animation_duration);
 
 	    var_array.forEach(function(var_elem, idx) {
 		if (selfie.var_map[idx] == undefined) {
@@ -132,7 +136,7 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
 	    });
 	    return animation_duration;
 	}));
-    }
+    };
 
     // variables that are used in callbacks must be set here
     this.callbacks["AlgorithmContext"] = this.AlgorithmContext;
@@ -213,6 +217,7 @@ Algorithm.prototype.getAnimationQueue = function() {
  */
 Algorithm.prototype.startAnimation = function() {
     this.running = false;
+    this.runningCodeStack = [];
     this.animation_queue = []; // reset the animation queue
     this.run.apply(this, arguments);
 
@@ -252,16 +257,32 @@ Algorithm.prototype.runStack = function() {
 
 Algorithm.prototype.executeNextRow = function() {
     if (this.animation_queue.length > 0) {
-	this.__executeNextRow(this.animation_queue[0].rowNumber);
+	var rownum = this.animation_queue[0].rowNumber;
+	var codeId = this.animation_queue[0].codeContainerId;
+
+	var lastFunc = this.runningCodeStack.pop();
+	this.removeAllRowHighlighting(lastFunc);
+	this.highlightRow(codeId, rownum, 0, undefined);
+	this.__executeNextRow(rownum);
     }
 }
 
 Algorithm.prototype.__executeNextRow = function(prevRowNum) {
+    
     if (this.animation_queue.length > 0) {
 	var rownum = this.animation_queue[0].rowNumber;
+	var codeId = this.animation_queue[0].codeContainerId;
+
 	if (!this.running && rownum != prevRowNum) {
 	    return;
 	}
+ 	if (this.running && rownum != prevRowNum) {
+	    var lastFunc = this.runningCodeStack.pop();
+	    this.removeAllRowHighlighting(lastFunc);
+	    this.highlightRow(codeId, rownum, 0, undefined);
+	}
+
+	this.runningCodeStack.push(codeId);
 	var animation_duration = this.animation_queue[0].animationFunction.call(this);
 	this.animation_queue.shift();
 	var this_obj = this;
@@ -269,13 +290,18 @@ Algorithm.prototype.__executeNextRow = function(prevRowNum) {
 	    this_obj.__executeNextRow(rownum);
 	}, animation_duration);
     }
+    else {
+	var lastFunc = this.runningCodeStack.pop();
+	this.removeAllRowHighlighting(lastFunc);
+    }
 }
 
 
-function AnimationFrame(type, rowNumber, animationFunction) {
+function AnimationFrame(type, rowNumber, codeContainerId, animationFunction) {
     this.type = type;
     this.rowNumber = rowNumber;
     this.animationFunction = animationFunction;
+    this.codeContainerId = codeContainerId;
 }
 /////////////////////////////////////////////////////////////////
 // Algorithm class end ///
