@@ -55,7 +55,7 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
     this.AlgorithmContext = algorithmContext;
 
     function getRowToHighlightSelector(rowNumber, codeContainerId) {
-	return "#" + codeContainerId + " li:nth-child(" + (rowNumber + 1) +")";
+	return "." + codeContainerId + ":last-of-type li:nth-child(" + (rowNumber + 1) +")";
     }
 
     this.highlightRow = function highlightRow(codeContainerId, rowNumber, startDelay, durationOfHighlight) {
@@ -72,7 +72,7 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
     };
 
     this.removeAllRowHighlighting = function(codeContainerId) {
-	d3.selectAll("#" + codeContainerId + " .highlighted-row").classed("highlighted-row", false);
+	d3.selectAll("." + codeContainerId + " .highlighted-row").classed("highlighted-row", false);
     };
 
     this.preRowExecute = function(row_num) {

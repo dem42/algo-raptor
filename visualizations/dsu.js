@@ -38,13 +38,13 @@
     /*      Setup the svg stuff    */
     /*******************************/
     var margin = { left: 0, top: 30, right: 10, bottom: 100};
-    var height = 450;
-    var width = 1400;
+    //var width = 1400;
     var treew = 200;
+    var treeh = 450;
     var nodeRadius = 20;
     var svg = d3.select("#" + algorithmTabId + " .graphics").append("svg")
-	.attr("width", width)
-	.attr("height", height)
+	.attr("width", "100%")
+	.attr("height", treeh + 10)
 	.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -128,8 +128,7 @@
     function drawTreeFun(data, i, child) {
 
 	var animation_duration = 1000;
-
-	var tree = d3.layout.tree().size([treew - margin.right, height - margin.bottom])
+	var tree = d3.layout.tree().size([treew - margin.right, treeh - margin.bottom])
 	    .children(function(d) {
 		// 		var children = [];
 		// if (d.children != undefined) {
@@ -375,17 +374,19 @@
 
 
     d3.select("#" + algorithmTabId + " .code")
+	.append("div")
+	.attr("class", "dsu-find-code")
 	.append("pre")
         .attr("class", "prettyprint lang-js linenums:1")
-	.attr("id", "dsu-find-code")
 	.append("code")
         .attr("class", "language-js")
         .text(dsuFind);
 
     d3.select("#" + algorithmTabId + " .code")
+	.append("div")
+	.attr("class", "dsu-union-code")
 	.append("pre")
         .attr("class", "prettyprint lang-js linenums:1")
-	.attr("id", "dsu-union-code")
 	.append("code")
         .attr("class", "language-js")
         .text(dsuUnion);

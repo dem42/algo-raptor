@@ -79,12 +79,6 @@
      * it initializes the data
      */
     cbs[0] = function(data) { 
-	return this.AlgorithmContext.default_animation_duration;
-    };
-    /* callback called after the array has been sorted
-     * it draws the data
-     */
-    cbs[5] = function(data) { 
 	var animation_duration = 1000;
 
 	svg = d3.select("#" + algorithmTabId + " .graphics").append("svg")
@@ -111,19 +105,37 @@
 	    .attr("dy", 15)
 	    .text(function(d) { return d.val; });
 
-	/*interpolating works with transforms too .. so cool -> move to new spot*/
-	gs.transition().duration(animation_duration).attr("transform", function(d, i) {
-	    return "translate(" + 2*w*i + "," + Y + ")";
-	});
-
 	/* setup the arrow data */
 	arrow = svg.append("image")
-	    .style("display","none")
+	    .style("visibility","hidden")
 	    .attr("y",0)
 	    .attr("x",0)
 	    .attr("width",30)
 	    .attr("height",30)
 	    .attr("xlink:href", "assets/arrow2.svg");
+
+	return animation_duration;
+    };
+    /* callback called after the array has been sorted
+     * it draws the data
+     */
+    cbs[5] = function(data) { 
+	var animation_duration = 1000;
+
+	/* the gs have an old_i which is their old order .. we move the gs to where they are
+	 * in the old order
+	 */
+	var gs = svg.selectAll(".gs");
+
+	var map_of_new_pos = {};
+	for (var i=0;i < data.length; i++) {
+	    map_of_new_pos[data[i].old_i] = i;
+	}
+
+	/*interpolating works with transforms too .. so cool -> move to new spot*/
+	gs.transition().duration(animation_duration).attr("transform", function(d, i) {
+	    return "translate(" + 2*w*map_of_new_pos[i] + "," + Y + ")";
+	});
 	
 	return animation_duration;
     };
@@ -132,14 +144,14 @@
      */
     cbs[8] = function(mid) { 
 	var animation_duration = 1000;
-	arrow.style("display","block").transition().duration(animation_duration).attr("x",2*w*mid-3);
+	arrow.style("visibility","visible").transition().duration(animation_duration).attr("x",2*w*mid-3);
 	return animation_duration;
     };
     /*callback called after a match was found
      */
     cbs[16] = function(low) { 
 	var animation_duration = 1000;
-	arrow.style("display","block").transition().duration(animation_duration).attr("x",2*w*low-3);
+	arrow.style("visibility","visible").transition().duration(animation_duration).attr("x",2*w*low-3);
 	svg.append("text")
 	    .attr("dy", "100px")
 	    .attr("class", "not-found-label")
@@ -199,9 +211,10 @@
 	.text("start");
 
     d3.select("#" + algorithmTabId + " .code")
+	.append("div")
+	.attr("class", "bs-code")
 	.append("pre")
 	.attr("class", "prettyprint lang-js linenums:1")
-    	.attr("id", "bs-code")
 	.append("code")
 	.attr("class", "language-js")
 	.text(balgo.toString());

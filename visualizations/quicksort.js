@@ -79,13 +79,11 @@
     var data = sequence_to_sort.map(function(d, i) {
 	return {val : d, old_idx: i};
     });;
-	
+
     var margin = { left: 10, top: 30, right: 10, bottom: 100};
-    var height = 1050;
-    var width = 1600;
     var svg = d3.select("#" + algorithmTabId + " .graphics").append("svg")
-	.attr("width", width)
-	.attr("height", height)
+	.attr("width",  "100%")
+	.attr("height", "1050px")
 	.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -324,9 +322,10 @@
     var swap_algo = new Algorithm(swap_function, swap_callbacks, "swap_function-code", swap_context);
 
     d3.select("#" + algorithmTabId + " .code")
+	.append("div")
+	.attr("class", "quicksort-code")
 	.append("pre")
         .attr("class", "prettyprint lang-js linenums:1")
-	.attr("id", "quicksort-code")
 	.append("code")
         .attr("class", "language-js")
         .text(qual_algo);
@@ -351,6 +350,38 @@
 	    this[i] = x;
 	}
     };
+    var typingPlugin = new TextTypingPlugin(50);
+    var shrunk = 0;
+    d3.select("#" + algorithmTabId + " .options").append("button")
+	.attr("style", "margin-left: 10px")
+        .on("click", function(d) {
+
+	    if (shrunk % 3 != 2) {
+
+	    var frameTextContainer = d3.select("#" + algorithmTabId + " .code")
+		.insert("div", "#quicksort-code")
+		.attr("display", "none")
+		.attr("class",  algorithmTabId + "-stack-frame")
+		.style("padding-top", "100px")
+	    .append("svg").attr("width", "100%").attr("height", "100%")
+		.append("text").attr("id", "frame-text").attr("transform", "scale(3)").style({"fill":"black"}).attr("dy", "1em");
+
+		var text_delay = typingPlugin.animateText("Pushing a new stack frame!", frameTextContainer);
+
+		//d3.select("#quicksort-code").transition().delay(text_delay).duration(100).style("display", "none");
+		d3.select("." + algorithmTabId + "-stack-frame:last-of-type").transition().delay(text_delay).duration(100).style("display", "block");
+		d3.select("." + algorithmTabId + "-stack-frame:last-of-type").transition().delay(text_delay + 100).duration(1000).style("padding-top", "0px").style("height", "20px");
+		d3.select("." + algorithmTabId + "-stack-frame:last-of-type #frame-text").transition().delay(text_delay + 100).duration(1000).attr("transform", "scale(1)");
+		//d3.select("#quicksort-code").transition().delay(text_delay + 1100).duration(100).style("display", "block");
+		shrunk++;
+	    }
+	    else {
+		//d3.select("#quicksort-code").transition().delay(1000).style("display", "block");
+		d3.select("." + algorithmTabId + "-stack-frame:last-of-type").transition().duration(1000).remove();
+		shrunk++;
+	    }
+	})
+	.text("Shrink!");
 
     d3.select("#" + algorithmTabId + " .options").append("button")
 	.attr("style", "margin-left: 10px")
