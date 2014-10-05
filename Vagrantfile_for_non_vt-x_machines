@@ -8,15 +8,21 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # All Vagrant configuration is done here. The most common configuration
   # options are documented and commented below. For a complete reference,
   # please see the online documentation at vagrantup.com.
+
+  # comment this out on 64 bit systems
+  config.vm.provider :virtualbox do |vb|
+    vb.customize [ "modifyvm", :id, "--hwvirtex", "off", "--cpus", 1 ]
+  end
   
+
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "hashicorp/precise64"
+  config.vm.box = "hashicorp/precise32"
 
   # prepare x11 forwarding so that we can run the gui on inside vagrant
   config.ssh.forward_x11 = true
 
   config.vm.network "forwarded_port", guest: 8989, host: 8989
 
-  config.vm.provision :shell, path: "provision.sh"
+  config.vm.provision :shell, path: "provision-for-32.sh"
   config.vm.provision :shell, :inline => "sudo initctl emit vagrant-ready"
 end

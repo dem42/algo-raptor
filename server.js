@@ -4,6 +4,7 @@ var http = require('http');
 var express = require('express');
 var _ = require('underscore');
 
+var appDir = path.dirname(require.main.filename);
 var app = express();
 app.set('port', 8989);
 app.use(express.static(path.join(__dirname, '.')));
@@ -18,7 +19,8 @@ app.get('/test', function(req, res) {
 
 app.get('/visualizations', function(req, res) {
     res.setHeader("Content-type", "text/json; charset=utf-8");
-    fs.readdir("visualizations", function(err, files) {
+
+    fs.readdir(appDir + "/visualizations", function(err, files) {
 	var myset = Object.create(null);
 	_.each(files, function(f) { myset[f.replace("~","").replace(".js","").replace(".css", "")] = true });
 	var filtered_files = [];

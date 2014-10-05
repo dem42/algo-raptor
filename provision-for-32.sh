@@ -2,7 +2,7 @@
 apt-get update --fix-missing
 apt-get install -y emacs
 
-TAR=node-v0.10.30-linux-x64
+TAR=node-v0.10.30-linux-x86
 wget http://nodejs.org/dist/v0.10.30/${TAR}.tar.gz
 tar xzf ${TAR}.tar.gz
 touch /etc/init/node.conf
