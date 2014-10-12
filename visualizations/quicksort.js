@@ -67,8 +67,8 @@
 		new_right = new_right - 1;
 	    }
 	}
-	quicksort(data, left, (new_right >= left) ? new_right : left, swap_function);
-	quicksort(data, (new_left <= right) ? new_left : left, right, swap_function);
+	quicksort(data, left, new_right, swap_function);
+	quicksort(data, new_left, right, swap_function);
     }
 
     /*************************/
@@ -353,36 +353,17 @@
 	    this[i] = x;
 	}
     };
-    var typingPlugin = new TextTypingPlugin(50);
-    var shrunk = 0;
+    var shrunk = 1;
     d3.select("#" + algorithmTabId + " .options").append("button")
 	.attr("style", "margin-left: 10px")
         .on("click", function(d) {
-
-	    if (shrunk % 3 != 2) {
-
-	    var frameTextContainer = d3.select("#" + algorithmTabId + " .code")
-		.insert("div", "#quicksort-code")
-		.attr("display", "none")
-		.attr("class",  algorithmTabId + "-stack-frame")
-		.style("padding-top", "100px")
-	    .append("svg").attr("width", "100%").attr("height", "100%")
-		.append("text").attr("id", "frame-text").attr("transform", "scale(3)").style({"fill":"black"}).attr("dy", "1em");
-
-		var text_delay = typingPlugin.animateText("Pushing a new stack frame!", frameTextContainer);
-
-		//d3.select("#quicksort-code").transition().delay(text_delay).duration(100).style("display", "none");
-		d3.select("." + algorithmTabId + "-stack-frame:last-of-type").transition().delay(text_delay).duration(100).style("display", "block");
-		d3.select("." + algorithmTabId + "-stack-frame:last-of-type").transition().delay(text_delay + 100).duration(1000).style("padding-top", "0px").style("height", "20px");
-		d3.select("." + algorithmTabId + "-stack-frame:last-of-type #frame-text").transition().delay(text_delay + 100).duration(1000).attr("transform", "scale(1)");
-		//d3.select("#quicksort-code").transition().delay(text_delay + 1100).duration(100).style("display", "block");
-		shrunk++;
+	    if (shrunk % 3 != 0) {
+		AlgorithmUtils.visualizeNewStackFrame(qual_algo);
 	    }
 	    else {
-		//d3.select("#quicksort-code").transition().delay(1000).style("display", "block");
-		d3.select("." + algorithmTabId + "-stack-frame:last-of-type").transition().duration(1000).remove();
-		shrunk++;
+		AlgorithmUtils.popStackFrame(qual_algo);
 	    }
+	    shrunk++;
 	})
 	.text("Shrink!");
 

@@ -87,3 +87,37 @@ AlgorithmUtils.insertIntoHeaderList = function(tabId, headerText, listItemId) {
     listItem.append("a").data([listItemId]).attr("href", tabId).attr("role", "tab").attr("data-toggle", "tab")
 	.text(headerText);
 }
+
+// for adding a new frame for a recursive algorithm
+AlgorithmUtils.visualizeNewStackFrame = function(algorithm) {
+    if (!Algorithm.prototype.isPrototypeOf(algorithm)) {
+	console.error("First argument to visualizeNewStackFrame must have a prototype of Algorithm");
+	return;
+    }
+
+    var selector = "." + algorithm.codeContainerId + ":last-of-type";
+    var height = $(selector).height();
+    var frow_height = $(selector + " li:nth-child(1)").height();
+    var clone = $(selector).clone();
+    var ds = d3.select(selector);
+    ds.style({"overflow": "hidden", "margin-bottom": "5px"}).attr("data-oldheight", height + "px");
+    ds.transition().duration(100).style("height", frow_height + "px");
+    setTimeout(function() {
+	clone.insertAfter(selector);
+	//$("#" + algorithmTabId + " .code").append(clone);
+    }, 500);
+}
+
+//remove an old stack frame and expand the previous one
+AlgorithmUtils.popStackFrame = function(algorithm) {
+    if (!Algorithm.prototype.isPrototypeOf(algorithm)) {
+	console.error("First argument to visualizeNewStackFrame must have a prototype of Algorithm");
+	return;
+    }
+
+    var selector = "." + algorithm.codeContainerId + ":last-of-type";
+    d3.select(selector).remove();
+    var ds = d3.select(selector);
+    var oldh = ds.attr("data-oldheight");
+    ds.transition().delay(500).duration(100).style("height", oldh);
+}

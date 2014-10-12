@@ -1,3 +1,5 @@
+body { font-size: 62.5%; }
+
 .aviz-footer {
     border-top: 1px solid #eee;
     padding-top: 20px;
@@ -31,16 +33,16 @@
 }
 
 pre.prettyprint {
-    font-size: 16px;
+    font-size: 1em;
 }
 
 .code {
-    font-size: 12px;
+    font-size: 1em;
     font-family: sans-serif;
 }
 
 .graphics {
-    font-size: 12px;
+    font-size: 1em;
     font-family: sans-serif;
 }
 
@@ -53,7 +55,7 @@ li.highlighted-row {
 
 .jumbotron {
     margin-top: -10px;
-    font-size: 21px;
+    font-size: 1.26em;
 }
 
 .controls-header {
@@ -71,7 +73,7 @@ li.highlighted-row {
 
 .controls-info-text {
     font-style: italic;
-    font-size: 11px;
+    font-size: 0.70em;
     padding-right: 15px;
     padding-left: 3px;
 }

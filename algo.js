@@ -26,9 +26,11 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
     // used by the runStack command to kick off the animation in continuous mode
     this.running = false;
     this.runningCodeStack = [];
+    this.lastRowNum = undefined;
 
     var tokens = func.toString().split("\n");
     var LN = tokens.length;
+    this.lastRowNum = LN;
     var result = undefined;
     var args = this.param[1].split(",");
     for (var i=0;i < args.length; i++) {
@@ -78,7 +80,7 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
     this.preRowExecute = function(row_num, var_array0) {
 	var var_array = AlgorithmUtils.clone(var_array0);
 	var selfie = this;
-	this.animation_queue.push(new AnimationFrame("pre", row_num, this.codeContainerId, function() {
+	this.animation_queue.push(new AnimationFrame("pre", row_num, this.lastRowNum, this.codeContainerId, function() {
 	    var animation_duration;
 	    if (row_num in selfie.callbacks && selfie.callbacks[row_num].pre != undefined)
 	    {
@@ -109,7 +111,7 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
 	
 	var var_array = AlgorithmUtils.clone(var_array0);
 	var selfie = this;
-	this.animation_queue.push(new AnimationFrame("post", row_num, this.codeContainerId, function() {
+	this.animation_queue.push(new AnimationFrame("post", row_num, this.lastRowNum, this.codeContainerId, function() {
 	    var animation_duration;
 	    if (row_num in selfie.callbacks)
 	    {
@@ -308,6 +310,13 @@ Algorithm.prototype.__executeNextRow = function(prevRowNum) {
 	    this.highlightRow(codeId, rownum, 0, undefined);
 	}
 
+	if (rownum == 0 && existsOnTheStack(codeId, this.runningCodeStack)) {
+	    AlgorithmUtils.visualizeNewStackFrame(this);
+	}
+	if (this.animation_queue[0].isReturnRow) {
+	    AlgorithmUtils.popStackFrame(this);
+	}
+
 	this.runningCodeStack.push(codeId);
 	var animation_duration = this.animation_queue[0].animationFunction.call(this);
 	this.animation_queue.shift();
@@ -320,14 +329,22 @@ Algorithm.prototype.__executeNextRow = function(prevRowNum) {
 	var lastFunc = this.runningCodeStack.pop();
 	this.removeAllRowHighlighting(lastFunc);
     }
+    
+    function existsOnTheStack(codeId, stack) {
+	var N = stack.length;
+	for (var i=0;i<N;i++) {
+	    if (stack[i] == codeId) return true;
+	}
+	return false;
+    }
 }
 
-
-function AnimationFrame(type, rowNumber, codeContainerId, animationFunction) {
+function AnimationFrame(type, rowNumber, lastRowNum, codeContainerId, animationFunction) {
     this.type = type;
     this.rowNumber = rowNumber;
     this.animationFunction = animationFunction;
     this.codeContainerId = codeContainerId;
+    this.isReturnRow = rowNumber == lastRowNum;
 }
 /////////////////////////////////////////////////////////////////
 // Algorithm class end ///
