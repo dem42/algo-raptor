@@ -75,10 +75,33 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
 	d3.selectAll("." + codeContainerId + " .highlighted-row").classed("highlighted-row", false);
     };
 
-    this.preRowExecute = function(row_num) {
-	var self = this;
+    this.preRowExecute = function(row_num, var_array0) {
+	var var_array = AlgorithmUtils.clone(var_array0);
+	var selfie = this;
 	this.animation_queue.push(new AnimationFrame("pre", row_num, this.codeContainerId, function() {
-	    return self.AlgorithmContext.default_animation_duration;
+	    var animation_duration;
+	    if (row_num in selfie.callbacks && selfie.callbacks[row_num].pre != undefined)
+	    {
+		var callback_obj = selfie.callbacks[row_num].pre;
+		var fun_param = callback_obj.toString().match(/\(([^\(\)]*)\)/);
+		var param_vals = [];
+		fun_param[1].split(",").forEach(function(p) {
+		    var trimmed = $.trim(p);
+		    if (trimmed == "") {
+			return;
+		    }
+		    if (selfie.varname_map[$.trim(p)].idx == undefined) {
+			console.error("Your callback is looking for a variable named", p, "which isn't defined in the function", selfie.funcName);
+		    }
+	    	    param_vals.push(var_array[selfie.varname_map[$.trim(p)].idx]);
+		});
+		animation_duration = callback_obj.apply(selfie.callbacks, param_vals);
+	    }
+	    else
+	    {
+		animation_duration = selfie.AlgorithmContext.default_animation_duration;
+	    }
+	    return animation_duration;
 	}));
     };
 
@@ -90,16 +113,20 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
 	    var animation_duration;
 	    if (row_num in selfie.callbacks)
 	    {
-		var fun_param = selfie.callbacks[row_num].toString().match(/\(([^\(\)]*)\)/);
+		var callback_obj = selfie.callbacks[row_num].post != undefined ? selfie.callbacks[row_num].post : selfie.callbacks[row_num];
+		var fun_param = callback_obj.toString().match(/\(([^\(\)]*)\)/);
 		var param_vals = [];
 		fun_param[1].split(",").forEach(function(p) {
 		    var trimmed = $.trim(p);
 		    if (trimmed == "") {
 			return;
 		    }
+		    if (selfie.varname_map[$.trim(p)].idx == undefined) {
+			console.error("Your callback is looking for a variable named", p, "which isn't defined in the function", selfie.funcName);
+		    }
 	    	    param_vals.push(var_array[selfie.varname_map[$.trim(p)].idx]);
 		});
-		animation_duration = selfie.callbacks[row_num].apply(selfie.callbacks, param_vals);
+		animation_duration = callback_obj.apply(selfie.callbacks, param_vals);
 	    }
 	    else
 	    {
@@ -173,15 +200,14 @@ Algorithm.prototype.addDebugging = function(fstr) {
     {
 	// preExecute is for rows like if or while conditions that get evaluated to false
 	if (i > 0 && $.trim(tokens[i]) != "" && $.trim(tokens[i]).indexOf("{") != 0 && $.trim(tokens[i]).indexOf("else") != 0) {
-	    nfun += "self.preRowExecute(" + i + ");";
+	    nfun += "self.preRowExecute(" + i + ", [" + this.found_vars + "]);";
 	}
 
    	nfun += tokens[i];
 	if (i < tokens.length-1 && ($.trim(tokens[i+1]).indexOf("{") != 0) && ($.trim(tokens[i+1]).indexOf("else") != 0)) { 
 	    // add the handle row function to every row except for the first and last
 	    // this function will deal with row highlighting and var printing
-	    nfun += "self.postRowExecute(" + i;
-	    nfun += ", [" + this.found_vars + "]);";
+	    nfun += "self.postRowExecute(" + i + ", [" + this.found_vars + "]);";
 
 	}
 	nfun += "\n";

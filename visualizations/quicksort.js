@@ -273,12 +273,45 @@
     // we are going to do the animation inside swap and return the length of that
     // animation in the post swap callbacks to correctly animate the delay
     var swapping_animation_duration = 3000;
-    q_callbacks[16] = function(data, new_left, new_right) {
-	var self = this;
-	updateLeft.call(self, data, new_left);
-	updateRight.call(self, data, new_right);
-	return swapping_animation_duration;
-    }
+    q_callbacks[16] = {
+	post: function(data, new_left, new_right) {
+	    var self = this;
+	    updateLeft.call(self, data, new_left);
+	    updateRight.call(self, data, new_right);
+	    return swapping_animation_duration;
+	},
+	pre: function(data, new_left, new_right) {
+	    var step_duration = 1000;
+	    var i = new_left;
+	    var j = new_right;
+	    if (i == j) return;
+
+	    var gi = d3.select("#q-g-" + data[i].old_idx)
+	    var gj = d3.select("#q-g-" + data[j].old_idx)
+
+	    var di = gi.datum();
+	    var dj = gj.datum();
+
+	    var trns1 = [di.x_off, di.y_off];
+	    var trns2 = [dj.x_off, dj.y_off];
+	    gi.transition().duration(step_duration).attr("transform", "translate(" + trns1[0] + " " + (trns1[1] - maxi_width) + ")");
+	    gj.transition().duration(step_duration).attr("transform", "translate(" + trns2[0] + " " + (trns2[1] + maxi_width) + ")");
+
+	    gi.transition().delay(step_duration).duration(step_duration).attr("transform", "translate(" + trns2[0] + " " + (trns1[1] - maxi_width) + ")");
+	    gj.transition().delay(step_duration).duration(step_duration).attr("transform", "translate(" + trns1[0] + " " + (trns2[1] + maxi_width) + ")");
+
+	    gi.transition().delay(2*step_duration).duration(step_duration).attr("transform", "translate(" + trns2[0] + " " + trns1[1] + ")");
+	    gj.transition().delay(2*step_duration).duration(step_duration).attr("transform", "translate(" + trns1[0] + " " + trns2[1] + ")");
+
+	    di.x_off = trns2[0];
+	    di.y_off = trns1[1];
+
+	    dj.x_off = trns1[0];
+	    dj.y_off = trns2[1];
+
+	    return 0;
+	}
+    };
     var algo_context = {
 	default_animation_duration : 300,
     };
@@ -286,36 +319,6 @@
     AlgorithmUtils.attachAlgoToControls(qual_algo, algorithmTabId);
 
     var swap_callbacks = [];
-    swap_callbacks[0] = function(data, i, j) {
-	var step_duration = 1000;
-	if (i == j) return;
-
-	var gi = d3.select("#q-g-" + data[i].old_idx)
-	var gj = d3.select("#q-g-" + data[j].old_idx)
-
-	var di = gi.datum();
-	var dj = gj.datum();
-
-	var trns1 = [di.x_off, di.y_off];
-	var trns2 = [dj.x_off, dj.y_off];
-	gi.transition().duration(step_duration).attr("transform", "translate(" + trns1[0] + " " + (trns1[1] - maxi_width) + ")");
-	gj.transition().duration(step_duration).attr("transform", "translate(" + trns2[0] + " " + (trns2[1] + maxi_width) + ")");
-
-	gi.transition().delay(step_duration).duration(step_duration).attr("transform", "translate(" + trns2[0] + " " + (trns1[1] - maxi_width) + ")");
-	gj.transition().delay(step_duration).duration(step_duration).attr("transform", "translate(" + trns1[0] + " " + (trns2[1] + maxi_width) + ")");
-
-	gi.transition().delay(2*step_duration).duration(step_duration).attr("transform", "translate(" + trns2[0] + " " + trns1[1] + ")");
-	gj.transition().delay(2*step_duration).duration(step_duration).attr("transform", "translate(" + trns1[0] + " " + trns2[1] + ")");
-
-	di.x_off = trns2[0];
-	di.y_off = trns1[1];
-
-	dj.x_off = trns1[0];
-	dj.y_off = trns2[1];
-
-	return 0;
-    }
-
     var swap_context = {
 	default_animation_duration: 0, 
     }
@@ -335,7 +338,7 @@
 	.on("click", function(d) {
 	    console.log("Before", data.map(function(d) { return d.val; }));
 	    qual_algo.startAnimation(data, 0, data.length - 1, function(data, i, j) {
-		return swap_algo.runWithSharedAnimationQueue(qual_algo, data, i, j); 
+		return swap_algo.run(data, i, j); 
 	    });
 	    console.log("After", data.map(function(d) { return d.val; }));
 	})
