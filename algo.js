@@ -26,7 +26,8 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
     // used by the runStack command to kick off the animation in continuous mode
     this.running = false;
     this.runningCodeStack = [];
-    this.lastRowNum = undefined;
+    this.functionStack = [];
+    this.return_rows = {};
 
     var tokens = func.toString().split("\n");
     var LN = tokens.length;
@@ -38,6 +39,7 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
     }
 
     var var_pat = /\s*var\s+([a-zA-Z_$][0-9a-zA-Z_$]*)\s*=/;
+    var ret_pat = /^return\s*;|^return\s+.*|.*\s+return\s*;|.*\s+return\s+.*/;
     var _found_vars = args.length;
     for (var i=0; i < LN; i++) {
 	// direct eval uses the global context
@@ -49,6 +51,7 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
 	    this.varname_map[result[1]] = {"row_num" : i, "idx" : _found_vars};
 	    _found_vars++;
 	}
+	this.return_rows[i] = ret_pat.test(tokens[i]) || i == LN-1;
     }
     this.found_vars = args;
     /*
@@ -80,7 +83,7 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
     this.preRowExecute = function(row_num, var_array0) {
 	var var_array = AlgorithmUtils.clone(var_array0);
 	var selfie = this;
-	this.animation_queue.push(new AnimationFrame("pre", row_num, this.lastRowNum, this.codeContainerId, function() {
+	this.animation_queue.push(new AnimationFrame("pre", row_num, this.return_rows, this.codeContainerId, function() {
 	    var animation_duration;
 	    if (row_num in selfie.callbacks && selfie.callbacks[row_num].pre != undefined)
 	    {
@@ -111,7 +114,7 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
 	
 	var var_array = AlgorithmUtils.clone(var_array0);
 	var selfie = this;
-	this.animation_queue.push(new AnimationFrame("post", row_num, this.lastRowNum, this.codeContainerId, function() {
+	this.animation_queue.push(new AnimationFrame("post", row_num, this.return_rows, this.codeContainerId, function() {
 	    var animation_duration;
 	    if (row_num in selfie.callbacks)
 	    {
@@ -246,6 +249,7 @@ Algorithm.prototype.getAnimationQueue = function() {
 Algorithm.prototype.startAnimation = function() {
     this.running = false;
     this.runningCodeStack = [];
+    this.functionStack = [];
     this.animation_queue = []; // reset the animation queue
     this.run.apply(this, arguments);
 
@@ -304,26 +308,46 @@ Algorithm.prototype.__executeNextRow = function(prevRowNum) {
 	if (!this.running && rownum != prevRowNum) {
 	    return;
 	}
- 	if (this.running && rownum != prevRowNum) {
-	    var lastFunc = this.runningCodeStack.pop();
-	    this.removeAllRowHighlighting(lastFunc);
-	    this.highlightRow(codeId, rownum, 0, undefined);
-	}
 
-	if (rownum == 0 && existsOnTheStack(codeId, this.runningCodeStack)) {
-	    AlgorithmUtils.visualizeNewStackFrame(this);
-	}
-	if (this.animation_queue[0].isReturnRow) {
-	    AlgorithmUtils.popStackFrame(this);
-	}
 
-	this.runningCodeStack.push(codeId);
-	var animation_duration = this.animation_queue[0].animationFunction.call(this);
-	this.animation_queue.shift();
+	var preanimation_extra_time = 0;
+	if (rownum == 0) {
+	    if (existsOnTheStack(codeId, this.functionStack)) {
+		preanimation_extra_time += AlgorithmUtils.visualizeNewStackFrame(this);
+	    }
+	    this.functionStack.push(codeId);
+	}
+	var doFrameRemoval = this.animation_queue[0].isReturnRow();
+
 	var this_obj = this;
+	var animationFunction = this.animation_queue[0].animationFunction;
 	setTimeout(function() {
-	    this_obj.__executeNextRow(rownum);
-	}, animation_duration);
+	    if (this_obj.running && rownum != prevRowNum) {
+		var lastFunc = this_obj.runningCodeStack.pop();
+		this_obj.removeAllRowHighlighting(lastFunc);
+		this_obj.highlightRow(codeId, rownum, 0, undefined);
+	    }
+
+	    this_obj.runningCodeStack.push(codeId);
+	    this_obj.animation_queue.shift();
+
+	    var animation_duration = animationFunction.call(this_obj);
+	    
+	    setTimeout(function() {
+		if (doFrameRemoval && isRecursionFrame(codeId, this_obj.functionStack)) {
+			var removal_duration = AlgorithmUtils.popStackFrame(this_obj);
+			setTimeout(function() {
+			    this_obj.__executeNextRow(rownum);
+			}, removal_duration);
+		}
+		else {
+		    this_obj.__executeNextRow(rownum);
+		}
+		if (doFrameRemoval) {
+		    this_obj.functionStack.pop();
+		}
+	    }, animation_duration);
+	}, preanimation_extra_time);
     }
     else {
 	var lastFunc = this.runningCodeStack.pop();
@@ -337,14 +361,28 @@ Algorithm.prototype.__executeNextRow = function(prevRowNum) {
 	}
 	return false;
     }
+
+    function isRecursionFrame(codeId, stack) {
+	var N = stack.length;
+	var cnt = 0;
+	for (var i=0;i<N;i++) {
+	    if (stack[i] == codeId) {
+		cnt++;
+	    }
+	}
+	return cnt > 1;
+    }
 }
 
-function AnimationFrame(type, rowNumber, lastRowNum, codeContainerId, animationFunction) {
+function AnimationFrame(type, rowNumber, returnRows, codeContainerId, animationFunction) {
     this.type = type;
     this.rowNumber = rowNumber;
     this.animationFunction = animationFunction;
     this.codeContainerId = codeContainerId;
-    this.isReturnRow = rowNumber == lastRowNum;
+    this.returnRows = returnRows
+}
+AnimationFrame.prototype.isReturnRow = function() {
+    return this.returnRows[this.rowNumber];
 }
 /////////////////////////////////////////////////////////////////
 // Algorithm class end ///

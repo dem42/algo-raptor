@@ -28,8 +28,8 @@ app.get('/visualizations', function(req, res) {
 	    filtered_files.push(file);
 	}
 	
-	console.log(filtered_files);
-	console.log(JSON.stringify(filtered_files));
+	//console.log(filtered_files);
+	//console.log(JSON.stringify(filtered_files));
 	res.send(JSON.stringify(filtered_files));
     });
 });
