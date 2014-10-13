@@ -96,7 +96,7 @@ AlgorithmUtils.visualizeNewStackFrame = function(algorithm) {
     }
     var duration = 1000;
     var delay = 500;
-    var selector = "." + algorithm.codeContainerId + ":last-of-type";
+    var selector = "." + algorithm.codeContainerId + " div:last-of-type";
     var height = $(selector).height();
     var frow_height = $(selector + " li:nth-child(1)").height();
     var clone = $(selector).clone();
@@ -120,7 +120,7 @@ AlgorithmUtils.popStackFrame = function(algorithm) {
     }
     var duration = 1000;
     var delay = 500;
-    var selector = "." + algorithm.codeContainerId + ":last-of-type";
+    var selector = "." + algorithm.codeContainerId + " div:last-of-type";
     d3.select(selector).remove();
     var ds = d3.select(selector);
     var oldh = ds.attr("data-oldheight");

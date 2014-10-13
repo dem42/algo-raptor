@@ -213,6 +213,8 @@
     d3.select("#" + algorithmTabId + " .code")
 	.append("div")
 	.attr("class", "bs-code")
+        .append("div")
+	.attr("class", "function-code-holder")
 	.append("pre")
 	.attr("class", "prettyprint lang-js linenums:1")
 	.append("code")

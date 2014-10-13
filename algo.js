@@ -60,10 +60,11 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
     this.AlgorithmContext = algorithmContext;
 
     function getRowToHighlightSelector(rowNumber, codeContainerId) {
-	return "." + codeContainerId + ":last-of-type li:nth-child(" + (rowNumber + 1) +")";
+	return "." + codeContainerId + " div:last-of-type li:nth-child(" + (rowNumber + 1) +")";
     }
 
     this.highlightRow = function highlightRow(codeContainerId, rowNumber, startDelay, durationOfHighlight) {
+	console.log("highlighting", codeContainerId, rowNumber);
 	var rowToHighlightSelector = getRowToHighlightSelector(rowNumber, codeContainerId);
 	setTimeout(function() {
 	    $(rowToHighlightSelector).toggleClass("highlighted-row");
@@ -308,7 +309,7 @@ Algorithm.prototype.__executeNextRow = function(prevRowNum) {
 	if (!this.running && rownum != prevRowNum) {
 	    return;
 	}
-
+	console.log("In exec row of", rownum, codeId);
 
 	var preanimation_extra_time = 0;
 	if (rownum == 0) {
