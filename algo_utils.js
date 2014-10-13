@@ -105,6 +105,7 @@ AlgorithmUtils.visualizeNewStackFrame = function(algorithm) {
     ds.transition().duration(duration).style("height", frow_height + "px");
     setTimeout(function() {
 	clone.insertAfter(selector);
+	d3.select(selector).selectAll("span.com").remove();
 	//$("#" + algorithmTabId + " .code").append(clone);
     }, duration + delay);
 
