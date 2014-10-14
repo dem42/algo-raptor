@@ -54,12 +54,12 @@
     var svg = null;
 
     function bsearch(data, key) {
+	//data must be sorted before we can binary search
+	data.sort(function(a,b) { return a.val - b.val;});
+
 	var high = data.length-1;
 	var low = 0;
 	var mid = 0;
-
-	data.sort(function(a,b) { return a.val - b.val;});
-
 	while (low < high) {
 	    mid = Math.floor((high + low)/2);
 	    if (data[mid].val < +key) {
@@ -119,7 +119,7 @@
     /* callback called after the array has been sorted
      * it draws the data
      */
-    cbs[5] = function(data) { 
+    cbs[2] = function(data) { 
 	var animation_duration = 1000;
 
 	/* the gs have an old_i which is their old order .. we move the gs to where they are

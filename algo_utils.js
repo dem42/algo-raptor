@@ -89,14 +89,10 @@ AlgorithmUtils.insertIntoHeaderList = function(tabId, headerText, listItemId) {
 }
 
 // for adding a new frame for a recursive algorithm
-AlgorithmUtils.visualizeNewStackFrame = function(algorithm) {
-    if (!Algorithm.prototype.isPrototypeOf(algorithm)) {
-	console.error("First argument to visualizeNewStackFrame must have a prototype of Algorithm");
-	return;
-    }
+AlgorithmUtils.visualizeNewStackFrame = function(codeContainerId) {
     var duration = 1000;
     var delay = 500;
-    var selector = "." + algorithm.codeContainerId + " div:last-of-type";
+    var selector = "." + codeContainerId + " div:last-of-type";
     var height = $(selector).height();
     var frow_height = $(selector + " li:nth-child(1)").height();
     var clone = $(selector).clone();
@@ -105,22 +101,23 @@ AlgorithmUtils.visualizeNewStackFrame = function(algorithm) {
     ds.transition().duration(duration).style("height", frow_height + "px");
     setTimeout(function() {
 	clone.insertAfter(selector);
-	d3.select(selector).selectAll("span.com").remove();
-	//$("#" + algorithmTabId + " .code").append(clone);
+	AlgorithmUtils.clearComments(codeContainerId);
     }, duration + delay);
 
     return duration + delay;
 }
 
+//remove dynamic comments (values of variables appended with // during execution of the algorithm)
+AlgorithmUtils.clearComments = function(codeContainerId) {
+    var selector = "." + codeContainerId + " div:last-of-type";
+    d3.select(selector).selectAll("span.com.dynamic").remove();
+}
+
 //remove an old stack frame and expand the previous one
-AlgorithmUtils.popStackFrame = function(algorithm) {
-    if (!Algorithm.prototype.isPrototypeOf(algorithm)) {
-	console.error("First argument to popStackFrame must have a prototype of Algorithm");
-	return;
-    }
+AlgorithmUtils.popStackFrame = function(codeContainerId) {
     var duration = 1000;
     var delay = 500;
-    var selector = "." + algorithm.codeContainerId + " div:last-of-type";
+    var selector = "." + codeContainerId + " div:last-of-type";
     d3.select(selector).remove();
     var ds = d3.select(selector);
     var oldh = ds.attr("data-oldheight");

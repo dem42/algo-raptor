@@ -52,6 +52,9 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
 	    _found_vars++;
 	}
 	this.return_rows[i] = ret_pat.test(tokens[i]) || i == LN-1;
+	if (this.return_rows[i]) {
+	    console.log("return row", tokens[i]);
+	}
     }
     this.found_vars = args;
     /*
@@ -64,7 +67,6 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
     }
 
     this.highlightRow = function highlightRow(codeContainerId, rowNumber, startDelay, durationOfHighlight) {
-	console.log("highlighting", codeContainerId, rowNumber);
 	var rowToHighlightSelector = getRowToHighlightSelector(rowNumber, codeContainerId);
 	setTimeout(function() {
 	    $(rowToHighlightSelector).toggleClass("highlighted-row");
@@ -161,7 +163,7 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
 			var code = d3.select(rowToHighlightSelector).select("code");
 			var comment_span = code.select("span.com");
 			if (comment_span.empty()) {
-			    code.append("span").attr("class", "com");
+			    code.append("span").attr("class", "com dynamic");
 			}
 			code.select("span.com").text("  //" + selfie.var_map[idx].name + " = " + var_elem);
 		    }, animation_duration);
@@ -255,9 +257,6 @@ Algorithm.prototype.startAnimation = function() {
     this.run.apply(this, arguments);
 
     var self = this;
-    // setTimeout(function() {
-    // 	self.runStack();
-    // 	}, 1000);
 }
 
 /** 
@@ -309,12 +308,11 @@ Algorithm.prototype.__executeNextRow = function(prevRowNum) {
 	if (!this.running && rownum != prevRowNum) {
 	    return;
 	}
-	console.log("In exec row of", rownum, codeId);
 
 	var preanimation_extra_time = 0;
 	if (rownum == 0) {
 	    if (existsOnTheStack(codeId, this.functionStack)) {
-		preanimation_extra_time += AlgorithmUtils.visualizeNewStackFrame(this);
+		preanimation_extra_time += AlgorithmUtils.visualizeNewStackFrame(codeId);
 	    }
 	    this.functionStack.push(codeId);
 	}
@@ -335,17 +333,23 @@ Algorithm.prototype.__executeNextRow = function(prevRowNum) {
 	    var animation_duration = animationFunction.call(this_obj);
 	    
 	    setTimeout(function() {
-		if (doFrameRemoval && isRecursionFrame(codeId, this_obj.functionStack)) {
-			var removal_duration = AlgorithmUtils.popStackFrame(this_obj);
+		console.log("in frame", codeId, rownum, "with remove frame", doFrameRemoval, "is rec frame", isRecursionFrame(codeId, this_obj.functionStack));
+		if (doFrameRemoval) {
+		    // a function has returned so we need to handle that
+		    if(isRecursionFrame(codeId, this_obj.functionStack)) {
+			var removal_duration = AlgorithmUtils.popStackFrame(codeId);
 			setTimeout(function() {
 			    this_obj.__executeNextRow(rownum);
 			}, removal_duration);
+		    }
+		    else {
+			AlgorithmUtils.clearComments(codeId);
+			this_obj.__executeNextRow(rownum);
+		    }
+		    this_obj.functionStack.pop();
 		}
 		else {
 		    this_obj.__executeNextRow(rownum);
-		}
-		if (doFrameRemoval) {
-		    this_obj.functionStack.pop();
 		}
 	    }, animation_duration);
 	}, preanimation_extra_time);
