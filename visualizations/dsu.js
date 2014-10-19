@@ -37,11 +37,11 @@
     /*******************************/
     /*      Setup the svg stuff    */
     /*******************************/
-    var margin = { left: 0, top: 30, right: 10, bottom: 100};
     //var width = 1400;
     var treew = 200;
     var treeh = 450;
-    var nodeRadius = 20;
+    var nodeRadius = 32;
+    var margin = { left: 0, top: (1.5 * nodeRadius), right: 10, bottom: 100};
 
     var svg = d3.select("#" + algorithmTabId + " .graphics").append("svg")
 	.attr("width", 1000)
@@ -203,7 +203,7 @@
 	    .attr("font-size", "0")
 	    .transition()
 	    .delay(2*animation_duration)
-	    .attr("font-size", "12");
+	    .attr("font-size", "16");
 
 	var rankInfos = svgNodes.append("text")
 	    .attr("class", "node-rank")
@@ -215,7 +215,7 @@
 	    .attr("font-size", "0")
 	    .transition()
 	    .delay(2*animation_duration)
-	    .attr("font-size", "8");
+	    .attr("font-size", "12");
 
 	// in svg the order of elements defines the z-index 
 	// we added a moveToFront function to d3.selection that changes the order of elements
