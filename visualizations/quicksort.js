@@ -82,7 +82,7 @@
 
     var margin = { left: 10, top: 30, right: 10, bottom: 100};
     var svg = d3.select("#" + algorithmTabId + " .graphics").append("svg")
-	.attr("width",  "100%")
+	.attr("width",  "900px")
 	.attr("height", "1050px")
 	.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");

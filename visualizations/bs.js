@@ -81,9 +81,11 @@
     cbs[0] = function(data) { 
 	var animation_duration = 1000;
 
+	var viewBox = AlgorithmUtils.calcViewBox("#" + algorithmTabId + " .graphics", width, height);
 	svg = d3.select("#" + algorithmTabId + " .graphics").append("svg")
-	    .attr("width", width)
-	    .attr("height", height)
+	    .attr("width", viewBox.width)
+	    .attr("height", viewBox.height)
+	    .attr("viewBox", viewBox.string)
 	    .append("g")
 	    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 

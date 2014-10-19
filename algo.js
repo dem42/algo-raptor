@@ -52,9 +52,6 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
 	    _found_vars++;
 	}
 	this.return_rows[i] = ret_pat.test(tokens[i]) || i == LN-1;
-	if (this.return_rows[i]) {
-	    console.log("return row", tokens[i]);
-	}
     }
     this.found_vars = args;
     /*

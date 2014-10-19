@@ -42,8 +42,9 @@
     var treew = 200;
     var treeh = 450;
     var nodeRadius = 20;
+
     var svg = d3.select("#" + algorithmTabId + " .graphics").append("svg")
-	.attr("width", "100%")
+	.attr("width", 1000)
 	.attr("height", treeh + 10)
 	.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -59,7 +60,7 @@
 	.attr("height", 220)
 	.attr("display", "none");
 
-    var next_num = 6;
+    var next_num = 5;
     var data = [];
     for (var j = 0; j < next_num; j++) {
 	data.push({"name": j});
@@ -186,35 +187,35 @@
 	var circles = svgNodes.append("circle")
 	    .attr("cx", 0)
 	    .attr("cy", 0)
-	    .attr("r", "0px")
+	    .attr("r", "0")
 	    .transition() //transitioning from 0em to 2em
 	    .delay(animation_duration)
 	    .duration(animation_duration)
-	    .attr("r", nodeRadius + "px");
+	    .attr("r", nodeRadius);
 
 	var texts = svgNodes.append("text")
 	    .attr("class", "node-name")
-            .attr("dx", function(d) {var num = ("" + d.name).length; return (num * -5) + "px";})
-            .attr("dy", "5px")
+            .attr("dx", function(d) {var num = ("" + d.name).length; return (num * -5);})
+            .attr("dy", "5")
 	    .attr("onmousedown", "return false;")
 	    .style("cursor", "not-allowed")
 	    .text(function(d) { return d.name; })
-	    .attr("font-size", "0pt")
+	    .attr("font-size", "0")
 	    .transition()
 	    .delay(2*animation_duration)
-	    .attr("font-size", "12pt");
+	    .attr("font-size", "12");
 
 	var rankInfos = svgNodes.append("text")
 	    .attr("class", "node-rank")
-            .attr("dx", (nodeRadius) + "px")
-            .attr("dy", (-nodeRadius) + "px")
+            .attr("dx", (nodeRadius))
+            .attr("dy", (-nodeRadius))
 	    .attr("onmousedown", "return false;")
 	    .style("cursor", "not-allowed")
 	    .text(function(d) { return "Rank = " + d.rank; })
-	    .attr("font-size", "0pt")
+	    .attr("font-size", "0")
 	    .transition()
 	    .delay(2*animation_duration)
-	    .attr("font-size", "8pt");
+	    .attr("font-size", "8");
 
 	// in svg the order of elements defines the z-index 
 	// we added a moveToFront function to d3.selection that changes the order of elements
@@ -282,13 +283,13 @@
     }
     cbsUnion[3] = function(data, r1, r2) {
 	d3.select("#node-" + r1).select(".node-rank").transition()
-	    .attr("dx","-30px")
-	    .attr("dy","60px")
-	    .style("font-size", "26px");
+	    .attr("dx","-30")
+	    .attr("dy","60")
+	    .style("font-size", "26");
 	d3.select("#node-" + r2).select(".node-rank").transition()
-	    .attr("dx","-30px")
-	    .attr("dy","60px")
-	    .style("font-size", "26px");
+	    .attr("dx","-30")
+	    .attr("dy","60")
+	    .style("font-size", "26");
     }
     cbsUnion[5] = function(b, r1, r2, data) {
 	d3.select("#node-" + r2).select(".node-rank").transition().remove();
@@ -341,13 +342,13 @@
 	}
 
 	d3.select("#node-" + r1).select(".node-rank").transition().delay(animation_duration).duration(transition_duration)
-	    .attr("dx", (nodeRadius) + "px")
-            .attr("dy", (-nodeRadius) + "px")
-	    .style("font-size", "8pt");
+	    .attr("dx", (nodeRadius))
+            .attr("dy", (-nodeRadius))
+	    .style("font-size", "8");
 	d3.select("#node-" + r2).select(".node-rank").transition().delay(animation_duration).duration(transition_duration)
-	    .attr("dx", (nodeRadius) + "px")
-            .attr("dy", (-nodeRadius) + "px")
-	    .style("font-size", "8pt");
+	    .attr("dx", (nodeRadius))
+            .attr("dy", (-nodeRadius))
+	    .style("font-size", "8");
 	setTimeout(function() {
 	    d3.select("g.cmp_result").remove();
 	}, animation_duration);
@@ -401,11 +402,9 @@
       called automatically
     */
     //$(function(){prettyPrint()});
-    
-
+    // we set the viewBox parameters here since this is when the divs are ready (dom ready)
     data.forEach(function(d) { d.rank = 0;});
     data.forEach(function(d, i) {
 	drawTreeFun(AlgorithmUtils.clone(d), i);
     });
-
 })();
