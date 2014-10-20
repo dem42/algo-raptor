@@ -330,7 +330,6 @@ Algorithm.prototype.__executeNextRow = function(prevRowNum) {
 	    var animation_duration = animationFunction.call(this_obj);
 	    
 	    setTimeout(function() {
-		console.log("in frame", codeId, rownum, "with remove frame", doFrameRemoval, "is rec frame", isRecursionFrame(codeId, this_obj.functionStack));
 		if (doFrameRemoval) {
 		    // a function has returned so we need to handle that
 		    if(isRecursionFrame(codeId, this_obj.functionStack)) {

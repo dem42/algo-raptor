@@ -87,21 +87,6 @@ AlgorithmUtils.insertIntoHeaderList = function(tabId, headerText, listItemId) {
     listItem.append("a").data([listItemId]).attr("href", tabId).attr("role", "tab").attr("data-toggle", "tab")
 	.attr("data-tab-id", tabId)
 	.text(headerText);
-
-    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-	var tabz =  $(e.target).attr("data-tab-id");
-	$(tabz + " svg").each(function() {
-	    console.log("in indiv click", $(this).width());
-	    if ($(this).attr("data-adjusted") == "true") {
-		return;
-	    }
-	    var viewBox = AlgorithmUtils.calcViewBox(tabId + " .graphics", $(this).width(), $(this).height());
-	    d3.select(this).attr("width", viewBox.width)
-		.attr("height", viewBox.height)
-		.attr("viewBox", viewBox.string)
-		.attr("data-adjusted", "true");
-	});
-    });
 }
 
 // for adding a new frame for a recursive algorithm
@@ -145,7 +130,6 @@ AlgorithmUtils.popStackFrame = function(codeContainerId) {
 //comupte a viewBox to scale svg contents properly on smaller screen sizes
 AlgorithmUtils.calcViewBox = function(parentId, width, height) {
     var parentWidth = $(parentId).width() * 1.0;
-    console.log("parent width" , parentWidth, "parentId", parentId);
     //ratio computed from parent width and made 10% smaller (smaller pixels than original) to fit inside the parent
     var vbx_ratio = (width / parentWidth); 
     return {"string" : "0 0 " + width + " " + (vbx_ratio * height), "width" : (parentWidth), "height" : height };

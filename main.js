@@ -25,6 +25,9 @@ $(function () {
 	    if (needPrettyPrint) {
 		prettyPrint.call({});
 	    }
+	    // attach a callback on shown tab to adjust svg sizes dynamically
+	    // this is needed to make sure our visualizations fit onto smaller screens
+	    $('a[data-toggle="tab"]').on('shown.bs.tab', resizingSvg);
 	});
     }
 
@@ -42,5 +45,20 @@ $(function () {
             });
 	    updater();
         }, 5000);
+    }
+
+    function resizingSvg(e) {
+	var tabz =  $(e.target).attr("data-tab-id");
+
+	$(tabz + " svg").each(function() {
+	    if ($(this).attr("data-adjusted") == "true") {
+		return;
+	    }
+	    var viewBox = AlgorithmUtils.calcViewBox(tabz + " .graphics", $(this).width(), $(this).height());
+	    d3.select(this).attr("width", viewBox.width)
+		.attr("height", viewBox.height)
+		.attr("viewBox", viewBox.string)
+		.attr("data-adjusted", "true");
+	});
     }
 });

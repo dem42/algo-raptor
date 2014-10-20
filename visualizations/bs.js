@@ -43,15 +43,19 @@
     /*      Setup the svg stuff    */
     /*******************************/
     var margin = { left: 10, top: 10, right: 10, bottom: 10},
-    height = 150,
-    width = 800,
+    height = 200,
+    width = 600,
     w = 20,
     h = 20,
     N = 15,
     Y = 50;
     var cbs = {};
     var arrow = false;
-    var svg = null;
+    var svg = d3.select("#" + algorithmTabId + " .graphics").append("svg")
+	.attr("width", width)
+	.attr("height", 0);
+    var svgg = null; //current svg group
+    var cumulative_height = 0; //this is how we know by how much to translate latter groups vertically
 
     function bsearch(data, key) {
 	//data must be sorted before we can binary search
@@ -80,19 +84,18 @@
      */
     cbs[0] = function(data) { 
 	var animation_duration = 1000;
-
-	var viewBox = AlgorithmUtils.calcViewBox("#" + algorithmTabId + " .graphics", width, height);
-	svg = d3.select("#" + algorithmTabId + " .graphics").append("svg")
-	    .attr("width", viewBox.width)
+	svgg = svg.append("g")
+	    .attr("transform", "translate(" + margin.left + "," + (margin.top + cumulative_height) +  ")");
+	cumulative_height += height;
+	var viewBox = AlgorithmUtils.calcViewBox("#" + algorithmTabId + " .graphics", width, cumulative_height);
+	svg.attr("width", viewBox.width)
 	    .attr("height", viewBox.height)
 	    .attr("viewBox", viewBox.string)
-	    .append("g")
-	    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 	/* the gs have an old_i which is their old order .. we move the gs to where they are
 	 * in the old order
 	 */
-	var gs = svg.selectAll(".gs")
+	var gs = svgg.selectAll(".gs")
 	    .data(data)
 	    .enter().append("g")
 	    .attr("class", "gs")
@@ -108,7 +111,7 @@
 	    .text(function(d) { return d.val; });
 
 	/* setup the arrow data */
-	arrow = svg.append("image")
+	arrow = svgg.append("image")
 	    .style("visibility","hidden")
 	    .attr("y",0)
 	    .attr("x",0)
@@ -127,7 +130,7 @@
 	/* the gs have an old_i which is their old order .. we move the gs to where they are
 	 * in the old order
 	 */
-	var gs = svg.selectAll(".gs");
+	var gs = svgg.selectAll(".gs");
 
 	var map_of_new_pos = {};
 	for (var i=0;i < data.length; i++) {
@@ -154,7 +157,7 @@
     cbs[16] = function(low) { 
 	var animation_duration = 1000;
 	arrow.style("visibility","visible").transition().duration(animation_duration).attr("x",2*w*low-3);
-	svg.append("text")
+	svgg.append("text")
 	    .attr("dy", "100px")
 	    .attr("class", "not-found-label")
 	    .transition().duration(animation_duration).text("Found!");
@@ -164,7 +167,7 @@
      */
     cbs[18] = function() { 
 	var animation_duration = 1000;
-	svg.append("text")
+	svgg.append("text")
 	    .attr("dy", "100px")
 	    .attr("class", "not-found-label")
 	    .transition().duration(animation_duration).text("Not Found!");
