@@ -154,9 +154,12 @@ li.highlighted-row {
     -moz-box-shadow: 
         0px 1px 1px rgba(255,255,255,0.3) inset, 
         0px 1px 2px rgba(255,255,255,0.5);
-    transition: all 0.1s ease-in-out;
+/*   
+     we don't need this because our play button transitions to a stop button when pressed
+     transition: all 0.1s ease-in-out;
     -webkit-transition: all 0.1s ease-in-out;
     -moz-transition: all 0.1s ease-in-out;
+*/
 }
 
 .a-btn-icon span.next-btn {
@@ -165,19 +168,30 @@ li.highlighted-row {
 
 .a-btn-icon span.play-btn {
     background-position: 320px 2px;
+    transition: all 0 ease 0;
+    -webkit-transition: all 0 ease 0;
+    -moz-transition: all 0 ease 0;
+
 }
 
-.a-btn:hover{
+.a-btn-icon span.pause-btn {
+    background-position: 263px 2px;
+    transition: all 0 ease 0;
+    -webkit-transition: all 0 ease 0;
+    -moz-transition: all 0 ease 0;
+}
+
+.a-btn.enabled-btn:hover{
     box-shadow: 
         0px 1px 1px rgba(255,255,255,0.8) inset, 
         1px 1px 5px rgba(0,0,0,0.4); 
 }
-.a-btn:hover .a-btn-icon span{
+.a-btn.enabled-btn:hover .a-btn-icon span{
     opacity: 1;
 }
 
 
-.a-btn:active {
+.a-btn.enabled-btn:active {
     position:relative;
     top:1px;
     /*background: linear-gradient(top, #6f97c5 0%, #80a9da 100%);
@@ -189,8 +203,15 @@ li.highlighted-row {
     -moz-box-shadow:1px 1px 2px rgba(0,0,0,0.4) inset;
     border-color: #80a9da;
 }
-.a-btn:active .a-btn-icon span{
+.a-btn.enabled-btn:active .a-btn-icon span{
     transform: scale(1.1);
     -webkit-transform: scale(1.1);
     -moz-transform: scale(1.1);
+}
+
+.a-btn.disabled-btn {
+    background: gray;
+}
+.a-btn.disabled-btn .a-btn-icon {
+    opacity: 0.5;
 }

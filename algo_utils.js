@@ -37,7 +37,7 @@ AlgorithmUtils.insertCustomControls = function(controlsDiv, algorithmId, algorit
 AlgorithmUtils.insertDefaultControls = function(controlsDiv, algorithmId) {
 
     function appendButton(div, classname, algorithmName) {
-	var button = div.append("a").attr("href", "#").attr("class", "a-btn").attr("id", classname + "-of-" + algorithmId);
+	var button = div.append("a").attr("href", "#").classed("a-btn enabled-btn", true).attr("id", classname + "-of-" + algorithmId);
 	button.append("span").attr("class", "a-btn-icon").append("span").attr("class", classname);
     }
 
@@ -56,11 +56,26 @@ AlgorithmUtils.attachAlgoToControls = function(algorithm, algorithmId) {
 	return;
     }
 
+    var play_pressed = false;
     d3.select("#" + "play-btn-of-" + algorithmId).on("click", function() {
-     	algorithm.runStack();
+	if (!play_pressed) {
+	    play_pressed = true;
+	    d3.select("#" + "play-btn-of-" + algorithmId + " span span").attr("class", "pause-btn");
+	    d3.select("#" + "next-btn-of-" + algorithmId).classed("disabled-btn", true);
+	    d3.select("#" + "next-btn-of-" + algorithmId).classed("enabled-btn", false);
+     	    algorithm.runStack();
+	}
+	else {
+	    d3.select("#" + "play-btn-of-" + algorithmId + " span span").attr("class", "play-btn");
+	    d3.select("#" + "next-btn-of-" + algorithmId).classed("disabled-btn", false);
+	    d3.select("#" + "next-btn-of-" + algorithmId).classed("enabled-btn", true);
+	    play_pressed = false;
+	}
     });
     d3.select("#" + "next-btn-of-" + algorithmId).on("click", function() {
-     	algorithm.executeNextRow();
+	if (!play_pressed) {
+     	    algorithm.executeNextRow();
+	}
     });
 }
 

@@ -49,7 +49,6 @@ $(function () {
 
     function resizingSvg(e) {
 	var tabz =  $(e.target).attr("data-tab-id");
-
 	$(tabz + " svg").each(function() {
 	    if ($(this).attr("data-adjusted") == "true") {
 		return;
