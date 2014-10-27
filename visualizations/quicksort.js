@@ -315,8 +315,9 @@
     var algo_context = {
 	default_animation_duration : 300,
     };
-    var qual_algo = new Algorithm(quicksort, q_callbacks, "quicksort-code", algo_context);
-    AlgorithmUtils.attachAlgoToControls(qual_algo, algorithmTabId);
+    var qual_algo = new Algorithm(quicksort, q_callbacks, "quicksort-code", algo_context, function() {
+	AlgorithmUtils.resetControls(algorithmTabId);
+    });
 
     var swap_callbacks = [];
     var swap_context = {
@@ -336,15 +337,16 @@
         .text(qual_algo);
 
     
-    d3.select("#" + algorithmTabId + " .options").append("button")
-	.on("click", function(d) {
-	    console.log("Before", data.map(function(d) { return d.val; }));
-	    qual_algo.startAnimation(data, 0, data.length - 1, function(data, i, j) {
-		return swap_algo.run(data, i, j); 
-	    });
-	    console.log("After", data.map(function(d) { return d.val; }));
-	})
-	.text("Sort");
+    function kickoff(executionFunction) {
+	console.log("Before", data.map(function(d) { return d.val; }));
+	qual_algo.startAnimation(data, 0, data.length - 1, function(data, i, j) {
+	    return swap_algo.run(data, i, j); 
+	});
+	console.log("After", data.map(function(d) { return d.val; }));
+	executionFunction();
+    };
+    // setup the controls
+    AlgorithmUtils.attachAlgoToControls(qual_algo, algorithmTabId, kickoff);
 
     Array.prototype.shuffle = function() {
 	var N = this.length;
@@ -355,23 +357,8 @@
 	    this[i] = x;
 	}
     };
-    var shrunk = 1;
     d3.select("#" + algorithmTabId + " .options").append("button")
-	.attr("style", "margin-left: 10px")
-        .on("click", function(d) {
-	    if (shrunk % 3 != 0) {
-		AlgorithmUtils.visualizeNewStackFrame(qual_algo);
-	    }
-	    else {
-		AlgorithmUtils.popStackFrame(qual_algo);
-	    }
-	    shrunk++;
-	})
-	.text("Shrink!");
-
-    d3.select("#" + algorithmTabId + " .options").append("button")
-	.attr("style", "margin-left: 10px")
-        .on("click", function(d) {
+        .on("click", function() {
 	    sequence_to_sort.shuffle();
 	    sequence_to_sort.forEach(function(d, i) {
 		data[i].val = d;

@@ -98,31 +98,6 @@
 	}
     }
 
-
-    /**
-     * node selection function, triggered when user clicks on a circle
-     */
-    var selected = [];
-    function selectNode(svgObj, d) {
-	//this is used to determine whether nodes can be selected or not
-	if (d3.selectAll(".node.highlight-elem").size() >= 2) {
-	    return;
-	}
-	svgObj.setAttribute("class", "node highlight-elem");
-	selected.push({"data":d, "obj":svgObj});
-	if (selected.length == 2) {
-	    setTimeout(function() { 	    
-		var selected1 = selected[0].data.name;
-		var selected2 = selected[1].data.name;
-		var findInClosure = function(node, data) {
-		    return dsuFind.runWithSharedAnimationQueue(dsuUnion, node, data);
-		}
-		dsuUnion.startAnimation(selected1, selected2, data, findInClosure);
-		selected = [];
-	    }, 200);
-	}
-    }
-
     /**
      * tree rendering function, called to draw a d3 tree hierarchy 
      */
@@ -181,8 +156,8 @@
 	    .enter().append("g")
 	    .attr("class", "node")
 	    .attr("id", function(d) { return "node-" + d.name; })
-            .attr("transform", function(d) {return "translate(" + (d.x + data.order*treew) + "," + d.y + ")";})
-	    .on("click", function(d) {selectNode(this, d);});
+            .attr("transform", function(d) {return "translate(" + (d.x + data.order*treew) + "," + d.y + ")";});
+
 	
 	var circles = svgNodes.append("circle")
 	    .attr("cx", 0)
@@ -198,7 +173,6 @@
             .attr("dx", function(d) {var num = ("" + d.name).length; return (num * -5);})
             .attr("dy", "5")
 	    .attr("onmousedown", "return false;")
-	    .style("cursor", "not-allowed")
 	    .text(function(d) { return d.name; })
 	    .attr("font-size", "0")
 	    .transition()
@@ -210,7 +184,6 @@
             .attr("dx", (nodeRadius))
             .attr("dy", (-nodeRadius))
 	    .attr("onmousedown", "return false;")
-	    .style("cursor", "not-allowed")
 	    .text(function(d) { return "Rank = " + d.rank; })
 	    .attr("font-size", "0")
 	    .transition()
@@ -370,8 +343,9 @@
     };
 
     var dsuFind = new Algorithm(find, cbsFind, "dsu-find-code", algorithmContext);
-    var dsuUnion = new Algorithm(union, cbsUnion, "dsu-union-code", algorithmContext);
-
+    var dsuUnion = new Algorithm(union, cbsUnion, "dsu-union-code", algorithmContext, function() {
+	AlgorithmUtils.resetControls(algorithmTabId);
+    });
 
 
     d3.select("#" + algorithmTabId + " .code")
@@ -396,7 +370,63 @@
         .attr("class", "language-js")
         .text(dsuUnion);
 
-    AlgorithmUtils.attachAlgoToControls(dsuUnion, algorithmTabId);
+
+    function kickOff(executionFunction) {
+	/* The function that starts the simulation.
+	 * It creates a dialog and the dialog starts the execution
+	 */
+	var dialog_obj = {
+	    title:"Start set union", 
+	    message: '<p>Click "Proceed" and select two graph nodes by clicking on them.</p>' +
+		'<p>The visualization will start after two nodes have been clicked</p>',
+	    buttons: {
+		success: {
+		    label: "Proceed",
+		    className: "btn-success",
+		    callback: function() {
+			svg.selectAll(".node").on("click", function(d) {selectNode(this, d);});
+			/**
+			 * node selection function, triggered when user clicks on a circle
+			 */
+			var selected = [];
+			var select_mode = true;
+			function selectNode(svgObj, d) {
+			    //this is used to determine whether nodes can be selected or not
+			    if (!select_mode) {
+				return;
+			    }
+			    svgObj.setAttribute("class", "node highlight-elem");
+			    selected.push({"data":d, "obj":svgObj});
+			    if (selected.length == 2) {
+				select_mode = false;
+				setTimeout(function() { 	    
+				    var selected1 = selected[0].data.name;
+				    var selected2 = selected[1].data.name;
+				    var findInClosure = function(node, data) {
+					return dsuFind.runWithSharedAnimationQueue(dsuUnion, node, data);
+				    }
+				    dsuUnion.startAnimation(selected1, selected2, data, findInClosure);
+				    selected = [];
+				    // remove the click function
+				    svg.selectAll(".node").on("click", function() {});
+				    executionFunction();
+				}, 200);
+			    }
+			};
+		    }
+		},
+		cancel: {
+		    label: "Cancel",
+		    className: "btn-primary",
+		    callback: function() {
+		    }
+		}
+	    }
+	};
+
+	bootbox.dialog(dialog_obj);
+    };
+    AlgorithmUtils.attachAlgoToControls(dsuUnion, algorithmTabId, kickOff);
 
     /*calls google-prettify to make the code look nice
       called automatically
