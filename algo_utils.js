@@ -49,32 +49,51 @@ AlgorithmUtils.insertDefaultControls = function(controlsDiv, algorithmId) {
     appendButton(exRadioDiv, "next-btn", algorithmId);
 }
 
+AlgorithmUtils.resetControls = function(algorithmId) {
+    d3.select("#" + "play-btn-of-" + algorithmId + " span span").attr("class", "play-btn");
+    d3.select("#" + "next-btn-of-" + algorithmId).classed("disabled-btn", false);
+    d3.select("#" + "next-btn-of-" + algorithmId).classed("enabled-btn", true);
+}
+
 // connect the algorithm to default control callbacks
-AlgorithmUtils.attachAlgoToControls = function(algorithm, algorithmId) {
+AlgorithmUtils.attachAlgoToControls = function(algorithm, algorithmId, kickoffCallback) {
     if (!Algorithm.prototype.isPrototypeOf(algorithm)) {
 	console.error("First argument to attachAlgoToControls must have a prototype of Algorithm");
 	return;
     }
 
-    var play_pressed = false;
-    d3.select("#" + "play-btn-of-" + algorithmId).on("click", function() {
-	if (!play_pressed) {
-	    play_pressed = true;
+    var play_function = function() {
+	if (!algorithm.runningInContMode) {
 	    d3.select("#" + "play-btn-of-" + algorithmId + " span span").attr("class", "pause-btn");
 	    d3.select("#" + "next-btn-of-" + algorithmId).classed("disabled-btn", true);
 	    d3.select("#" + "next-btn-of-" + algorithmId).classed("enabled-btn", false);
      	    algorithm.runStack();
 	}
 	else {
-	    d3.select("#" + "play-btn-of-" + algorithmId + " span span").attr("class", "play-btn");
-	    d3.select("#" + "next-btn-of-" + algorithmId).classed("disabled-btn", false);
-	    d3.select("#" + "next-btn-of-" + algorithmId).classed("enabled-btn", true);
-	    play_pressed = false;
+	    algorithm.runningInContMode = false; //stopping
+	    AlgorithmUtils.resetControls(algorithmId);
+	}
+    };
+    var next_function = function() {
+	if (!algorithm.runningInContMode) {
+     	    algorithm.executeNextRowInStepMode();
+	}
+    };
+
+    d3.select("#" + "play-btn-of-" + algorithmId).on("click", function() {
+	if (!algorithm.isRunning() && kickoffCallback != undefined) {
+	    kickoffCallback(play_function);
+	}
+	else {
+	    play_function();
 	}
     });
     d3.select("#" + "next-btn-of-" + algorithmId).on("click", function() {
-	if (!play_pressed) {
-     	    algorithm.executeNextRow();
+	if (!algorithm.isRunning() && kickoffCallback != undefined) {
+	    kickoffCallback(next_function);
+	}
+	else {
+	    next_function();
 	}
     });
 }

@@ -13,7 +13,7 @@
  *
  * @author mpapanek
  */
-function Algorithm(func, callbacks, codeContainerId, algorithmContext)
+function Algorithm(func, callbacks, codeContainerId, algorithmContext, resetControlsFunction)
 {
     this.codeContainerId = codeContainerId;
     this.func = func;
@@ -24,10 +24,13 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext)
     this.funcName = func.toString().match(/function\s*(.*?)\s*\(/)[1];
     this.animation_queue = [];
     // used by the runStack command to kick off the animation in continuous mode
-    this.running = false;
+    this.runningInContMode = false;
+    // used by the runStack command to kick off the animation in step mode
+    this.runningInStepMode = false;
     this.runningCodeStack = [];
     this.functionStack = [];
     this.return_rows = {};
+    this.resetControls = resetControlsFunction;
 
     var tokens = func.toString().split("\n");
     var LN = tokens.length;
@@ -247,7 +250,7 @@ Algorithm.prototype.getAnimationQueue = function() {
  * Start algorithm animation
  */
 Algorithm.prototype.startAnimation = function() {
-    this.running = false;
+    this.runningInContMode = false;
     this.runningCodeStack = [];
     this.functionStack = [];
     this.animation_queue = []; // reset the animation queue
@@ -280,11 +283,11 @@ Algorithm.prototype.runWithSharedAnimationQueue = function(algorithmToShareWith)
 }
 
 Algorithm.prototype.runStack = function() {
-    this.running = true;
+    this.runningInContMode = true;
     this.__executeNextRow();
 }
 
-Algorithm.prototype.executeNextRow = function() {
+Algorithm.prototype.executeNextRowInStepMode = function() {
     if (this.animation_queue.length > 0) {
 	var rownum = this.animation_queue[0].rowNumber;
 	var codeId = this.animation_queue[0].codeContainerId;
@@ -292,8 +295,13 @@ Algorithm.prototype.executeNextRow = function() {
 	var lastFunc = this.runningCodeStack.pop();
 	this.removeAllRowHighlighting(lastFunc);
 	this.highlightRow(codeId, rownum, 0, undefined);
+	this.runningInStepMode = true;
 	this.__executeNextRow(rownum);
     }
+}
+
+Algorithm.prototype.isRunning = function() {
+    return this.animation_queue.length > 0;
 }
 
 Algorithm.prototype.__executeNextRow = function(prevRowNum) {
@@ -302,7 +310,7 @@ Algorithm.prototype.__executeNextRow = function(prevRowNum) {
 	var rownum = this.animation_queue[0].rowNumber;
 	var codeId = this.animation_queue[0].codeContainerId;
 
-	if (!this.running && rownum != prevRowNum) {
+	if (!this.runningInContMode && rownum != prevRowNum) {
 	    return;
 	}
 
@@ -318,7 +326,7 @@ Algorithm.prototype.__executeNextRow = function(prevRowNum) {
 	var this_obj = this;
 	var animationFunction = this.animation_queue[0].animationFunction;
 	setTimeout(function() {
-	    if (this_obj.running && rownum != prevRowNum) {
+	    if (this_obj.runningInContMode && rownum != prevRowNum) {
 		var lastFunc = this_obj.runningCodeStack.pop();
 		this_obj.removeAllRowHighlighting(lastFunc);
 		this_obj.highlightRow(codeId, rownum, 0, undefined);
@@ -353,6 +361,11 @@ Algorithm.prototype.__executeNextRow = function(prevRowNum) {
     else {
 	var lastFunc = this.runningCodeStack.pop();
 	this.removeAllRowHighlighting(lastFunc);
+	if(this.resetControls != undefined) {
+	    this.resetControls(this.codeContainerId);
+	}
+	this.runningInContMode = false;
+	this.runningInStepMode = false;
     }
     
     function existsOnTheStack(codeId, stack) {

@@ -199,21 +199,55 @@
 	default_animation_duration : 500,
     };
     /* create an Algorithm instance wired with callbacks */
-    var balgo = new Algorithm(bsearch, cbs, "bs-code", algorithmContext);
-    AlgorithmUtils.attachAlgoToControls(balgo, algorithmTabId);
+    var balgo = new Algorithm(bsearch, cbs, "bs-code", algorithmContext, function() {
+	AlgorithmUtils.resetControls(algorithmTabId);
+    });
+    AlgorithmUtils.attachAlgoToControls(balgo, algorithmTabId, function kickOff(executionFunction) {
+	/* The function that starts the simulation.
+	 * It creates a dialog and the dialog starts the execution
+	 */
+	bootbox.dialog({
+	    title:"Start binary search", 
+	    message: '<span>Enter a value to search for:</span>' + 
+		'<input id="find" type="text" class="input-box" maxlength="2" />',
+	    buttons: {
+		success: {
+		    label: "Start",
+		    className: "btn-success",
+		    callback: function() {
+			console.log("hello");
+			var lo = 0, hi = N, m, tf = document.getElementById("find").value;
+			console.log(data, tf);
+			d3.selectAll(".forms .input-box").each(function(v, i, a) {
+			    data[i] = { val: this.value};
+			});
+			data.forEach(function (v,i) { v.old_i = i; });
+			balgo.startAnimation(data,tf,lo,hi,m);
+			executionFunction();
+		    }
+		},
+		cancel: {
+		    label: "Cancel",
+		    className: "btn-primary",
+		    callback: function() {
+		    }
+		}
+	    }
+	});
+    });
     
-    d3.select("#" + algorithmTabId + " .options").append("span")
-	.text("Find value : ");
+    // d3.select("#" + algorithmTabId + " .options").append("span")
+    // 	.text("Find value : ");
 
-    d3.select("#" + algorithmTabId + " .options").append("input")
-	.attr("id", "find")
-	.attr("type","text")
-	.attr("class","input-box")
-	.attr("maxlength", 2);
+    // d3.select("#" + algorithmTabId + " .options").append("input")
+    // 	.attr("id", "find")
+    // 	.attr("type","text")
+    // 	.attr("class","input-box")
+    // 	.attr("maxlength", 2);
 
-    d3.select("#" + algorithmTabId + " .options").append("button")
-	.on("click", function(d) { kickoff(); })
-	.text("start");
+    // d3.select("#" + algorithmTabId + " .options").append("button")
+    // 	.on("click", function(d) { kickoff(); })
+    // 	.text("start");
 
     d3.select("#" + algorithmTabId + " .code")
 	.append("div")
@@ -225,15 +259,5 @@
 	.append("code")
 	.attr("class", "language-js")
 	.text(balgo.toString());
-    
-    /*the function that starts the simulation*/
-    var kickoff = function kickOff() {
-	var lo = 0, hi = N, m, tf = document.getElementById("find").value;
-	console.log(data);
-	d3.selectAll(".forms .input-box").each(function(v, i, a) {
-	    data[i] = { val: this.value};
-	});
-	data.forEach(function (v,i) { v.old_i = i; });
-	balgo.startAnimation(data,tf,lo,hi,m);
-    }
+
 })();
