@@ -25,7 +25,6 @@
     AlgorithmUtils.insertCustomControls(ops, algorithmTabId, algorithmName);
     ops.append("div").attr("class", "forms");
     
-
     
     var visPanel = leftPanel.append("div").attr("class", "row")
 	.append("div").attr("class", "col-md-12")
@@ -236,19 +235,6 @@
 	});
     });
     
-    // d3.select("#" + algorithmTabId + " .options").append("span")
-    // 	.text("Find value : ");
-
-    // d3.select("#" + algorithmTabId + " .options").append("input")
-    // 	.attr("id", "find")
-    // 	.attr("type","text")
-    // 	.attr("class","input-box")
-    // 	.attr("maxlength", 2);
-
-    // d3.select("#" + algorithmTabId + " .options").append("button")
-    // 	.on("click", function(d) { kickoff(); })
-    // 	.text("start");
-
     d3.select("#" + algorithmTabId + " .code")
 	.append("div")
 	.attr("class", "bs-code")

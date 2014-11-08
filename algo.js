@@ -271,6 +271,10 @@ Algorithm.prototype.run = function() {
     return eval(c);
 }
 
+// a visualization is always limited to just one animation queue
+// this will be the animation queue of the function that you started with startAnimation
+// if you have multiple functions and want to visualize the calling of these other functions you 
+// can use the runWithSharedAnimationQueue function to attach them
 Algorithm.prototype.runWithSharedAnimationQueue = function(algorithmToShareWith) {
     if (!Algorithm.prototype.isPrototypeOf(algorithmToShareWith)) {
 	console.error("First argument to runWithSharedAnimationQueue must have a prototype of Algorithm");

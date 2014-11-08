@@ -24,9 +24,6 @@ var FFT_A = (function chart() {
     var ops = leftPanelBody.append("div").attr("class", "options");
     AlgorithmUtils.insertDefaultControls(ops, algorithmTabId);
     AlgorithmUtils.insertCustomControls(ops, algorithmTabId, algorithmName);
-    ops.append("div").attr("class", "forms");
-    
-
     
     var visPanel = leftPanel.append("div").attr("class", "row")
     	.append("div").attr("class", "col-md-12")
@@ -45,30 +42,30 @@ var FFT_A = (function chart() {
     /*      Functions              */
     /*******************************/
     var Complex = {};
-    Complex.cons = function Complex(r, i) {
+    Complex.create = function Complex(r, i) {
 	this.real = r;
 	this.imaginary = i;
 	this.toString = function() {return "(" + this.real + ", " + this.imaginary + ")"};
     };
 
     Complex.add = function add(a, b) {
-    	return new Complex.cons(a.real + b.real,a.imaginary + b.imaginary);
+    	return new Complex.create(a.real + b.real,a.imaginary + b.imaginary);
     };
 
     Complex.sub = function sub(a, b) {
-	return new Complex.cons(a.real - b.real, a.imaginary - b.imaginary);
+	return new Complex.create(a.real - b.real, a.imaginary - b.imaginary);
     };
 
     Complex.mult = function mult(a, b) {
-	return new Complex.cons(a.real*b.real - a.imaginary*b.imaginary, a.real*b.imaginary + a.imaginary*b.real);
+	return new Complex.create(a.real*b.real - a.imaginary*b.imaginary, a.real*b.imaginary + a.imaginary*b.real);
     };
 
-    Complex.calc_unity = function calc_unity(idx, N) {
-	return new Complex.cons(Math.cos((2*Math.PI*idx) / N), Math.sin((2*Math.PI*idx) / N));
+    Complex.calc_unity = function calc_unity(idx, N, Complex) {
+	return new Complex.create(Math.cos((2*Math.PI*idx) / N), Math.sin((2*Math.PI*idx) / N));
     };
     
     function FFT(p, q, eval_roots_of_unity, Complex) {
-    	var N = 10;
+    	var N = p.length > q.length ? p.length : q.length;
     	var outN = 2*N - 1;
     	var helper_arr = [];
     	eval_at_roots_of_unity(p, outN, 0, helper_arr, Complex);
@@ -87,6 +84,7 @@ var FFT_A = (function chart() {
     	for (var i=0; i < outN; i++) {
     	    res[i].real = res[i].real / (outN + 1);
     	}
+	return res;
     }
 
     function eval_at_roots_of_unity(poly, len, start, helper_arr, Complex) {
@@ -111,7 +109,7 @@ var FFT_A = (function chart() {
     	    eval_at_roots_of_unity(poly, len/2, start + (len/2), helper_arr, Complex);
 	    console.log("before eval", poly.slice(start, start + len), len, start);
     	    for (var i=0; i < (len / 2); i++) {
-    		var temp = Complex.mult(Complex.calc_unity(i, len),  poly[start + (len/2) + i]);
+    		var temp = Complex.mult(Complex.calc_unity(i, len),  poly[start + (len/2) + i], Complex);
     		helper_arr[i] = Complex.add(poly[start + i], temp);
     		helper_arr[i + (len/2)] = Complex.sub(poly[start + i], temp);
     	    }
@@ -123,7 +121,29 @@ var FFT_A = (function chart() {
 
     var ev = new Algorithm(eval_at_roots_of_unity, {}, "eval-code", {}); 
     var calc = new Algorithm(Complex.calc_unity, {}, "calc-code", {}); 
-    var fft = new Algorithm(FFT, {}, "fft-code", {}); 
+    var fft_call = [];
+    fft_call[20] = function(res) { 
+	res.forEach(function(d) { console.log(d.toString()); });
+    };
+    var fft = new Algorithm(FFT, fft_call, "fft-code", {default_animation_duration : 10}); 
+    var poly_p = [(new Complex.create(1,0)), (new Complex.create(4,0))];
+    var poly_q = [new Complex.create(3,0)];
+    // we need a kickoff function that will start the algorithm
+    function kickoff(executionFunction) {
+	console.log("Before fft");
+	var sharedEv = function(poly, len, start, helper_arr, Complex) {
+	    ev.runWithSharedAnimationQueue(fft, poly, len, start, helper_arr, Complex);
+	}
+	var sharedCalc = function(idx, N, Complex) {
+	    ev.runWithSharedAnimationQueue(fft, idx, N, Complex);
+	}
+	Complex.calc_unity = sharedCalc;
+	fft.startAnimation(poly_p, poly_q, sharedEv, Complex);
+	console.log("After fft");
+	executionFunction();
+    };
+    // we attach the kickoff to the default controls
+    AlgorithmUtils.attachAlgoToControls(fft, algorithmTabId, kickoff);
 
     d3.select("#" + algorithmTabId + " .code")
     	.append("div")

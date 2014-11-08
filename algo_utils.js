@@ -23,6 +23,7 @@ AlgorithmUtils.clone = function clone(obj) {
 
     for (prop in obj) {
 	if (obj.hasOwnProperty(prop)) {
+	    console.log(obj, typeof obj, prop);
 	    cpy[prop] = clone(obj[prop]);
 	}
     }
@@ -56,6 +57,10 @@ AlgorithmUtils.resetControls = function(algorithmId) {
 }
 
 // connect the algorithm to default control callbacks
+// this is necessary if you want the default controls to kick the algorithm off
+// if you have some dialog that needs to query for input before the algorithm is started pass it as kickoffCallback
+// the argument passed as kickoffCallback must be either undefined or a function that accepts another function as
+// an argument. The function passed to kickoffCallback should be executed in kickoffCallback as the last step
 AlgorithmUtils.attachAlgoToControls = function(algorithm, algorithmId, kickoffCallback) {
     if (!Algorithm.prototype.isPrototypeOf(algorithm)) {
 	console.error("First argument to attachAlgoToControls must have a prototype of Algorithm");
