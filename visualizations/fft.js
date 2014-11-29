@@ -126,6 +126,7 @@ var FFT_A = (function chart() {
     	    eval_at_roots_of_unity(poly, half_len, start + half_len, helper_arr, Complex);
 	    console.log("before eval", len, start);
     	    for (var i=0; i < (len / 2); i++) {
+		console.log(poly[start + half_len + i], Complex.num(poly[start + half_len + i]), Complex.calc_unity(i, len, Complex));
     		var temp = Complex.mult(Complex.calc_unity(i, len, Complex),  Complex.num(poly[start + half_len + i]));
     		helper_arr[i] = Complex.add(poly[start + i], temp);
     		helper_arr[i + half_len] = Complex.sub(poly[start + i], temp);
@@ -136,13 +137,13 @@ var FFT_A = (function chart() {
     	}
     }
 
-    var ev = new Algorithm(eval_at_roots_of_unity, {}, "eval-code", {default_animation_duration : 600}); 
-    var calc = new Algorithm(Complex.calc_unity, {}, "calc-code", {default_animation_duration : 600}); 
+    var ev = new Algorithm(eval_at_roots_of_unity, {}, "eval-code", {default_animation_duration : 100}); 
+    var calc = new Algorithm(Complex.calc_unity, {}, "calc-code", {default_animation_duration : 100}); 
     var fft_call = [];
     fft_call[20] = function(res) { 
 	res.forEach(function(d) { console.log(d.toString()); });
     };
-    var fft = new Algorithm(FFT, fft_call, "fft-code", {default_animation_duration : 600}); 
+    var fft = new Algorithm(FFT, fft_call, "fft-code", {default_animation_duration : 100}); 
     var poly_p = [new Complex.create(1,0), new Complex.create(4,0)];
     var poly_q = [new Complex.create(3,0)];
     console.log("after creating arrays", poly_p, poly_q, Complex, Complex.create);
@@ -151,10 +152,10 @@ var FFT_A = (function chart() {
     function kickoff(executionFunction) {
 	console.log("Before fft", poly_p, poly_q);
 	var sharedEv = function(poly, len, start, helper_arr, Complex) {
-	    ev.runWithSharedAnimationQueue(fft, poly, len, start, helper_arr, Complex);
+	    return ev.runWithSharedAnimationQueue(fft, poly, len, start, helper_arr, Complex);
 	}
 	var sharedCalc = function(idx, N, Complex) {
-	    calc.runWithSharedAnimationQueue(fft, idx, N, Complex);
+	    return calc.runWithSharedAnimationQueue(fft, idx, N, Complex);
 	}
 	Complex.calc_unity = sharedCalc;
 	var result = fft.startAnimation(poly_p, poly_q, sharedEv, Complex);
