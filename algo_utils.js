@@ -19,11 +19,10 @@ AlgorithmUtils.clone = function clone(obj) {
 	return obj;
     }
 
-    var cpy = obj.constructor();
-
+    var cpy = new obj.constructor();
     for (prop in obj) {
 	if (obj.hasOwnProperty(prop)) {
-	    console.log(obj, typeof obj, prop);
+	    //console.log(obj.constructor, cpy, obj);
 	    cpy[prop] = clone(obj[prop]);
 	}
     }

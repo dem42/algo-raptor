@@ -45,8 +45,12 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext, resetCont
     var ret_pat = /^return\s*;|^return\s+.*|.*\s+return\s*;|.*\s+return\s+.*/;
     var _found_vars = args.length;
     for (var i=0; i < LN; i++) {
-	// direct eval uses the global context
+	// direct eval uses the global context so the variable names are in global
 	var trimmed = $.trim(tokens[i]);
+	var strm = trimmed.substring(0,2);
+	if (strm == "//" || strm == "/*") {
+	    continue;
+	}
 	var result = trimmed.match(var_pat);
 	if (result != null) {
 	    args += "," + result[1];

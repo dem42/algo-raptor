@@ -47,6 +47,14 @@ var FFT_A = (function chart() {
 	this.imaginary = i;
 	this.toString = function() {return "(" + this.real + ", " + this.imaginary + ")"};
     };
+    Complex.ZERO = new Complex.create(0,0);
+
+    Complex.num = function(complex) {
+	if (complex == undefined) {
+	    return Complex.ZERO;
+	}
+	return complex;
+    };
 
     Complex.add = function add(a, b) {
     	return new Complex.create(a.real + b.real,a.imaginary + b.imaginary);
@@ -64,54 +72,63 @@ var FFT_A = (function chart() {
 	return new Complex.create(Math.cos((2*Math.PI*idx) / N), Math.sin((2*Math.PI*idx) / N));
     };
     
-    function FFT(p, q, eval_roots_of_unity, Complex) {
+    function FFT(p, q, eval_at_roots_of_unity, Complex) {
+	console.log(p, q);
     	var N = p.length > q.length ? p.length : q.length;
     	var outN = 2*N - 1;
     	var helper_arr = [];
+	console.log("step 0 done");
     	eval_at_roots_of_unity(p, outN, 0, helper_arr, Complex);
+	console.log("step 1 done");
     	eval_at_roots_of_unity(q, outN, 0, helper_arr, Complex);
+	console.log("step 2 done");
     	var res = [];
     	for (var i=0; i < outN; i++) {
-    	    res[i] = Complex.mult(p[i], q[i]);
+    	    res[i] = Complex.mult(Complex.num(p[i]), Complex.num(q[i]));
+	    console.log(Complex.num(p[i]),Complex.num(q[i]), res[i], i);
+
     	}
-    	eval_at_roots_of_unity(r, outN, 0, helper_arr, Complex);
+    	eval_at_roots_of_unity(res, outN, 0, helper_arr, Complex);
+	console.log("step 3 done", res);
     	// rearrange roots of unity
-    	for (var i=1; i < N; i++) {
-    	    var temp = res[i];
-    	    res[i] = res[outN + 1 - i];
-    	    res[outN + 1 - i] = temp;
-    	}
+    	// for (var i=1; i < N; i++) {
+    	//     var temp = res[i];
+    	//     res[i] = res[outN + 1 - i];
+    	//     res[outN + 1 - i] = temp;
+    	// }
     	for (var i=0; i < outN; i++) {
-    	    res[i].real = res[i].real / (outN + 1);
+    	    res[i].real = (Complex.num(res[i])).real / (outN + 1);
     	}
 	return res;
     }
 
     function eval_at_roots_of_unity(poly, len, start, helper_arr, Complex) {
-    	if (len == 2) {
-    	    var temp0 = poly[start];
-    	    var temp1 = poly[start+1];
+	console.log(len, start, poly);
+    	if (len <= 2) {
+    	    var temp0 = Complex.num(poly[start]);
+    	    var temp1 = Complex.num(poly[start+1]);
     	    poly[start] = Complex.add(temp0, temp1);
     	    poly[start+1] = Complex.sub(temp0, temp1);
     	}
     	else {
-	    console.log("before perm", poly.slice(start, start + len), len, start);
+	    var half_len = Math.floor(len/2);
+	    console.log("before perm", len, start);
     	    for(var i=0; i < (len / 2); i++) {
     		var x = start + 2*i;
-    		helper_arr[i] = poly[x];
-    		helper_arr[i + (len/2)] = poly[x+1];
+    		helper_arr[i] = Complex.num(poly[x]);
+    		helper_arr[i + (half_len)] = Complex.num(poly[x+1]);
     	    }
-	    console.log("permuted", helper_arr.slice(0, len), len, start);
+	    console.log("permuted", len, start);
     	    for(var i=0; i < len; i++) {
-    		poly[start + i] = helper_arr[i];
+    		poly[start + i] = Complex.num(helper_arr[i]);
     	    }
-    	    eval_at_roots_of_unity(poly, len/2, start, helper_arr, Complex);
-    	    eval_at_roots_of_unity(poly, len/2, start + (len/2), helper_arr, Complex);
-	    console.log("before eval", poly.slice(start, start + len), len, start);
+    	    eval_at_roots_of_unity(poly, half_len, start, helper_arr, Complex);
+    	    eval_at_roots_of_unity(poly, half_len, start + half_len, helper_arr, Complex);
+	    console.log("before eval", len, start);
     	    for (var i=0; i < (len / 2); i++) {
-    		var temp = Complex.mult(Complex.calc_unity(i, len),  poly[start + (len/2) + i], Complex);
+    		var temp = Complex.mult(Complex.calc_unity(i, len, Complex),  Complex.num(poly[start + half_len + i]));
     		helper_arr[i] = Complex.add(poly[start + i], temp);
-    		helper_arr[i + (len/2)] = Complex.sub(poly[start + i], temp);
+    		helper_arr[i + half_len] = Complex.sub(poly[start + i], temp);
     	    }
     	    for(var i=0; i < len; i++) {
     		poly[start + i] = helper_arr[i];
@@ -119,27 +136,29 @@ var FFT_A = (function chart() {
     	}
     }
 
-    var ev = new Algorithm(eval_at_roots_of_unity, {}, "eval-code", {}); 
-    var calc = new Algorithm(Complex.calc_unity, {}, "calc-code", {}); 
+    var ev = new Algorithm(eval_at_roots_of_unity, {}, "eval-code", {default_animation_duration : 600}); 
+    var calc = new Algorithm(Complex.calc_unity, {}, "calc-code", {default_animation_duration : 600}); 
     var fft_call = [];
     fft_call[20] = function(res) { 
 	res.forEach(function(d) { console.log(d.toString()); });
     };
-    var fft = new Algorithm(FFT, fft_call, "fft-code", {default_animation_duration : 10}); 
-    var poly_p = [(new Complex.create(1,0)), (new Complex.create(4,0))];
+    var fft = new Algorithm(FFT, fft_call, "fft-code", {default_animation_duration : 600}); 
+    var poly_p = [new Complex.create(1,0), new Complex.create(4,0)];
     var poly_q = [new Complex.create(3,0)];
+    console.log("after creating arrays", poly_p, poly_q, Complex, Complex.create);
+
     // we need a kickoff function that will start the algorithm
     function kickoff(executionFunction) {
-	console.log("Before fft");
+	console.log("Before fft", poly_p, poly_q);
 	var sharedEv = function(poly, len, start, helper_arr, Complex) {
 	    ev.runWithSharedAnimationQueue(fft, poly, len, start, helper_arr, Complex);
 	}
 	var sharedCalc = function(idx, N, Complex) {
-	    ev.runWithSharedAnimationQueue(fft, idx, N, Complex);
+	    calc.runWithSharedAnimationQueue(fft, idx, N, Complex);
 	}
 	Complex.calc_unity = sharedCalc;
-	fft.startAnimation(poly_p, poly_q, sharedEv, Complex);
-	console.log("After fft");
+	var result = fft.startAnimation(poly_p, poly_q, sharedEv, Complex);
+	console.log("After fft", result);
 	executionFunction();
     };
     // we attach the kickoff to the default controls
