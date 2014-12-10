@@ -130,31 +130,29 @@ var FFT_A = (function chart() {
     	if (len == 1) {
 	    return;
     	}
-    	else {
-	    var half_len = Math.floor(len / 2);
-	    console.log("before perm " + poly.slice(start, start + len), start, len);
-    	    for(var i=0; i < half_len; i++) {
-    		var x = start + 2*i;
-    		helper_arr[i] = poly[x];
-    		helper_arr[i + (half_len)] = poly[x+1];
-    	    }
-	    console.log("permuted " + helper_arr.slice(0, len), start, len);
-    	    for(var j=0; j < len; j++) {
-    		poly[start + j] = helper_arr[j];
-    	    }
-    	    eval_at_roots_of_unity(poly, half_len, start, helper_arr, Complex);
-    	    eval_at_roots_of_unity(poly, half_len, start + half_len, helper_arr, Complex);
-	    console.log("before eval " + poly.slice(start, start + len), start, len);
-    	    for (var k=0; k < half_len; k++) {
-    		var temp = Complex.mult(Complex.calc_unity(k, len, Complex),  poly[start + half_len + k]);
-    		helper_arr[k] = Complex.add(poly[start + k], temp);
-    		helper_arr[k + half_len] = Complex.sub(poly[start + k], temp);
-    	    }
-    	    for(var l=0; l < len; l++) {
-    		poly[start + l] = helper_arr[l];
-    	    }
-	    console.log("after eval " + poly.slice(start, start + len), start, len);
+	var half_len = Math.floor(len / 2);
+	console.log("before perm " + poly.slice(start, start + len), start, len);
+    	for(var i=0; i < half_len; i++) {
+    	    var x = start + 2*i;
+    	    helper_arr[i] = poly[x];
+    	    helper_arr[i + (half_len)] = poly[x+1];
     	}
+	console.log("permuted " + helper_arr.slice(0, len), start, len);
+    	for(var j=0; j < len; j++) {
+    	    poly[start + j] = helper_arr[j];
+    	}
+    	eval_at_roots_of_unity(poly, half_len, start, helper_arr, Complex);
+    	eval_at_roots_of_unity(poly, half_len, start + half_len, helper_arr, Complex);
+	console.log("before eval " + poly.slice(start, start + len), start, len);
+    	for (var k=0; k < half_len; k++) {
+    	    var temp = Complex.mult(Complex.calc_unity(k, len, Complex),  poly[start + half_len + k]);
+    	    helper_arr[k] = Complex.add(poly[start + k], temp);
+    	    helper_arr[k + half_len] = Complex.sub(poly[start + k], temp);
+    	}
+    	for(var l=0; l < len; l++) {
+    	    poly[start + l] = helper_arr[l];
+    	}
+	console.log("after eval " + poly.slice(start, start + len), start, len);
     }
 
     var ev = new Algorithm(eval_at_roots_of_unity, {}, "eval-code", {default_animation_duration : 800}); 
@@ -164,9 +162,8 @@ var FFT_A = (function chart() {
 	res.forEach(function(d) { console.log(d.toString()); });
     };
     var fft = new Algorithm(FFT, fft_call, "fft-code", {default_animation_duration : 100}); 
-    var poly_ev = [Complex.create(1,0), Complex.create(2,0), Complex.create(3,0), undefined, undefined, undefined, undefined, undefined];
-    var poly_p = [Complex.create(1,0), Complex.create(4,0)];
-    var poly_q = [Complex.create(2,0), Complex.create(3,0)];
+    var poly_p = [Complex.create(11,0), Complex.ZERO, Complex.create(-3,0), Complex.ZERO, Complex.create(9,0)];
+    var poly_q = [Complex.ZERO, Complex.create(-1,0), Complex.ZERO, Complex.create(7,0), Complex.ZERO, Complex.create(3.4, 0)];
     console.log("after creating arrays", poly_p, poly_q, Complex, Complex.create);
 
     // we need a kickoff function that will start the algorithm
