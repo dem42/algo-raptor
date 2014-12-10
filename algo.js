@@ -267,9 +267,8 @@ Algorithm.prototype.startAnimation = function() {
     this.runningCodeStack = [];
     this.functionStack = [];
     this.animation_queue = []; // reset the animation queue
-    this.run.apply(this, arguments);
-
-    var self = this;
+    var result = this.run.apply(this, arguments);
+    return result;
 }
 
 /** 
