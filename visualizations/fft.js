@@ -48,7 +48,9 @@ var FFT_A = (function chart() {
 	}
 	this.real = r;
 	this.imaginary = i;
-	this.toString = function() {return "(" + this.real + ", " + this.imaginary + ")"};
+    };
+    Complex.create.prototype.toString = function() {
+	return "" + Math.round10(this.real, -4) + " + " + Math.round10(this.imaginary, -4) + "i";
     };
     Complex.ZERO = Complex.create(0,0);
 
@@ -129,28 +131,19 @@ var FFT_A = (function chart() {
     	}
     	else {
 	    var half_len = Math.floor((len + 1)/2);
-	    console.log("before perm", len, start);
-	    for(var z = start; z < len; z++) {
-		console.log("before perm..", poly[z]);
-	    }
+	    console.log("before perm " + poly.slice(start, len), start, len);
     	    for(var i=0; i < half_len; i++) {
     		var x = start + 2*i;
     		helper_arr[i] = poly[x];
     		helper_arr[i + (half_len)] = poly[x+1];
     	    }
-	    console.log("permuted", helper_arr, len, start);
-	    for(var z = start; z < len; z++) {
-		console.log("permuted..", helper_arr[z]);
-	    }
+	    console.log("permuted " + helper_arr.slice(start, len), start, len);
     	    for(var i=0; i < len; i++) {
     		poly[start + i] = helper_arr[i];
     	    }
     	    eval_at_roots_of_unity(poly, half_len, start, helper_arr, Complex);
     	    eval_at_roots_of_unity(poly, len - half_len, start + half_len, helper_arr, Complex);
-	    console.log("before eval", poly, len, start);
-	    for(var z = start; z < len; z++) {
-		console.log("before eval..", poly[z]);
-	    }
+	    console.log("before eval " + poly.slice(start, len), start, len);
     	    for (var i=0; i < (len / 2); i++) {
 		console.log(poly[start + half_len + i], poly[start + half_len + i], Complex.calc_unity(i, len, Complex));
     		var temp = Complex.mult(Complex.calc_unity(i, len, Complex),  poly[start + half_len + i]);
@@ -160,10 +153,7 @@ var FFT_A = (function chart() {
     	    for(var i=0; i < len; i++) {
     		poly[start + i] = helper_arr[i];
     	    }
-	    console.log("after eval", poly, len, start);
-	    for(var z = start; z < len; z++) {
-		console.log("after perm..", poly[z]);
-	    }
+	    console.log("after eval " + poly.slice(start, len), start, len);
     	}
     }
 

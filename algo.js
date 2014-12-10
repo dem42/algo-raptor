@@ -154,6 +154,7 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext, resetCont
 		    return;
 		}
 		var rowToHighlightSelector = getRowToHighlightSelector(selfie.var_map[idx].row_num, codeContainerId);
+		/*** add or remove dynamic debugging info **/
 		if (var_elem == undefined) {
 		    setTimeout(function() {
 			var comment_span = d3.select(rowToHighlightSelector).select("code").select("span.com");
@@ -169,7 +170,7 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext, resetCont
 			if (comment_span.empty()) {
 			    code.append("span").attr("class", "com dynamic");
 			}
-			code.select("span.com").text("  //" + selfie.var_map[idx].name + " = " + var_elem);
+			code.select("span.com").text("  //" + selfie.var_map[idx].name + " = " + Algorithm.getTextForPrinting(var_elem));
 		    }, animation_duration);
 		}
 	    });
@@ -183,6 +184,14 @@ function Algorithm(func, callbacks, codeContainerId, algorithmContext, resetCont
     this.codeContainerId = codeContainerId;
 }
 /* statics */
+Algorithm.getTextForPrinting = function(object) {
+    /** testing strict equality of type to numeric and rounding to see if it is a double**/
+    if (typeof(object) === "number" && Math.round(object) != object) {
+	return Math.round10(object, -4);
+    }
+    return object;
+}
+
 Algorithm.paramArg = function(N) {
     var res = "";
     for(var i=0;i<N;i++)
