@@ -1,7 +1,7 @@
 .fft-poly {
     font-size: 2.5em;
     stroke-width: 1px;
-    stroke: green;
+    stroke: #333;
     font-family: sans-serif;
 }
 
@@ -9,6 +9,6 @@
     vertical-align: super;
     font-size: 1.5em;
     stroke-width: 1px;
-    stroke: green;
+    stroke: #333;
     font-family: sans-serif;
 }
