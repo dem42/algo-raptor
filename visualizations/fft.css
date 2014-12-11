@@ -1,3 +1,11 @@
+.n-value {
+   font-size: 3.5em;
+    /*stroke-width: 0.5px;*/
+    stroke: red;
+    fill: red;
+    font-family: freeserif, serif; /*"Lucida Console", Courier, monospace;*/
+}
+
 .fft-poly {
     font-size: 3.5em;
     /*stroke-width: 0.5px;*/

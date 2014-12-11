@@ -44,21 +44,22 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
     // create and populate a section for standard algorithm controls
     AlgorithmUtils.insertDefaultControls = function(controlsDiv, algorithmId) {
 
-	function appendButton(div, classname, algorithmName) {
+	function appendButton(div, classname, algorithmName, tooltip) {
 	    var button = div.append("a").attr("href", "#").classed("a-btn enabled-btn", true).attr("id", classname + "-of-" + algorithmId);
-	    button.append("span").attr("class", "a-btn-icon").append("span").attr("class", classname);
+	    button.append("span").attr("class", "a-btn-icon").attr("title", tooltip).append("span").attr("class", classname);
 	}
 
 	controlsDiv.append("div").attr("class", "controls-header").text("General Controls:");
 	var defaultControls = controlsDiv.append("div").attr("class", "default-controls");
 	var exRadioDiv = defaultControls.append("div").attr("class", "execution-type-radios");
 	exRadioDiv.append("p").attr("class", "controls-info-text").text("Choose how to execute the algorithm:");
-	appendButton(exRadioDiv, "play-btn", algorithmId);
-	appendButton(exRadioDiv, "next-btn", algorithmId);
+	appendButton(exRadioDiv, "play-btn", algorithmId, "Start the algorithm in continuous mode (the algorithm will run on its own)");
+	appendButton(exRadioDiv, "next-btn", algorithmId, "Take the next step in the algorithm in step-by-step mode (you have to click for the algorithm to keep going)");
     }
 
     AlgorithmUtils.resetControls = function(algorithmId) {
 	d3.select("#" + "play-btn-of-" + algorithmId + " span span").attr("class", "play-btn");
+	d3.select("#" + "play-btn-of-" + algorithmId + " span").attr("title", "Start the algorithm in continuous mode (the algorithm will run on its own)");
 	d3.select("#" + "next-btn-of-" + algorithmId).classed("disabled-btn", false);
 	d3.select("#" + "next-btn-of-" + algorithmId).classed("enabled-btn", true);
     }
@@ -72,6 +73,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 	var play_function = function() {
 	    if (!algorithm.runningInContMode) {
 		d3.select("#" + "play-btn-of-" + algorithmId + " span span").attr("class", "pause-btn");
+		d3.select("#" + "play-btn-of-" + algorithmId + " span").attr("title", "Pause the algorithm");
 		d3.select("#" + "next-btn-of-" + algorithmId).classed("disabled-btn", true);
 		d3.select("#" + "next-btn-of-" + algorithmId).classed("enabled-btn", false);
      		algorithm.runStack();

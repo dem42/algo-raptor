@@ -106,27 +106,27 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     /***********************
      **    Functions     ***
      **********************/
-    function FFT_transform(poly, len, start, helper_arr, Complex) {
-    	if (len == 1) {
+    function FFT_transform(poly, start, N, helper_arr, Complex) {
+    	if (N == 1) {
 	    return;
     	}
-	var half_len = Math.floor(len / 2);
-    	for(var i=0; i < half_len; i++) {
+	var half_N = Math.floor(N / 2);
+    	for(var i=0; i < half_N; i++) {
     	    var x = start + 2*i;
     	    helper_arr[i] = poly[x];
-    	    helper_arr[i + (half_len)] = poly[x+1];
+    	    helper_arr[i + (half_N)] = poly[x+1];
     	}
-    	for(var j=0; j < len; j++) {
+    	for(var j=0; j < N; j++) {
     	    poly[start + j] = helper_arr[j];
     	}
-    	FFT_transform(poly, half_len, start, helper_arr, Complex);
-    	FFT_transform(poly, half_len, start + half_len, helper_arr, Complex);
-    	for (var k=0; k < half_len; k++) {
-    	    var temp = Complex.mult(Complex.calc_unity(k, len, Complex),  poly[start + half_len + k]);
+    	FFT_transform(poly, start, half_N, helper_arr, Complex);
+    	FFT_transform(poly, start + half_N, half_N, helper_arr, Complex);
+    	for (var k=0; k < half_N; k++) {
+    	    var temp = Complex.mult(Complex.calc_unity(k, N, Complex),  poly[start + half_N + k]);
     	    helper_arr[k] = Complex.add(poly[start + k], temp);
-    	    helper_arr[k + half_len] = Complex.sub(poly[start + k], temp);
+    	    helper_arr[k + half_N] = Complex.sub(poly[start + k], temp);
     	}
-    	for(var l=0; l < len; l++) {
+    	for(var l=0; l < N; l++) {
     	    poly[start + l] = helper_arr[l];
     	}
     }
@@ -137,13 +137,13 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	/* zero pad */
 	p.fill(Complex.ZERO, p.length, nearest2Pow);
 	q.fill(Complex.ZERO, q.length, nearest2Pow);
-    	FFT_transform(p, nearest2Pow, 0, [], Complex);
-    	FFT_transform(q, nearest2Pow, 0, [], Complex);
+    	FFT_transform(p, 0, nearest2Pow, [], Complex);
+    	FFT_transform(q, 0, nearest2Pow, [], Complex);
     	var res = [];
     	for (var i=0; i < nearest2Pow; i++) {
     	    res[i] = Complex.mult(p[i], q[i]);
     	}
-    	FFT_transform(res, nearest2Pow, 0, [], Complex);
+    	FFT_transform(res, 0, nearest2Pow, [], Complex);
     	// rearrange roots of unity
     	for (var i=1; i < nearest2Pow / 2; i++) {
     	    var temp = res[i];
@@ -170,15 +170,6 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     /**********************
      ** Wire up the Algos *
      **********************/
-    var ev = new _my.Algorithm(FFT_transform, {}, "eval-code", {default_animation_duration : 200}, function() {
-	_my.AlgorithmUtils.resetControls(algorithmTabId);
-    }); 
-    var calc = new _my.Algorithm(Complex.calc_unity, {}, "calc-code", {default_animation_duration : 200}); 
-    var fft_call = [];
-    function digLen(val) {
-	return ("" + val).length;
-    }
-
     var poly_ev = [Complex.create(-1,0), Complex.ZERO, Complex.create(-5,0), Complex.ZERO];
     var poly_p = [Complex.create(11,0), Complex.ZERO, Complex.create(-3,0), Complex.create(2,0)];
     var poly_q = [Complex.create(-3,0), Complex.create(3.4, 0), Complex.create(-7, 0)];
@@ -213,17 +204,35 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    .text(function(d) { return d.key < 2 ? " " : d.key; });
     }
     
-    drawPoly(poly_p, svg, "p-elem", 0);
-    drawPoly(poly_q, svg, "q-elem", 500);
+    //drawPoly(poly_p, svg, "p-elem", 0);
+    //drawPoly(poly_q, svg, "q-elem", 500);
 
-    fft_call[0] = function(p, q) {
-	
+
+    var ev_calls = [];
+    var calc_calls = [];
+    ev_calls[0] = function(poly, start, N) {
+	console.log(this);
+	drawPoly(poly.slice(start, N), svg, "ev-elem", 200);
+	svg.append("g")
+	    .attr("id", "n-line1")
+	    .attr("transform", function(d) { return "translate(" + 0 + ", 20)"; })
+	    .append("text")
+	    .attr("class", "n-value")
+	    .text("N = " + N);
     };
-    fft_call[20] = function(res) { 
+    ev_calls[20] = function() { 
 
     };
+    var ev = new _my.Algorithm(FFT_transform, ev_calls, "eval-code", {default_animation_duration : 200}, function() {
+	_my.AlgorithmUtils.resetControls(algorithmTabId);
+    }); 
+    var calc = new _my.Algorithm(Complex.calc_unity, calc_calls, "calc-code", {default_animation_duration : 200}); 
+    var fft_call = [];
+    function digLen(val) {
+	return ("" + val).length;
+    }
     
-    var fft = new _my.Algorithm(FFT_multiply, fft_call, "fft-code", {default_animation_duration : 200}, function() {
+    var fft = new _my.Algorithm(FFT_multiply, [], "fft-code", {default_animation_duration : 200}, function() {
 	_my.AlgorithmUtils.resetControls(algorithmTabId);
     }); 
 
@@ -248,13 +257,13 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     function kickoff_fft_trans(executionFunction) {
 	console.log("Before fft transform", "" + poly_ev);
 	var sharedEv = function(poly, len, start, helper_arr, Complex) {
-	    return ev.runWithSharedAnimationQueue(fft, poly, len, start, helper_arr, Complex);
+	    return ev.runWithSharedAnimationQueue(fft, poly, start, len, helper_arr, Complex);
 	}
 	var sharedCalc = function(idx, N, Complex) {
 	    return calc.runWithSharedAnimationQueue(ev, idx, N, Complex);
 	}
 	Complex.calc_unity = sharedCalc;
-	var result = ev.startAnimation(poly_ev, poly_ev.length, 0, [], Complex);
+	var result = ev.startAnimation(poly_ev, 0, poly_ev.length, [], Complex);
 	console.log("After fft transform", "" + poly_ev);
 	executionFunction();
     };
