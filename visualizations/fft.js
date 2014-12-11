@@ -176,42 +176,35 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     var elem_between = 2;
     var btw_elem = 10;
     var per_width = (width - 100) / (poly_p.length + poly_q.length + elem_between);
-    var p_elems = [];
-    var off = 0;
-    for(var i=poly_p.length-1; i >= 0; i--) {
-	p_elems.push({"val" : poly_p[i].real, "key": i, "offset": off});
-	off += per_width + btw_elem;
+
+    function drawPoly(poly, svg, classname, left_margin) {
+	var elems = [];
+	for(var i=poly.length-1; i >= 0; i--) {
+	    elems.push({"val" : Math.abs(poly[i].real), "key": i, 
+			"sign": (poly[i].real < 0 ? ((i != poly.length-1) ? " - " : "-") : ((i != poly.length-1) ? " + " : ""))});
+	}
+	var textFields = svg.append("g")
+	    .attr("id", classname + "-line1")
+	    .attr("transform", function(d) { return "translate(" + left_margin + ", 20)"; })
+	    .attr("class", "coef-line")
+	    .append("text")
+	    .attr("class", "poly-elem " + classname)
+	    .selectAll("." + classname)
+	    .data(elems, function(d) { return d.key; })
+	    .enter()
+	    .append("tspan")
+	    .attr("y", 0)
+	    .attr("class", "fft-poly")
+	    .text(function(d) { return d.sign + d.val + (d.key == 0 ? "" : "x"); })
+	textFields.filter(function(d) { return d.key >= 2; })
+	    .append("tspan")
+	    .attr("class", "fft-super")
+	    .attr("dy", -20)
+	    .text(function(d) { return d.key < 2 ? " " : d.key; });
     }
-    var q_elems = [];
-    off += elem_between*per_width;
-    for(var i=poly_q.length - 1; i >= 0; i--) {
-	q_elems.push({"val" : poly_q[i].real, "key": i, "offset": off});
-	off += per_width + btw_elem;
-    }
-    svg.selectAll(".p-elem")
-	.data(p_elems, function(d) { return d.key; })
-	.enter()
-	.append("g")
-	.attr("class", "poly-elem p-elem")
-	.attr("transform", function(d) { return "translate(" + d.offset + ", 20)"; })
-	.append("text")
-	.attr("class", "fft-poly")
-	.text(function(d) { return d.val + (d.key == 0 ? "" : "x"); });
-    svg.selectAll(".q-elem")
-	.data(q_elems, function(d) { return d.key; })
-	.enter()
-	.append("g")
-	.attr("class", "poly-elem q-elem")
-	.attr("transform", function(d) { return "translate(" + d.offset + ", 20)"; })
-	.append("text")
-	.attr("class", "fft-poly")
-	.text(function(d) { return d.val + (d.key == 0 ? "" : "x"); });
-    svg.selectAll(".poly-elem")
-	.append("text")
-	.attr("class", "fft-super")
-	.attr("dy", -20)
-	.attr("dx", function(d) { return 20*(digLen(d.val) + 1); })
-	.text(function(d) { return d.key < 2 ? "" : d.key; }); 
+    
+    drawPoly(poly_p, svg, "p-elem", 0);
+    drawPoly(poly_q, svg, "q-elem", 500);
 
     fft_call[0] = function(p, q) {
 	

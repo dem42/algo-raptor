@@ -1,14 +1,14 @@
 .fft-poly {
-    font-size: 2.5em;
-    stroke-width: 1px;
+    font-size: 3.5em;
+    /*stroke-width: 0.5px;*/
     stroke: #333;
-    font-family: sans-serif;
+    font-family: freeserif, serif; /*"Lucida Console", Courier, monospace;*/
 }
 
 .fft-super {
     vertical-align: super;
-    font-size: 1.5em;
-    stroke-width: 1px;
+    font-size: 0.8em;
+    stroke-width: 0.5px;
     stroke: #333;
-    font-family: sans-serif;
+    font-family: freeserif, serif; /*"Lucida Console", Courier, monospace;*/
 }
