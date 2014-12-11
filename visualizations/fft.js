@@ -19,7 +19,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     	.append("div").attr("class", "tab-pane").attr("id", algorithmTabId)
         .append("div").attr("class", "container-fluid")
     	.append("div").attr("class", "row")
-    var leftPanel = row0.append("div").attr("class", "col-md-4")
+    var leftPanel = row0.append("div").attr("class", "col-md-5")
     var controlsPanel = leftPanel.append("div").attr("class", "row controls")
     	.append("div").attr("class", "col-md-12")
     	.append("div").attr("class", "panel panel-default");
@@ -36,7 +36,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     visPanel.append("div").attr("class", "panel-heading").text("Algorithm Visualization");
     visPanel.append("div").attr("class", "panel-body graphics");
 
-    var codePanel = row0.append("div").attr("class", "col-md-8")
+    var codePanel = row0.append("div").attr("class", "col-md-7")
     	.append("div").attr("class", "panel panel-default");
     codePanel.append("div").attr("class", "panel-heading").text("Code");
     codePanel.append("div").attr("class", "panel-body code");
@@ -99,7 +99,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     /***********************
      **    Functions     ***
      **********************/
-function eval_at_roots_of_unity(poly, len, start, helper_arr, Complex) {
+    function evaluate(poly, len, start, helper_arr, Complex) {
     	if (len == 1) {
 	    return;
     	}
@@ -112,8 +112,8 @@ function eval_at_roots_of_unity(poly, len, start, helper_arr, Complex) {
     	for(var j=0; j < len; j++) {
     	    poly[start + j] = helper_arr[j];
     	}
-    	eval_at_roots_of_unity(poly, half_len, start, helper_arr, Complex);
-    	eval_at_roots_of_unity(poly, half_len, start + half_len, helper_arr, Complex);
+    	evaluate(poly, half_len, start, helper_arr, Complex);
+    	evaluate(poly, half_len, start + half_len, helper_arr, Complex);
     	for (var k=0; k < half_len; k++) {
     	    var temp = Complex.mult(Complex.calc_unity(k, len, Complex),  poly[start + half_len + k]);
     	    helper_arr[k] = Complex.add(poly[start + k], temp);
@@ -124,21 +124,19 @@ function eval_at_roots_of_unity(poly, len, start, helper_arr, Complex) {
     	}
     }
 
-    function FFT(p, q, eval_at_roots_of_unity, Complex) {
+    function FFT(p, q, evaluate, Complex) {
 	var N = p.length + q.length - 1;
     	var nearest2Pow = 1 << Math.ceil(Math.log2(N));
 	/* zero pad */
-	for (var j = Math.min(p.length, q.length); j < nearest2Pow; j++) {
-	    p[j] = p[j] != undefined ? p[j] : Complex.ZERO;
-	    q[j] = q[j] != undefined ? q[j] : Complex.ZERO;
-	}
-    	eval_at_roots_of_unity(p, nearest2Pow, 0, [], Complex);
-    	eval_at_roots_of_unity(q, nearest2Pow, 0, [], Complex);
+	p.fill(Complex.ZERO, p.length, nearest2Pow);
+	q.fill(Complex.ZERO, q.length, nearest2Pow);
+    	evaluate(p, nearest2Pow, 0, [], Complex);
+    	evaluate(q, nearest2Pow, 0, [], Complex);
     	var res = [];
     	for (var i=0; i < nearest2Pow; i++) {
     	    res[i] = Complex.mult(p[i], q[i]);
     	}
-    	eval_at_roots_of_unity(res, nearest2Pow, 0, [], Complex);
+    	evaluate(res, nearest2Pow, 0, [], Complex);
     	// rearrange roots of unity
     	for (var i=1; i < nearest2Pow / 2; i++) {
     	    var temp = res[i];
@@ -152,18 +150,79 @@ function eval_at_roots_of_unity(poly, len, start, helper_arr, Complex) {
     }
 
     /**********************
+     **   Set up SVG   ****
+     *********************/
+    var margin = { left: 10, top: 30, right: 10, bottom: 100};
+    var width = 900;
+    var svg = d3.select("#" + algorithmTabId + " .graphics").append("svg")
+	.attr("width",  width + "px")
+	.attr("height", "1050px")
+	.append("g")
+	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    /**********************
      ** Wire up the Algos *
      **********************/
-    var ev = new _my.Algorithm(eval_at_roots_of_unity, {}, "eval-code", {default_animation_duration : 200}); 
+    var ev = new _my.Algorithm(evaluate, {}, "eval-code", {default_animation_duration : 200}); 
     var calc = new _my.Algorithm(Complex.calc_unity, {}, "calc-code", {default_animation_duration : 200}); 
     var fft_call = [];
+    function digLen(val) {
+	return ("" + val).length;
+    }
+
+    var poly_p = [Complex.create(11,0), Complex.ZERO, Complex.create(-3,0), Complex.create(2,0)];
+    var poly_q = [Complex.create(-3,0), Complex.create(3.4, 0), Complex.create(-7, 0)];
+
+    var elem_between = 2;
+    var btw_elem = 10;
+    var per_width = (width - 100) / (poly_p.length + poly_q.length + elem_between);
+    var p_elems = [];
+    var off = 0;
+    for(var i=poly_p.length-1; i >= 0; i--) {
+	p_elems.push({"val" : poly_p[i].real, "key": i, "offset": off});
+	off += per_width + btw_elem;
+    }
+    var q_elems = [];
+    off += elem_between*per_width;
+    for(var i=poly_q.length - 1; i >= 0; i--) {
+	q_elems.push({"val" : poly_q[i].real, "key": i, "offset": off});
+	off += per_width + btw_elem;
+    }
+    svg.selectAll(".p-elem")
+	.data(p_elems, function(d) { return d.key; })
+	.enter()
+	.append("g")
+	.attr("class", "poly-elem p-elem")
+	.attr("transform", function(d) { return "translate(" + d.offset + ", 20)"; })
+	.append("text")
+	.attr("class", "fft-poly")
+	.text(function(d) { return d.val + (d.key == 0 ? "" : "x"); });
+    svg.selectAll(".q-elem")
+	.data(q_elems, function(d) { return d.key; })
+	.enter()
+	.append("g")
+	.attr("class", "poly-elem q-elem")
+	.attr("transform", function(d) { return "translate(" + d.offset + ", 20)"; })
+	.append("text")
+	.attr("class", "fft-poly")
+	.text(function(d) { return d.val + (d.key == 0 ? "" : "x"); });
+    svg.selectAll(".poly-elem")
+	.append("text")
+	.attr("class", "fft-super")
+	.attr("dy", -20)
+	.attr("dx", function(d) { return 20*(digLen(d.val) + 1); })
+	.text(function(d) { return d.key < 2 ? "" : d.key; }); 
+
+    fft_call[0] = function(p, q) {
+	
+    };
     fft_call[20] = function(res) { 
 
     };
     
-    var fft = new _my.Algorithm(FFT, fft_call, "fft-code", {default_animation_duration : 200}); 
-    var poly_p = [Complex.create(11,0), Complex.ZERO, Complex.create(-3,0)];
-    var poly_q = [Complex.create(-3,0), Complex.create(3.4, 0)];
+    var fft = new _my.Algorithm(FFT, fft_call, "fft-code", {default_animation_duration : 200}, function() {
+	_my.AlgorithmUtils.resetControls(algorithmTabId);
+    }); 
 
     // we need a kickoff function that will start the algorithm
     function kickoff(executionFunction) {
@@ -185,14 +244,14 @@ function eval_at_roots_of_unity(poly, len, start, helper_arr, Complex) {
 
     d3.select("#" + algorithmTabId + " .code")
     	.append("div")
-    	.attr("class", "calc-code")
+    	.attr("class", "fft-code")
         .append("div")
     	.attr("class", "function-code-holder")
     	.append("pre")
     	.attr("class", "prettyprint lang-js linenums:1")
     	.append("code")
     	.attr("class", "language-js")
-    	.text(calc.toString());
+    	.text(fft.toString());
 
     d3.select("#" + algorithmTabId + " .code")
     	.append("div")
@@ -207,14 +266,15 @@ function eval_at_roots_of_unity(poly, len, start, helper_arr, Complex) {
 
     d3.select("#" + algorithmTabId + " .code")
     	.append("div")
-    	.attr("class", "fft-code")
+    	.attr("class", "calc-code")
         .append("div")
     	.attr("class", "function-code-holder")
     	.append("pre")
     	.attr("class", "prettyprint lang-js linenums:1")
     	.append("code")
     	.attr("class", "language-js")
-    	.text(fft.toString());
+    	.text(calc.toString());
 
-    return {FFT : FFT, Complex : Complex, eval_at_roots_of_unity : eval_at_roots_of_unity};
+
+    return {FFT : FFT, Complex : Complex, evaluate : evaluate};
 })(ALGORITHM_MODULE, $, d3, bootbox);
