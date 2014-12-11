@@ -32,8 +32,13 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 	return cpy;
     }
 
-    AlgorithmUtils.insertCustomControls = function(controlsDiv, algorithmId, algorithmName) {
+    AlgorithmUtils.insertCustomControls = function(controlsDiv, algorithmId, algorithmName, comments) {
 	controlsDiv.append("div").attr("class", "custom-controls-header").text(algorithmName + " Controls:");
+
+	if (comments !== undefined) {
+	    var exRadioDiv = controlsDiv.append("div").attr("class", "custom-controls-comments-section");
+	    exRadioDiv.append("p").attr("class", "controls-info-text").text(comments);
+	}
     }
 
     // create and populate a section for standard algorithm controls

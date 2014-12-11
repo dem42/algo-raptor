@@ -12,3 +12,8 @@
     stroke: #333;
     font-family: freeserif, serif; /*"Lucida Console", Courier, monospace;*/
 }
+
+.fft-radio-button {
+    background-image:none;
+    background-color: white;
+}

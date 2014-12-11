@@ -97,6 +97,8 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    d3.selectAll("." + codeContainerId + " .highlighted-row").classed("highlighted-row", false);
 	};
 
+	/*** we need a pre-row and a post-row because some rows like for loop and ifs may not get to the end 
+             of the row if the condition fails but we would still like to see them executed **/
 	this.preRowExecute = function(row_num, var_array0) {
 	    var var_array = _my.AlgorithmUtils.clone(var_array0);
 	    var selfie = this;
@@ -127,6 +129,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    }));
 	};
 
+	/**** post row does the printing debug info inside the algorithm and  keeping track of variable values **/
 	this.postRowExecute = function(row_num, var_array0) {
 	    
 	    var var_array = _my.AlgorithmUtils.clone(var_array0);
@@ -283,6 +286,8 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 
     /** 
      * Execute the function with using animating the algorithm
+     *
+     * IF YOU WANT TO RUN WITH A SHARED ANIMATION QUEUE USE runWithSharedAnimationQueue TO WRAP THE INNER ALGO INSTEAD OF THIS
      */
     Algorithm.prototype.run = function() {
 	var N = this.getParams().length;
@@ -297,6 +302,8 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     // this will be the animation queue of the function that you started with startAnimation
     // if you have multiple functions and want to visualize the calling of these other functions you 
     // can use the runWithSharedAnimationQueue function to attach them
+    //
+    // IF YOU DONT WANT TO RUN WITH A SHARED ANIMATION QUEUE USE run TO WRAP THE INNER ALGO INSTEAD OF THIS
     Algorithm.prototype.runWithSharedAnimationQueue = function(algorithmToShareWith) {
 	if (!Algorithm.prototype.isPrototypeOf(algorithmToShareWith)) {
 	    console.error("First argument to runWithSharedAnimationQueue must have a prototype of Algorithm");
@@ -330,6 +337,8 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	return this.animation_queue.length > 0;
     }
 
+    /*** __executeNextRow is shared by both step by step and continuous execution and does all the animation frame queueing
+         and recursion frame shennanigans */
     Algorithm.prototype.__executeNextRow = function(prevRowNum) {
 	
 	if (this.animation_queue.length > 0) {
