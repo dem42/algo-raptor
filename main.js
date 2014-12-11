@@ -1,5 +1,12 @@
+// this is jquery syntax for adding this as a callback to run on a document ready event
 $(function () {
     
+    // alias our algorithm module -- since we are running this as callback on doc ready it should already be defined
+    var _my = ALGORITHM_MODULE;
+    if (_my == undefined) {
+	throw "Algorithm module is not defined!";
+    }
+
     $.ajaxSetup({
 	cache: false
     });
@@ -33,9 +40,17 @@ $(function () {
 		// on a work queue and will be processed when the browser is ready
 		// that means we don't have to worry about race conditions between multiple visualizations scripts 
 		$('head').append('<link rel="stylesheet" href="visualizations/' + data[i] + '.css" type="text/css" />');
-		$.getScript("visualizations/" + data[i] + ".js", function( data, textStatus, jqxhr ) {
-		    console.debug( "Download of algo:", textStatus ); // Success
-		});
+
+		(function(algo_name) { 
+		    var url = "visualizations/" + algo_name + ".js";
+		    $.getScript(url)
+			.done(function( data, textStatus, jqxhr ) {
+			    console.debug( "Download of algo :" + algo_name, textStatus ); // Success
+			})
+			.fail(function(jqxhr, settings, exception) {
+			    bootbox.alert("Problem loading algorithm: \"" + algo_name + "\".<br \><br \>" + exception);
+			});
+		}(data[i]));
 	    }
         }
     }
@@ -57,13 +72,12 @@ $(function () {
     }
 
     function resizingSvg(e) {
-	console.log("called");
 	var tabz =  $(e.target).attr("data-tab-id");
 	$(tabz + " svg").each(function() {
 	    if ($(this).attr("data-adjusted") == "true") {
 		return;
 	    }
-	    var viewBox = AlgorithmUtils.calcViewBox(tabz + " .graphics", $(this).width(), $(this).height());
+	    var viewBox = _my.AlgorithmUtils.calcViewBox(tabz + " .graphics", $(this).width(), $(this).height());
 	    d3.select(this).attr("width", viewBox.width)
 		.attr("height", viewBox.height)
 		.attr("viewBox", viewBox.string)

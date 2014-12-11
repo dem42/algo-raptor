@@ -1,14 +1,21 @@
-(function chart() {
+ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) {
+
+    // alias our algorithm module -- since we are running this code from main it must be ready
+    var _my = ALGORITHM_MODULE;
+    if (_my == undefined) {
+	throw "Algorithm module is not defined!";
+    }
+
     var algorithmTabId = "bsearch-tab";
     var algorithmName = "Binary Search";
 
     /*******************************/
     /*      Setup the panels       */
     /*******************************/
-    console.log("downloaded bs");
+    console.debug("downloaded bs", _my);
+    
+    _my.AlgorithmUtils.insertIntoHeaderList("#" + algorithmTabId, algorithmName, "search-1-binary");
 
-    AlgorithmUtils.insertIntoHeaderList("#" + algorithmTabId, algorithmName, "search-1-binary");
- 
     var row0 = d3.select("#algoContainer")
 	.append("div").attr("class", "tab-pane").attr("id", algorithmTabId)
         .append("div").attr("class", "container-fluid")
@@ -21,8 +28,8 @@
 
     var leftPanelBody = controlsPanel.append("div").attr("class", "panel-body");
     var ops = leftPanelBody.append("div").attr("class", "options");
-    AlgorithmUtils.insertDefaultControls(ops, algorithmTabId);
-    AlgorithmUtils.insertCustomControls(ops, algorithmTabId, algorithmName);
+    _my.AlgorithmUtils.insertDefaultControls(ops, algorithmTabId);
+    _my.AlgorithmUtils.insertCustomControls(ops, algorithmTabId, algorithmName);
     ops.append("div").attr("class", "forms");
     
     
@@ -37,7 +44,6 @@
     codePanel.append("div").attr("class", "panel-heading").text("Code");
     codePanel.append("div").attr("class", "panel-body code");
 
-    
     /*******************************/
     /*      Setup the svg stuff    */
     /*******************************/
@@ -86,7 +92,7 @@
 	svgg = svg.append("g")
 	    .attr("transform", "translate(" + margin.left + "," + (margin.top + cumulative_height) +  ")");
 	cumulative_height += height;
-	var viewBox = AlgorithmUtils.calcViewBox("#" + algorithmTabId + " .graphics", width, cumulative_height);
+	var viewBox = _my.AlgorithmUtils.calcViewBox("#" + algorithmTabId + " .graphics", width, cumulative_height);
 	svg.attr("width", viewBox.width)
 	    .attr("height", viewBox.height)
 	    .attr("viewBox", viewBox.string)
@@ -198,10 +204,10 @@
 	default_animation_duration : 500,
     };
     /* create an Algorithm instance wired with callbacks */
-    var balgo = new Algorithm(bsearch, cbs, "bs-code", algorithmContext, function() {
-	AlgorithmUtils.resetControls(algorithmTabId);
+    var balgo = new _my.Algorithm(bsearch, cbs, "bs-code", algorithmContext, function() {
+	_my.AlgorithmUtils.resetControls(algorithmTabId);
     });
-    AlgorithmUtils.attachAlgoToControls(balgo, algorithmTabId, function kickOff(executionFunction) {
+    _my.AlgorithmUtils.attachAlgoToControls(balgo, algorithmTabId, function kickOff(executionFunction) {
 	/* The function that starts the simulation.
 	 * It creates a dialog and the dialog starts the execution
 	 */
@@ -245,5 +251,7 @@
 	.append("code")
 	.attr("class", "language-js")
 	.text(balgo.toString());
+    
+    return {"bsearch": bsearch, "bsearch-algorithm": balgo};
 
-})();
+})(ALGORITHM_MODULE, $, d3, bootbox);

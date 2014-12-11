@@ -1,14 +1,19 @@
-var FFT_A = (function chart() {
+ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) {
+    // alias our algorithm module -- since we are running this code from main it must be ready
+    var _my = ALGORITHM_MODULE;
+    if (_my == undefined) {
+	throw "Algorithm module is not defined!";
+    }
     var algorithmTabId = "fft-tab";
     var algorithmName = "Fast Fourier Transform";
 
     /*******************************/
     /*      Setup the panels       */
     /*******************************/
-    console.log("downloaded fft");
+    console.debug("downloaded fft");
 
 
-    AlgorithmUtils.insertIntoHeaderList("#" + algorithmTabId, algorithmName, "fft");
+    _my.AlgorithmUtils.insertIntoHeaderList("#" + algorithmTabId, algorithmName, "fft");
     
     var row0 = d3.select("#algoContainer")
     	.append("div").attr("class", "tab-pane").attr("id", algorithmTabId)
@@ -22,8 +27,8 @@ var FFT_A = (function chart() {
 
     var leftPanelBody = controlsPanel.append("div").attr("class", "panel-body");
     var ops = leftPanelBody.append("div").attr("class", "options");
-    AlgorithmUtils.insertDefaultControls(ops, algorithmTabId);
-    AlgorithmUtils.insertCustomControls(ops, algorithmTabId, algorithmName);
+    _my.AlgorithmUtils.insertDefaultControls(ops, algorithmTabId);
+    _my.AlgorithmUtils.insertCustomControls(ops, algorithmTabId, algorithmName);
     
     var visPanel = leftPanel.append("div").attr("class", "row")
     	.append("div").attr("class", "col-md-12")
@@ -39,7 +44,7 @@ var FFT_A = (function chart() {
     
     
     /*******************************/
-    /*      Functions              */
+    /*      Complex number type    */
     /*******************************/
     var Complex = {};
     Complex.create = function Complex(r, i) {
@@ -91,8 +96,35 @@ var FFT_A = (function chart() {
 	return Complex.create(Math.cos((2*Math.PI*idx) / N), Math.sin((2*Math.PI*idx) / N));
     };
     
+    /***********************
+     **    Functions     ***
+     **********************/
+function eval_at_roots_of_unity(poly, len, start, helper_arr, Complex) {
+    	if (len == 1) {
+	    return;
+    	}
+	var half_len = Math.floor(len / 2);
+    	for(var i=0; i < half_len; i++) {
+    	    var x = start + 2*i;
+    	    helper_arr[i] = poly[x];
+    	    helper_arr[i + (half_len)] = poly[x+1];
+    	}
+    	for(var j=0; j < len; j++) {
+    	    poly[start + j] = helper_arr[j];
+    	}
+    	eval_at_roots_of_unity(poly, half_len, start, helper_arr, Complex);
+    	eval_at_roots_of_unity(poly, half_len, start + half_len, helper_arr, Complex);
+    	for (var k=0; k < half_len; k++) {
+    	    var temp = Complex.mult(Complex.calc_unity(k, len, Complex),  poly[start + half_len + k]);
+    	    helper_arr[k] = Complex.add(poly[start + k], temp);
+    	    helper_arr[k + half_len] = Complex.sub(poly[start + k], temp);
+    	}
+    	for(var l=0; l < len; l++) {
+    	    poly[start + l] = helper_arr[l];
+    	}
+    }
+
     function FFT(p, q, eval_at_roots_of_unity, Complex) {
-	console.log("" + p, "" + q);
 	var N = p.length + q.length - 1;
     	var nearest2Pow = 1 << Math.ceil(Math.log2(N));
 	/* zero pad */
@@ -100,19 +132,13 @@ var FFT_A = (function chart() {
 	    p[j] = p[j] != undefined ? p[j] : Complex.ZERO;
 	    q[j] = q[j] != undefined ? q[j] : Complex.ZERO;
 	}
-    	var helper_arr = [];
-	console.log("step 0 done");
-    	eval_at_roots_of_unity(p, nearest2Pow, 0, helper_arr, Complex);
-	console.log("step 1 done");
-    	eval_at_roots_of_unity(q, nearest2Pow, 0, helper_arr, Complex);
-	console.log("step 2 done");
+    	eval_at_roots_of_unity(p, nearest2Pow, 0, [], Complex);
+    	eval_at_roots_of_unity(q, nearest2Pow, 0, [], Complex);
     	var res = [];
     	for (var i=0; i < nearest2Pow; i++) {
     	    res[i] = Complex.mult(p[i], q[i]);
-	    console.log("" + p[i],"" + q[i], "" + res[i], i);
     	}
-    	eval_at_roots_of_unity(res, nearest2Pow, 0, helper_arr, Complex);
-	console.log("step 3 done " + res);
+    	eval_at_roots_of_unity(res, nearest2Pow, 0, [], Complex);
     	// rearrange roots of unity
     	for (var i=1; i < nearest2Pow / 2; i++) {
     	    var temp = res[i];
@@ -125,46 +151,19 @@ var FFT_A = (function chart() {
 	return res;
     }
 
-    function eval_at_roots_of_unity(poly, len, start, helper_arr, Complex) {
-	console.log(start, len, "" + poly.slice(start, start + len));
-    	if (len == 1) {
-	    return;
-    	}
-	var half_len = Math.floor(len / 2);
-	console.log("before perm " + poly.slice(start, start + len), start, len);
-    	for(var i=0; i < half_len; i++) {
-    	    var x = start + 2*i;
-    	    helper_arr[i] = poly[x];
-    	    helper_arr[i + (half_len)] = poly[x+1];
-    	}
-	console.log("permuted " + helper_arr.slice(0, len), start, len);
-    	for(var j=0; j < len; j++) {
-    	    poly[start + j] = helper_arr[j];
-    	}
-    	eval_at_roots_of_unity(poly, half_len, start, helper_arr, Complex);
-    	eval_at_roots_of_unity(poly, half_len, start + half_len, helper_arr, Complex);
-	console.log("before eval " + poly.slice(start, start + len), start, len);
-    	for (var k=0; k < half_len; k++) {
-    	    var temp = Complex.mult(Complex.calc_unity(k, len, Complex),  poly[start + half_len + k]);
-    	    helper_arr[k] = Complex.add(poly[start + k], temp);
-    	    helper_arr[k + half_len] = Complex.sub(poly[start + k], temp);
-    	}
-    	for(var l=0; l < len; l++) {
-    	    poly[start + l] = helper_arr[l];
-    	}
-	console.log("after eval " + poly.slice(start, start + len), start, len);
-    }
-
-    var ev = new Algorithm(eval_at_roots_of_unity, {}, "eval-code", {default_animation_duration : 800}); 
-    var calc = new Algorithm(Complex.calc_unity, {}, "calc-code", {default_animation_duration : 100}); 
+    /**********************
+     ** Wire up the Algos *
+     **********************/
+    var ev = new _my.Algorithm(eval_at_roots_of_unity, {}, "eval-code", {default_animation_duration : 200}); 
+    var calc = new _my.Algorithm(Complex.calc_unity, {}, "calc-code", {default_animation_duration : 200}); 
     var fft_call = [];
     fft_call[20] = function(res) { 
-	res.forEach(function(d) { console.log(d.toString()); });
+
     };
-    var fft = new Algorithm(FFT, fft_call, "fft-code", {default_animation_duration : 100}); 
-    var poly_p = [Complex.create(11,0), Complex.ZERO, Complex.create(-3,0), Complex.ZERO, Complex.create(9,0)];
-    var poly_q = [Complex.ZERO, Complex.create(-1,0), Complex.ZERO, Complex.create(7,0), Complex.ZERO, Complex.create(3.4, 0)];
-    console.log("after creating arrays", poly_p, poly_q, Complex, Complex.create);
+    
+    var fft = new _my.Algorithm(FFT, fft_call, "fft-code", {default_animation_duration : 200}); 
+    var poly_p = [Complex.create(11,0), Complex.ZERO, Complex.create(-3,0)];
+    var poly_q = [Complex.create(-3,0), Complex.create(3.4, 0)];
 
     // we need a kickoff function that will start the algorithm
     function kickoff(executionFunction) {
@@ -182,7 +181,7 @@ var FFT_A = (function chart() {
 	executionFunction();
     };
     // we attach the kickoff to the default controls
-    AlgorithmUtils.attachAlgoToControls(fft, algorithmTabId, kickoff);
+    _my.AlgorithmUtils.attachAlgoToControls(fft, algorithmTabId, kickoff);
 
     d3.select("#" + algorithmTabId + " .code")
     	.append("div")
@@ -218,4 +217,4 @@ var FFT_A = (function chart() {
     	.text(fft.toString());
 
     return {FFT : FFT, Complex : Complex, eval_at_roots_of_unity : eval_at_roots_of_unity};
-})();
+})(ALGORITHM_MODULE, $, d3, bootbox);

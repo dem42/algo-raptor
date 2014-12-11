@@ -1,13 +1,18 @@
-(function chart() {
+ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) {
+    // alias our algorithm module -- since we are running this code from main it must be ready
+    var _my = ALGORITHM_MODULE;
+    if (_my == undefined) {
+	throw "Algorithm module is not defined!";
+    }
     var algorithmTabId = "quicksort-tab";
     var algorithmName = "Quicksort";
 
     /*******************************/
     /*      Setup the panels       */
     /*******************************/
-    console.log("downloaded quicksort");
+    console.debug("downloaded quicksort");
 
-    AlgorithmUtils.insertIntoHeaderList("#" + algorithmTabId, algorithmName, "sorting-1-quicksort");
+    _my.AlgorithmUtils.insertIntoHeaderList("#" + algorithmTabId, algorithmName, "sorting-1-quicksort");
  
     var row0 = d3.select("#algoContainer")
 	.append("div").attr("class", "tab-pane").attr("id", algorithmTabId)
@@ -20,8 +25,8 @@
     controlsPanel.append("div").attr("class", "panel-heading").text("Controls:");
     var ops = controlsPanel.append("div").attr("class", "panel-body")
 	.append("div").attr("class", "options");
-    AlgorithmUtils.insertDefaultControls(ops, algorithmTabId);
-    AlgorithmUtils.insertCustomControls(ops, algorithmTabId, algorithmName);
+    _my.AlgorithmUtils.insertDefaultControls(ops, algorithmTabId);
+    _my.AlgorithmUtils.insertCustomControls(ops, algorithmTabId, algorithmName);
     
     var visPanel = leftPanel.append("div").attr("class", "row")
 	.append("div").attr("class", "col-md-12")
@@ -315,15 +320,15 @@
     var algo_context = {
 	default_animation_duration : 300,
     };
-    var qual_algo = new Algorithm(quicksort, q_callbacks, "quicksort-code", algo_context, function() {
-	AlgorithmUtils.resetControls(algorithmTabId);
+    var qual_algo = new _my.Algorithm(quicksort, q_callbacks, "quicksort-code", algo_context, function() {
+	_my.AlgorithmUtils.resetControls(algorithmTabId);
     });
 
     var swap_callbacks = [];
     var swap_context = {
 	default_animation_duration: 0, 
     }
-    var swap_algo = new Algorithm(swap_function, swap_callbacks, "swap_function-code", swap_context);
+    var swap_algo = new _my.Algorithm(swap_function, swap_callbacks, "swap_function-code", swap_context);
 
     d3.select("#" + algorithmTabId + " .code")
 	.append("div")
@@ -346,7 +351,7 @@
 	executionFunction();
     };
     // setup the controls
-    AlgorithmUtils.attachAlgoToControls(qual_algo, algorithmTabId, kickoff);
+    _my.AlgorithmUtils.attachAlgoToControls(qual_algo, algorithmTabId, kickoff);
 
     Array.prototype.shuffle = function() {
 	var N = this.length;
@@ -369,4 +374,7 @@
 	    init_circles(data);
 	})
     .text("Shuffle Data");
-})();
+
+    return {"quicksort": quicksort, "quicksort-algorithm": qual_algo};
+
+})(ALGORITHM_MODULE, $, d3, bootbox);

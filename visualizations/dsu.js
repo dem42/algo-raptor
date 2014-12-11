@@ -1,4 +1,10 @@
-(function chart() {
+ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) {
+    // alias our algorithm module -- since we are running this code from main it must be ready
+    var _my = ALGORITHM_MODULE;
+    if (_my == undefined) {
+	throw "Algorithm module is not defined!";
+    }
+
     var algorithmTabId = "dsu-tab";
     var algorithmName = "Disjoint Set Union";
 
@@ -7,7 +13,7 @@
     /*******************************/
     console.log("downloaded dsu");
 
-    AlgorithmUtils.insertIntoHeaderList("#" + algorithmTabId, algorithmName, "graphs-1-dsu");
+    _my.AlgorithmUtils.insertIntoHeaderList("#" + algorithmTabId, algorithmName, "graphs-1-dsu");
  
     var row0 = d3.select("#algoContainer")
 	.append("div").attr("class", "tab-pane").attr("id", algorithmTabId)
@@ -21,7 +27,7 @@
     controlsPanel.append("div").attr("class", "panel-heading").text("Controls:");
     var ops = controlsPanel.append("div").attr("class", "panel-body")
 	.append("div").attr("class", "options");
-    AlgorithmUtils.insertDefaultControls(ops, algorithmTabId);
+    _my.AlgorithmUtils.insertDefaultControls(ops, algorithmTabId);
 
     var treeNodesPanel = leftPanel.append("div").attr("class", "row")
 	.append("div").attr("class", "col-md-12")
@@ -212,7 +218,7 @@
 	var loser_order = loser.order;
 	var new_node = {"name": next_num, "rank": 0, "root": next_num, "children": [], "order": loser_order};
 	data.push(new_node);
-	var animation_duration = drawTreeFun(AlgorithmUtils.clone(new_node), next_num);
+	var animation_duration = drawTreeFun(_my.AlgorithmUtils.clone(new_node), next_num);
 	next_num++;
 
 	return animation_duration;
@@ -342,9 +348,9 @@
 	default_animation_duration : 500,
     };
 
-    var dsuFind = new Algorithm(find, cbsFind, "dsu-find-code", algorithmContext);
-    var dsuUnion = new Algorithm(union, cbsUnion, "dsu-union-code", algorithmContext, function() {
-	AlgorithmUtils.resetControls(algorithmTabId);
+    var dsuFind = new _my.Algorithm(find, cbsFind, "dsu-find-code", algorithmContext);
+    var dsuUnion = new _my.Algorithm(union, cbsUnion, "dsu-union-code", algorithmContext, function() {
+	_my.AlgorithmUtils.resetControls(algorithmTabId);
     });
 
 
@@ -426,7 +432,7 @@
 
 	bootbox.dialog(dialog_obj);
     };
-    AlgorithmUtils.attachAlgoToControls(dsuUnion, algorithmTabId, kickOff);
+    _my.AlgorithmUtils.attachAlgoToControls(dsuUnion, algorithmTabId, kickOff);
 
     /*calls google-prettify to make the code look nice
       called automatically
@@ -435,6 +441,9 @@
     // we set the viewBox parameters here since this is when the divs are ready (dom ready)
     data.forEach(function(d) { d.rank = 0;});
     data.forEach(function(d, i) {
-	drawTreeFun(AlgorithmUtils.clone(d), i);
+	drawTreeFun(_my.AlgorithmUtils.clone(d), i);
     });
-})();
+
+    return {"find": find, "union": union,  "find-algorithm": dsuFind, "union-algorithm": dsuUnion};
+
+})(ALGORITHM_MODULE, $, d3, bootbox);
