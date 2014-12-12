@@ -15,9 +15,20 @@
     stroke: red;
     stroke-width: 1.5px;
     font-size: 35px;
+    pointer-events: none;
 }
 
-.node .node-rank {
+.node-rank {
+    stroke-width: 1px;
+    pointer-events: none;
+}
+
+.node-name {
+    stroke-width: 1px;
+    pointer-events: none;
+}
+
+.node {
     stroke-width: 1px;
 }
 

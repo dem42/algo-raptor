@@ -215,8 +215,6 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     //drawPoly(poly_p, svg, "p-elem", 0);
     //drawPoly(poly_q, svg, "q-elem", 500);
 
-    var ev_calls = [];
-    var calc_calls = [];
 
     function radToDeg(val) { return val * 180 / Math.PI; }
 
@@ -293,58 +291,11 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	return diagonal;
     }
 
-    
-
+    var ev_calls = [];
+    var calc_calls = [];
     calc_calls[20] = function() {
 
-	var svg = d3.select("body").append("svg").append("g").attr("transform", "translate(100,50)")
-
-	var data = [ {a: 0}, {a: Math.PI / 2}, {a: Math.PI}, {a: 3*Math.PI/2}, {a: 2*Math.PI}]
-
-	var radial = d3.svg.arc()
-	    .innerRadius(31)
-	    .outerRadius(31)
-	    .endAngle(function(d, i) { return data[(i+1) % data.length].a; })
-	    .startAngle(function(d, i) { return data[i].a; })
-
-	var total_circle = d3.svg.arc()
-	    .innerRadius(31)
-	    .outerRadius(31)
-	    .endAngle(function(d) { return data[data.length-1].a; })
-	    .startAngle(function(d, i) { return data[0].a; })
-
-	var cen = total_circle.centroid(data[0], 0);
-	console.log(cen)
-
-	svg.append("circle").attr("r", "4").attr("x", cen[0]).attr("y", cen[1]);
-
-	var radial0 = d3.svg.line.radial().radius(10).angle(function(d,i) { return d.a; })
-
-	var path = svg.append("path")
-	    .attr("class", "line")
-	    .attr("d", total_circle(data));
-
 	
-	  var path = svg.selectAll(".arc")
-	  .data(data)
-	  .enter()
-	  .append("path")
-	  .attr("class", "line")
-	  .attr("d", radial)
-	  .each(function(d, i) {
-	  
-	  var totalLength = this.getTotalLength();
-
-	  d3.select(this)
-	  .attr("stroke-dasharray", totalLength + " " + totalLength)
-	  .attr("stroke-dashoffset", totalLength)
-	  .transition()
-          .duration(2000)
-          .delay(1000 * i)
-          .ease("linear")
-          .attr("stroke-dashoffset", 0);
-	  })
-
 	
     }
     var recursion_depth = 0;

@@ -9,3 +9,7 @@
     margin: 0.5em;
     text-align: center;
 }
+
+.bs-text {
+    pointer-events: none;
+}
