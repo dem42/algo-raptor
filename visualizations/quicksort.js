@@ -363,6 +363,8 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	}
     };
     d3.select("#" + algorithmTabId + " .options").append("button")
+	.attr("class", "btn btn-default btn-sm")
+	.attr("title", "Permute the quicksort input data. (The balls!)")
         .on("click", function() {
 	    sequence_to_sort.shuffle();
 	    sequence_to_sort.forEach(function(d, i) {

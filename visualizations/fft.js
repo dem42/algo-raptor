@@ -178,7 +178,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     var btw_elem = 10;
     var per_width = (width - 100) / (poly_p.length + poly_q.length + elem_between);
 
-    function drawPoly(poly, svg, classname, left_margin) {
+    function drawPoly(poly, svg, classname, left_margin, top_margin) {
 	var elems = [];
 	for(var i=poly.length-1; i >= 0; i--) {
 	    elems.push({"val" : Math.abs(poly[i].real), "key": i, 
@@ -186,7 +186,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	}
 	var textFields = svg.append("g")
 	    .attr("id", classname + "-line1")
-	    .attr("transform", function(d) { return "translate(" + left_margin + ", 20)"; })
+	    .attr("transform", function(d) { return "translate(" + left_margin + ", " + top_margin + ")"; })
 	    .attr("class", "coef-line")
 	    .append("text")
 	    .attr("class", "poly-elem " + classname)
@@ -207,21 +207,80 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     //drawPoly(poly_p, svg, "p-elem", 0);
     //drawPoly(poly_q, svg, "q-elem", 500);
 
-
     var ev_calls = [];
     var calc_calls = [];
+    calc_calls[20] = function() {
+
+	var svg = d3.select("body").append("svg").append("g").attr("transform", "translate(100,50)")
+
+	var data = [ {a: 0}, {a: Math.PI / 2}, {a: Math.PI}, {a: 3*Math.PI/2}, {a: 2*Math.PI}]
+
+	var radial = d3.svg.arc()
+	    .innerRadius(31)
+	    .outerRadius(31)
+	    .endAngle(function(d, i) { return data[(i+1) % data.length].a; })
+	    .startAngle(function(d, i) { return data[i].a; })
+
+	var total_circle = d3.svg.arc()
+	    .innerRadius(31)
+	    .outerRadius(31)
+	    .endAngle(function(d) { return data[data.length-1].a; })
+	    .startAngle(function(d, i) { return data[0].a; })
+
+	var cen = total_circle.centroid(data[0], 0);
+	console.log(cen)
+
+	svg.append("circle").attr("r", "4").attr("x", cen[0]).attr("y", cen[1]);
+
+	var radial0 = d3.svg.line.radial().radius(10).angle(function(d,i) { return d.a; })
+
+	var path = svg.append("path")
+	    .attr("class", "line")
+	    .attr("d", total_circle(data));
+
+	/*
+	  var path = svg.selectAll(".arc")
+	  .data(data)
+	  .enter()
+	  .append("path")
+	  .attr("class", "line")
+	  .attr("d", radial)
+	  .each(function(d, i) {
+	  
+	  var totalLength = this.getTotalLength();
+
+	  d3.select(this)
+	  .attr("stroke-dasharray", totalLength + " " + totalLength)
+	  .attr("stroke-dashoffset", totalLength)
+	  .transition()
+          .duration(2000)
+          .delay(1000 * i)
+          .ease("linear")
+          .attr("stroke-dashoffset", 0);
+	  })
+
+	*/
+    }
+    var recursion_depth = 0;
     ev_calls[0] = function(poly, start, N) {
-	console.log(this);
-	drawPoly(poly.slice(start, N), svg, "ev-elem", 200);
-	svg.append("g")
-	    .attr("id", "n-line1")
-	    .attr("transform", function(d) { return "translate(" + 0 + ", 20)"; })
+	var horiz_offset = (20*(recursion_depth + 1) + 80*recursion_depth);
+	var vertical_offset = 300 - recursion_depth*50 + start*(200 - 20*recursion_depth);
+	drawPoly(poly.slice(start, start + N), svg, "ev-elem", vertical_offset, horiz_offset);
+	svg.selectAll("#n-line" + recursion_depth)
+	    .data([recursion_depth])
+	    .enter()
+	    .append("g")
+	    .attr("id", "n-line" + recursion_depth)
+	    .attr("transform", function(d) { return "translate(" + 0 + ", " + horiz_offset + ")"; })
 	    .append("text")
 	    .attr("class", "n-value")
-	    .text("N = " + N);
+	    .text("N = " + N + ":");
+	recursion_depth++;
     };
-    ev_calls[20] = function() { 
-
+    ev_calls[23] = ev_calls[2] = { 
+	"pre": function() { 
+	    recursion_depth--;
+	}
     };
     var ev = new _my.Algorithm(FFT_transform, ev_calls, "eval-code", {default_animation_duration : 200}, function() {
 	_my.AlgorithmUtils.resetControls(algorithmTabId);
