@@ -61,6 +61,14 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	this.real = r;
 	this.imaginary = i;
     };
+    Complex.create.prototype.getAngle = function() {
+	var angle = Math.atan2(this.imaginary, this.real);
+	if (angle < 0) {
+	    angle += 2*Math.PI;
+	}
+	return angle;
+    }
+
     Complex.create.prototype.toString = function() {
 	return "" + Math.round10(this.real, -4) + " " + (this.imaginary >= 0 ? "+ " : "- ") + Math.abs(Math.round10(this.imaginary, -4)) + "i";
     };
@@ -209,6 +217,84 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 
     var ev_calls = [];
     var calc_calls = [];
+
+    function radToDeg(val) { return val * 180 / Math.PI; }
+
+    rootsOfUnityCircle(svg, 5, 120, 3000, "test-circle", 200, 200);
+
+    function rootsOfUnityCircle(svg, N, radius, duration, group_name, left_margin, top_margin) {
+	var data = []
+
+	var group = svg.append("g").attr("id", group_name). attr("transform", "translate(" + left_margin + ", " + top_margin + ")");
+
+	for(var idx = 0; idx < N; idx++) {
+	    var ci = Complex.calc_unity(idx, N, Complex);
+	    console.log("" + ci, ci.getAngle());
+	    data.push({angle: (ci.getAngle() + Math.PI/2)});
+	}
+	data.push({angle: 5*Math.PI/2}); //we need to close the circle
+	console.log(data);
+
+	var radial = d3.svg.arc().innerRadius(radius).outerRadius(radius)
+	    .endAngle(function(d, i) { return data[(i+1) % data.length].angle; })
+	    .startAngle(function(d, i) { return data[i].angle; })
+
+	// this arc generator is only used to compute a point on the circle using arc.centroid so that we
+	// can use this point to move around the circle
+	var total_circle = d3.svg.arc().innerRadius(radius).outerRadius(radius)
+	    .endAngle(function(d) { return 7*Math.PI/2 - 0.001; })
+	    .startAngle(function(d) { return 3*Math.PI/2; })
+
+	var point_on_crc = total_circle.centroid(data[0], 0);
+	var center_of_crc = [point_on_crc[0] - total_circle.outerRadius()(), point_on_crc[1]];
+
+	var d1 = d3.svg.diagonal()
+	    .source(function() {
+		return {"x": center_of_crc[0], "y": center_of_crc[1]}; })
+	    .target(function() {
+		return {"x": point_on_crc[0], "y": point_on_crc[1]}; })
+	
+    
+	  var path = group.selectAll(".arc").data(data).enter().append("path").attr("class", "root-of-unity-circle").attr("d", radial).each(function(d, i) {
+	      // the stroke-dasharray trick to animate a line by decreasing the gap between in the stroke dashes
+	      var totalLength = this.getTotalLength();
+
+	      d3.select(this)
+		  .attr("stroke-dasharray", totalLength + " " + totalLength)
+		  .attr("stroke-dashoffset", totalLength)
+		  .transition()
+		  .duration(duration)
+		  .delay((duration / 2) * i)
+		  .ease("linear")
+		  .attr("stroke-dashoffset", 0);
+	  });
+
+	// our diagonal inside the circle that points at the roots of unity
+	var diagonal = group.append("path").attr("d", d1(1)).attr("class","root-of-unity-arrow").attr("id", "unity-arrow")
+	    /*.transition()
+	    .duration(duration)
+	    .attr("transform", "rotate(359.99 " + center_of_crc[0] + " " + center_of_crc[1] + ")")*/
+
+
+	/*var radial0 = d3.svg.line.radial().radius(10).angle(function(d,i) { return d.a; })*/
+	var scale_factor = radius / 80;
+	group.selectAll("circle")
+	    .data(data.slice(0, data.length-1))
+	    .enter()
+	    .append("circle")
+	    .attr("class", "fft-invisible-root")
+	    .attr("r", 10 * scale_factor).attr("cx", point_on_crc[0]).attr("cy", point_on_crc[1])
+	    .transition()
+	    .duration(0)
+	    .delay(function(d, i) { return (duration/2) * i; })
+	    .attr("transform", function(d) { return "rotate(" + radToDeg(d.angle - Math.PI/2) + " " + center_of_crc[0] + " " + center_of_crc[1] + ")";})
+	    .attr("class", "fft-visible-root");
+
+	return diagonal;
+    }
+
+    
+
     calc_calls[20] = function() {
 
 	var svg = d3.select("body").append("svg").append("g").attr("transform", "translate(100,50)")
@@ -238,7 +324,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    .attr("class", "line")
 	    .attr("d", total_circle(data));
 
-	/*
+	
 	  var path = svg.selectAll(".arc")
 	  .data(data)
 	  .enter()
@@ -259,7 +345,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
           .attr("stroke-dashoffset", 0);
 	  })
 
-	*/
+	
     }
     var recursion_depth = 0;
     ev_calls[0] = function(poly, start, N) {
