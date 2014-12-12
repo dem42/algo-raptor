@@ -149,6 +149,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	    });
 	svg.selectAll(".circle-group").each(function(d, i) { d.x_off = sumUpTo(data, i); d.y_off = maxi_width;})
 	    .append("text")
+	    .attr("class", "quicksort-text")
 	    .style("font-size", function(d) { return ((computeWidth(d.val) / mini_width) * 100) + "%"; })
 	    .attr("dx", function(d) { return ((d.val > 9 ? 2 : 1)*-0.30) + "em"; })
 	    .attr("dy", function(d) { return "0.22em"; })
