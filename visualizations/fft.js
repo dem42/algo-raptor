@@ -221,14 +221,14 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     rootsOfUnityCircle(svg, 5, 120, 3000, "test-circle", 200, 200);
 
     function rootsOfUnityCircle(svg, N, radius, duration, group_name, left_margin, top_margin) {
-	var data = []
+	var data = [];
 
 	var group = svg.append("g").attr("id", group_name). attr("transform", "translate(" + left_margin + ", " + top_margin + ")");
 
 	for(var idx = 0; idx < N; idx++) {
 	    var ci = Complex.calc_unity(idx, N, Complex);
 	    console.log("" + ci, ci.getAngle());
-	    data.push({angle: (ci.getAngle() + Math.PI/2)});
+	    data.push({angle: (ci.getAngle() + Math.PI/2), text: ci.toString()});
 	}
 	data.push({angle: 5*Math.PI/2}); //we need to close the circle
 	console.log(data);
@@ -276,17 +276,32 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 
 	/*var radial0 = d3.svg.line.radial().radius(10).angle(function(d,i) { return d.a; })*/
 	var scale_factor = radius / 80;
-	group.selectAll("circle")
+	var unit_groups = group.selectAll("fft-unit-circle-roots")
 	    .data(data.slice(0, data.length-1))
 	    .enter()
-	    .append("circle")
-	    .attr("class", "fft-invisible-root")
-	    .attr("r", 10 * scale_factor).attr("cx", point_on_crc[0]).attr("cy", point_on_crc[1])
+	    .append("g")
+	    .attr("class", "fft-unit-circle-roots")
+	    .style("opacity", 1)
+	
+        unit_groups.append("circle")
+	    .attr("class", "fft-root")
+	    .attr("r", 10 * scale_factor);
+
+	unit_groups.append("text")
+	    .attr("class", "fft-text")
+	    .text(function(d) { return d.text; })
+	    //.filter(function(d) { var rem = d.angle % (2*Math.PI); return rem > Math.PI })
+	    .attr("transform", function(d) { return "rotate(" + -radToDeg(d.angle) + " "  + point_on_crc[0] + " " + point_on_crc[1] + ")"});
+
+	unit_groups.transition()
 	    .transition()
 	    .duration(0)
+	    .attr("transform", "translate(" + point_on_crc[0] + ", " + point_on_crc[1] + ")")
+	    .transition() //chaining transitions here (same as doing each("end", )
+	    .duration(0)
 	    .delay(function(d, i) { return (duration/2) * i; })
-	    .attr("transform", function(d) { return "rotate(" + radToDeg(d.angle - Math.PI/2) + " " + center_of_crc[0] + " " + center_of_crc[1] + ")";})
-	    .attr("class", "fft-visible-root");
+	    .attr("transform", function(d) { return "rotate(" + radToDeg(d.angle - Math.PI/2) + " " + center_of_crc[0] + " " + center_of_crc[1] + ") translate(" + point_on_crc[0] + ", " + point_on_crc[1] + ")" ;})
+	    .style("opacity", 1);
 
 	return diagonal;
     }

@@ -35,19 +35,21 @@
 
 .root-of-unity-circle {
     stroke: blue;
-    stroke-width: 1.5px;
+    stroke-width: 2px;
     fill: white;
     shape-rendering: geometricPrecision;
 }
 
-.fft-invisible-root {
-    opacity: 0;
-}
-
-.fft-visible-root {
+.fft-root {
     stroke: #333;
     stroke-width: 1.5px;
     fill: #ccc;
     opacity: 1;
     shape-rendering: geometricPrecision;
+}
+
+.fft-text {
+    stroke: #333;
+    font-family: sans-serif;
+    pointer-events: none;
 }
