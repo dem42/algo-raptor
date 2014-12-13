@@ -70,7 +70,21 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     }
 
     Complex.create.prototype.toString = function() {
-	return "" + Math.round10(this.real, -4) + " " + (this.imaginary >= 0 ? "+ " : "- ") + Math.abs(Math.round10(this.imaginary, -4)) + "i";
+	function addI(val) {
+	    if (val == 1 || val == -1) {
+		return "i";
+	    }
+	    return val + "i";
+	}
+	var ri = Math.round(this.imaginary, -2);
+	var rr = Math.round(this.real, -2);
+	if (ri == 0) {
+	    return "" + rr;
+	}
+	if (rr == 0) {
+	    return "" + addI(ri);
+	}
+	return "" + rr + " " + (this.imaginary >= 0 ? "+ " : "- ") + addI(Math.abs(ri));
     };
     Complex.ZERO = Complex.create(0,0);
 
@@ -218,7 +232,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 
     function radToDeg(val) { return val * 180 / Math.PI; }
 
-    rootsOfUnityCircle(svg, 5, 120, 3000, "test-circle", 200, 200);
+    rootsOfUnityCircle(svg, 4, 80, 3000, "test-circle", 200, 200);
 
     function rootsOfUnityCircle(svg, N, radius, duration, group_name, left_margin, top_margin) {
 	var data = [];
@@ -269,6 +283,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 
 	// our diagonal inside the circle that points at the roots of unity
 	var diagonal = group.append("path").attr("d", d1(1)).attr("class","root-of-unity-arrow").attr("id", "unity-arrow")
+	    .style("display", "none")
 	    /*.transition()
 	    .duration(duration)
 	    .attr("transform", "rotate(359.99 " + center_of_crc[0] + " " + center_of_crc[1] + ")")*/
@@ -281,17 +296,19 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    .enter()
 	    .append("g")
 	    .attr("class", "fft-unit-circle-roots")
-	    .style("opacity", 1)
+	    .style("display", "none")
 	
         unit_groups.append("circle")
 	    .attr("class", "fft-root")
 	    .attr("r", 10 * scale_factor);
 
-	unit_groups.append("text")
+	var text = unit_groups.append("text")
 	    .attr("class", "fft-text")
+	    .attr("dx", (1 * scale_factor) + "em")
+	    .attr("dy", (8 * scale_factor) + "px")
+	    .attr("font-size", "1.5em")
 	    .text(function(d) { return d.text; })
-	    //.filter(function(d) { var rem = d.angle % (2*Math.PI); return rem > Math.PI })
-	    .attr("transform", function(d) { return "rotate(" + -radToDeg(d.angle) + " "  + point_on_crc[0] + " " + point_on_crc[1] + ")"});
+	    .attr("transform", function(d) { return "rotate(" + -radToDeg(d.angle - Math.PI/2) + ")"; })
 
 	unit_groups.transition()
 	    .transition()
@@ -301,7 +318,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    .duration(0)
 	    .delay(function(d, i) { return (duration/2) * i; })
 	    .attr("transform", function(d) { return "rotate(" + radToDeg(d.angle - Math.PI/2) + " " + center_of_crc[0] + " " + center_of_crc[1] + ") translate(" + point_on_crc[0] + ", " + point_on_crc[1] + ")" ;})
-	    .style("opacity", 1);
+	    .style("display", "inline");
 
 	return diagonal;
     }

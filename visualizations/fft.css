@@ -34,7 +34,7 @@
 }
 
 .root-of-unity-circle {
-    stroke: blue;
+    stroke: green;
     stroke-width: 2px;
     fill: white;
     shape-rendering: geometricPrecision;
