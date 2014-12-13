@@ -71,8 +71,11 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 
     Complex.create.prototype.toString = function() {
 	function addI(val) {
-	    if (val == 1 || val == -1) {
+	    if (val == 1) {
 		return "i";
+	    }
+	    if (val == -1) {
+		return "-i";
 	    }
 	    return val + "i";
 	}
@@ -302,6 +305,14 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    .attr("class", "fft-root")
 	    .attr("r", 10 * scale_factor);
 
+	// the shadow adds a white shadow so that our text is visible no matter whats nearby
+	var text_shadow = unit_groups.append("text")
+	    .attr("class", "fft-text-shadow")
+	    .attr("dx", (1 * scale_factor) + "em")
+	    .attr("dy", (8 * scale_factor) + "px")
+	    .attr("font-size", "1.5em")
+	    .text(function(d) { return d.text; })
+	    .attr("transform", function(d) { return "rotate(" + -radToDeg(d.angle - Math.PI/2) + ")"; })
 	var text = unit_groups.append("text")
 	    .attr("class", "fft-text")
 	    .attr("dx", (1 * scale_factor) + "em")
