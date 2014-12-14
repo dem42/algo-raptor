@@ -192,6 +192,19 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+    /* reusable arrow marker to add to diagonals */
+    svg.append("svg:defs")
+	.append("svg:marker")
+	.attr("id", "arrow")
+	.attr("viewBox", "0 -5 10 10")
+	.attr("refX", 15)
+	.attr("refY", -1.5)
+	.attr("markerWidth", 6)
+	.attr("markerHeight", 6)
+	.attr("orient", "auto")
+	.append("svg:path")
+	.attr("d", "M0,-5L10,0L0,5");
+
     /**********************
      ** Wire up the Algos *
      **********************/
@@ -203,16 +216,63 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     var btw_elem = 10;
     var per_width = (width - 100) / (poly_p.length + poly_q.length + elem_between);
 
-    function drawPoly(poly, svg, classname, left_margin, top_margin) {
-	var elems = [];
+
+    //prepareLayoutForPolys(4, 50, svg, "test", 300, 20);
+
+    /***** this function creates a tree layout that we can then write the polynomials to and move them around in*/
+    function prepareLayoutForPolys(N, node_size, svg, group_name, left_margin, top_margin) {
+	var node_num = 2*N - 1;
+	var group = svg.append("g").attr("id", group_name). attr("transform", "translate(" + left_margin + ", " + top_margin + ")");
+	var data = [];
+	for (var i=1;i<=node_num;i++) {
+	    data.push({id: i, label: 0});    
+	};
+	var lbl_cnt = 0;
+	function preorder_label(node) {
+	    if (node > data.length) return;
+	    data[node - 1].label = lbl_cnt;
+	    lbl_cnt++;
+	    preorder_label(node*2);
+	    preorder_label(node*2 + 1);
+	};
+	preorder_label(1);
+	var tree = d3.layout.tree()
+	    .children(function(d) {
+		if (d.v.id >= data.length / 2) {
+		    return [];   
+		}
+		return [{v: data[2*d.v.id - 1]}, {v: data[2*d.v.id]}];
+	    })
+	    .nodeSize([node_size, 4*node_size])
+	    .separation(function(a, b) {
+		return (a.parent == b.parent ? ((a.depth == 2) ? 4 : 4) : 2);
+	    })
+	var nodes = tree.nodes({v: data[0]})
+	console.log(data, nodes);
+	group.selectAll(".fft-link")
+	    .data(tree.links(nodes))
+	    .enter()
+	    .append("path")
+	    .attr("class", "fft-link")
+	    .attr("d", d3.svg.diagonal())
+	var node_gs = 
+	    group.selectAll(".fft-node")
+	    .data(nodes)
+	    .enter()
+	    .append("g")
+	    .attr("class", "fft-node")
+	    .attr("id", function(d) { return "fft-node-num" + d.v.label; })
+	    .attr("transform", function(d) { return "translate(" + d.x + " " + d.y + ")";})
+	node_gs.append("circle").attr("class", "fft-node-circle").attr("r", node_size / 2);
+    }// end of prepareLayout
+
+    /**** this function places a polynomial into the tree */
+    function drawPoly(poly, elem_to_draw_into) {
 	for(var i=poly.length-1; i >= 0; i--) {
 	    elems.push({"val" : Math.abs(poly[i].real), "key": i, 
 			"sign": (poly[i].real < 0 ? ((i != poly.length-1) ? " - " : "-") : ((i != poly.length-1) ? " + " : ""))});
 	}
-	var textFields = svg.append("g")
-	    .attr("id", classname + "-line1")
-	    .attr("transform", function(d) { return "translate(" + left_margin + ", " + top_margin + ")"; })
-	    .attr("class", "coef-line")
+	var textFields = d3.select(elem_to_draw_into)
 	    .append("text")
 	    .attr("class", "poly-elem " + classname)
 	    .selectAll("." + classname)
@@ -227,16 +287,15 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    .attr("class", "fft-super")
 	    .attr("dy", -20)
 	    .text(function(d) { return d.key < 2 ? " " : d.key; });
-    }
-    
+    } // end of draw poly
+     
     //drawPoly(poly_p, svg, "p-elem", 0);
     //drawPoly(poly_q, svg, "q-elem", 500);
 
 
     function radToDeg(val) { return val * 180 / Math.PI; }
 
-    rootsOfUnityCircle(svg, 4, 80, 3000, "test-circle", 200, 200);
-
+    /******* this function draws a roots of unity circle and returns a diagonal that can be moved around the circle */
     function rootsOfUnityCircle(svg, N, radius, duration, group_name, left_margin, top_margin) {
 	var data = [];
 
@@ -332,29 +391,40 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    .style("display", "inline");
 
 	return diagonal;
+    } // end of roots of unity
+
+    function drawLayerLabel(N, rec_depth) {
+	d3.select("fft-layer-depth-node" + rec_depth)
+	    .append("text")
+	    .attr("class", "n-value")
+	    .text("N = " + N + ":");
     }
 
+    /********* here we wire the callbacks ************/
     var ev_calls = [];
     var calc_calls = [];
     calc_calls[20] = function() {
 
-	
+	//rootsOfUnityCircle(svg, 4, 80, 3000, "test-circle", 200, 200);
 	
     }
     var recursion_depth = 0;
+    var current_id = -1;
     ev_calls[0] = function(poly, start, N) {
-	var horiz_offset = (20*(recursion_depth + 1) + 80*recursion_depth);
-	var vertical_offset = 300 - recursion_depth*50 + start*(200 - 20*recursion_depth);
-	drawPoly(poly.slice(start, start + N), svg, "ev-elem", vertical_offset, horiz_offset);
-	svg.selectAll("#n-line" + recursion_depth)
+	if (recursion_depth == 0) {
+	    prepareLayoutForPolys(N, 20, svg, "fft-poly-tree", 20, 20);
+	}
+	current_id++;
+	drawPoly(poly.slice(start, start + N), svg, "#fft-node-num" + current_id);
+	//drawLayerLabel(N, recursion_depth);
+
+	/*svg.selectAll("#n-line" + recursion_depth)
 	    .data([recursion_depth])
 	    .enter()
 	    .append("g")
 	    .attr("id", "n-line" + recursion_depth)
 	    .attr("transform", function(d) { return "translate(" + 0 + ", " + horiz_offset + ")"; })
-	    .append("text")
-	    .attr("class", "n-value")
-	    .text("N = " + N + ":");
+	    */
 	recursion_depth++;
     };
     ev_calls[23] = ev_calls[2] = { 
