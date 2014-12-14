@@ -119,42 +119,42 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 
 
 	var diagonal = d3.svg.diagonal();
-	var movers = d3.selectAll(".link-g")
+	var movers = d3.selectAll(".dsu-link-g")
 	    .data(links, function (d) { return d.source.name + "-to-" + d.target.name })
 	
 	movers.transition()
 	    .duration(animation_duration)
 	    .attr("transform", "translate(" + data.order*treew + ",0)");
 
-	movers.select(".link")
+	movers.select(".dsu-link")
 	    .transition()
 	    .duration(animation_duration)
 	    .attr("d", diagonal)
 
-	var svgLinks = svg.selectAll(".link")
+	var svgLinks = svg.selectAll(".dsu-link")
 	    .data(links, function (d) { return d.source.name + "-to-" + d.target.name })
 	    .enter()
 	    .append("g")
-	    .attr("class", "link-g")
+	    .attr("class", "dsu-link-g")
 	    .attr("transform", "translate(" + data.order*treew + ",0)")
 	    .append("path")
-	    .attr("class", "link")
+	    .attr("class", "dsu-link")
 	    .attr("id", function(d) { return "from-" + d.source.name + "-to-" + d.target.name; })
 	    .transition()
 	    .delay(animation_duration)
 	    .attr("d", diagonal);
 
-	var mover_nodes = svg.selectAll(".node")
+	var mover_nodes = svg.selectAll(".dsu-node")
 	    .data(nodes, function(d) { return d.name; })
 	    .transition()
 	    .duration(animation_duration)
 	    .attr("transform", function(d) {return "translate(" + (d.x + data.order*treew) + "," + d.y + ")";});
 
-	var svgNodes = svg.selectAll(".node")
+	var svgNodes = svg.selectAll(".dsu-node")
 	    .data(nodes, function(d) { return d.name; })
 	    .enter().append("g")
-	    .attr("class", "node")
-	    .attr("id", function(d) { return "node-" + d.name; })
+	    .attr("class", "dsu-node")
+	    .attr("id", function(d) { return "dsu-node-" + d.name; })
             .attr("transform", function(d) {return "translate(" + (d.x + data.order*treew) + "," + d.y + ")";});
 
 	
@@ -168,7 +168,7 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    .attr("r", nodeRadius);
 
 	var texts = svgNodes.append("text")
-	    .attr("class", "node-name")
+	    .attr("class", "dsu-node-name")
             .attr("dx", function(d) {var num = ("" + d.name).length; return (num * -5);})
             .attr("dy", "5")
 	    .attr("onmousedown", "return false;")
@@ -179,7 +179,7 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    .attr("font-size", "16");
 
 	var rankInfos = svgNodes.append("text")
-	    .attr("class", "node-rank")
+	    .attr("class", "dsu-node-rank")
             .attr("dx", (nodeRadius))
             .attr("dy", (-nodeRadius))
 	    .attr("onmousedown", "return false;")
@@ -192,8 +192,8 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	// in svg the order of elements defines the z-index 
 	// we added a moveToFront function to d3.selection that changes the order of elements
 	setTimeout(function() {
-	    svg.select("#node-" + data.name).moveToFront();
-	    if (child != undefined) svg.select("#node-" + child.name).moveToFront();
+	    svg.select("#dsu-node-" + data.name).moveToFront();
+	    if (child != undefined) svg.select("#dsu-node-" + child.name).moveToFront();
 	}, animation_duration + 10);
 
 	return 2*animation_duration;
@@ -203,8 +203,8 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	(obj.children = obj.children || []).push(elem);
     }
     function cleanup(winner_num, loser_num) {
-	var winner = d3.select("#node-" + winner_num).datum();
-	var loser = d3.select("#node-" + loser_num).datum();
+	var winner = d3.select("#dsu-node-" + winner_num).datum();
+	var loser = d3.select("#dsu-node-" + loser_num).datum();
 	//remove_merged_nodes([winner_num,loser_num]);
 	push(winner, loser);
 	drawTreeFun(winner, winner_num, loser);
@@ -246,7 +246,7 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     }
     cbsFind[3] = function(ptr, data) {
 	setTimeout(function() {
-	    d3.select("#node-" + ptr).classed("highlight-elem", true);
+	    d3.select("#dsu-node-" + ptr).classed("highlight-elem", true);
 	}, this.AlgorithmContext.default_animation_duration);
 	return this.AlgorithmContext.default_animation_duration;
     }
@@ -254,21 +254,21 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	return this.AlgorithmContext.default_animation_duration;
     }
     cbsUnion[3] = function(data, r1, r2) {
-	d3.select("#node-" + r1).select(".node-rank").transition()
+	d3.select("#dsu-node-" + r1).select(".dsu-node-rank").transition()
 	    .attr("dx","-30")
 	    .attr("dy","60")
 	    .style("font-size", "26");
-	d3.select("#node-" + r2).select(".node-rank").transition()
+	d3.select("#dsu-node-" + r2).select(".dsu-node-rank").transition()
 	    .attr("dx","-30")
 	    .attr("dy","60")
 	    .style("font-size", "26");
     }
     cbsUnion[5] = function(b, r1, r2, data) {
-	d3.select("#node-" + r2).select(".node-rank").transition().remove();
+	d3.select("#dsu-node-" + r2).select(".dsu-node-rank").transition().remove();
 	return cleanup(r1, r2);
     }
     cbsUnion[8] = function(a, r2, r1, data) {
-	d3.select("#node-" + r1).select(".node-rank").transition().remove();
+	d3.select("#dsu-node-" + r1).select(".dsu-node-rank").transition().remove();
 	return cleanup(r2, r1);
     }
     cbsUnion[13] = function(r2, r1, data) {
@@ -280,8 +280,8 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    a = r2;
 	    b = r1;
 	}
-	d3.select("#node-" + a).select(".node-rank").transition().text("Rank = " + data[a].rank);
-	d3.select("#node-" + b).select(".node-rank").transition().remove();
+	d3.select("#dsu-node-" + a).select(".dsu-node-rank").transition().text("Rank = " + data[a].rank);
+	d3.select("#dsu-node-" + b).select(".dsu-node-rank").transition().remove();
 	return 0;
     }
     cbsUnion[4] = cbsUnion[7] = cbsUnion[11] = function(data, r2, r1, prob) {
@@ -289,8 +289,8 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	var animation_duration = 4*this.AlgorithmContext.default_animation_duration;
 	var transition_duration = this.AlgorithmContext.default_animation_duration;
 
-	var data_r1 = d3.select("#node-" + r1).datum();
-	var data_r2 = d3.select("#node-" + r2).datum();
+	var data_r1 = d3.select("#dsu-node-" + r1).datum();
+	var data_r2 = d3.select("#dsu-node-" + r2).datum();
 
 	var xoff = ((data_r1.x + data_r1.order*treew) + (data_r2.x + data_r2.order*treew))/2 + 20;
 	var yoff = data_r1.y + 60;
@@ -313,11 +313,11 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 
 	}
 
-	d3.select("#node-" + r1).select(".node-rank").transition().delay(animation_duration).duration(transition_duration)
+	d3.select("#dsu-node-" + r1).select(".dsu-node-rank").transition().delay(animation_duration).duration(transition_duration)
 	    .attr("dx", (nodeRadius))
             .attr("dy", (-nodeRadius))
 	    .style("font-size", "8");
-	d3.select("#node-" + r2).select(".node-rank").transition().delay(animation_duration).duration(transition_duration)
+	d3.select("#dsu-node-" + r2).select(".dsu-node-rank").transition().delay(animation_duration).duration(transition_duration)
 	    .attr("dx", (nodeRadius))
             .attr("dy", (-nodeRadius))
 	    .style("font-size", "8");
@@ -331,8 +331,8 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	return cleanup(r1, r2);
     }
     cbsUnion[21] = function(r1, r2, data) {
-	d3.selectAll(".link").classed("highlight-elem", false);
-	d3.selectAll(".node").classed("highlight-elem", false);
+	d3.selectAll(".dsu-link").classed("highlight-elem", false);
+	d3.selectAll(".dsu-node").classed("highlight-elem", false);
 	return this.AlgorithmContext.default_animation_duration;
     }
     // this object determines the behaviour of the algorighm code
@@ -383,7 +383,7 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 		    label: "Proceed",
 		    className: "btn-success",
 		    callback: function() {
-			svg.selectAll(".node").on("click", function(d) {selectNode(this, d);});
+			svg.selectAll(".dsu-node").on("click", function(d) {selectNode(this, d);});
 			/**
 			 * node selection function, triggered when user clicks on a circle
 			 */
@@ -394,7 +394,7 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 			    if (!select_mode) {
 				return;
 			    }
-			    svgObj.setAttribute("class", "node highlight-elem");
+			    svgObj.setAttribute("class", "dsu-node highlight-elem");
 			    selected.push({"data":d, "obj":svgObj});
 			    if (selected.length == 2) {
 				select_mode = false;
@@ -407,7 +407,7 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 				    dsuUnion.startAnimation(selected1, selected2, data, findInClosure);
 				    selected = [];
 				    // remove the click function
-				    svg.selectAll(".node").on("click", function() {});
+				    svg.selectAll(".dsu-node").on("click", function() {});
 				    executionFunction();
 				}, 200);
 			    }

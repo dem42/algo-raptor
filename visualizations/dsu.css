@@ -1,13 +1,13 @@
-.link {
+.dsu-link {
     fill: none;
-    stroke: #ccc;
+    stroke: #333;
     stroke-width: 1.5px;
 }
 
-.node {
-    fill: white;
-    stroke: steelBlue;
-    stroke-width: 1.5px;
+.dsu-node {
+    fill: #ccc;
+    stroke: #333;
+    stroke-width: 3px;
 }
 
 .cmp_result text {
@@ -18,21 +18,19 @@
     pointer-events: none;
 }
 
-.node-rank {
+.dsu-node-rank {
     stroke-width: 1px;
     pointer-events: none;
 }
 
-.node-name {
+.dsu-node-name {
     stroke-width: 1px;
+    stroke: #333;
+    fill: #333;
     pointer-events: none;
 }
 
-.node {
-    stroke-width: 1px;
-}
-
-.node.selected {
+.dsu-node.selected {
     fill: white;
     stroke: red;
     stroke-width: 1.5px;
