@@ -67,6 +67,7 @@
 .fft-link {
     stroke: white;
     fill: white;
+    display: none;
 }
 
 .fft-node-circle {

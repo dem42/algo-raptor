@@ -127,7 +127,8 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     };
 
     Complex.calc_unity = function calc_unity(idx, N, Complex) {
-	return Complex.create(Math.cos((2*Math.PI*idx) / N), Math.sin((2*Math.PI*idx) / N));
+	var coef = (2*Math.PI*idx) / N;
+	return Complex.create(Math.cos(coef), Math.sin(coef));
     };
     
     /***********************
@@ -149,7 +150,8 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     	FFT_transform(poly, start, half_N, helper_arr, Complex);
     	FFT_transform(poly, start + half_N, half_N, helper_arr, Complex);
     	for (var k=0; k < half_N; k++) {
-    	    var temp = Complex.mult(Complex.calc_unity(k, N, Complex),  poly[start + half_N + k]);
+	    var unity = Complex.calc_unity(k, N, Complex);
+    	    var temp = Complex.mult(unity,  poly[start + half_N + k]);
     	    helper_arr[k] = Complex.add(poly[start + k], temp);
     	    helper_arr[k + half_N] = Complex.sub(poly[start + k], temp);
     	}
@@ -240,7 +242,6 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	data.splice(0,0,{id: -1, label:0}, {id: 0, label:1});
 	var tree = d3.layout.tree()
 	    .children(function(d) {
-		console.log("computing child of ", d);
 		if (d.v.id <= 0) { return [{v: data[d.v.id + 2]}]; }
 		if (2*d.v.id + 1 >= data.length-1) { return []; }
 		return [{v: data[2*d.v.id + 1]}, {v: data[2*d.v.id + 2]}];
@@ -257,6 +258,8 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    .enter()
 	    .append("path")
 	    .attr("class", "fft-link")
+	    .attr("id", function(d) { return "fft-link-to" + d.target.v.label; })
+	    .attr("marker-end", function(d) { return "url(#" + "marker" + ")"; })
 	    .attr("d", d3.svg.diagonal())
 	var node_gs = 
 	    group.selectAll(".fft-node")
@@ -437,7 +440,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     var recursion_depth = 0;
     var current_id = 1;
     ev_calls[0] = function(poly, start, N) {
-	var tree_x_offset = 300;
+	var tree_x_offset = 310;
 	var tree1_y_offset = 70;
 	var tree2_y_offset = 1900;
 	if (recursion_depth == 0) {
@@ -455,7 +458,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 
 	recursion_depth++;
     };
-    ev_calls[23] = ev_calls[2] = { 
+    ev_calls[24] = ev_calls[2] = { 
 	"pre": function() { 
 	    recursion_depth--;
 	}
