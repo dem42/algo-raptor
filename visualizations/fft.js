@@ -432,6 +432,8 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     ev_calls[0] = function(poly, start, N) {
 	if (recursion_depth == 0) {
 	    prepareLayoutForPolys(4, 50, svg, "fft-poly_tree", 300, 70);
+	    prepareLayoutForPolys(4, 50, svg, "fft-poly_tree_upside_down", 0, 0);
+	    d3.select("#fft-poly_tree_upside_down").attr("transform", "translate(300, 1900) rotate(180)");
 	}
 	current_id++;
 	drawPoly(poly.slice(start, start + N), "#fft-node-num" + current_id);
