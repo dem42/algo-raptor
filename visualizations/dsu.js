@@ -112,13 +112,6 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	var animation_duration = 1000;
 	var tree = d3.layout.tree().size([treew - margin.right, treeh - margin.bottom])
 	    .children(function(d) {
-		// 		var children = [];
-		// if (d.children != undefined) {
-		//     for (var chid = 0; chid < d.children.length; chid++) {
-		// 	children.push(data_map[d.children[chid]]);
-		//     }
-		// }
-		// return children;
 		return d.children;
 	    });
 	var nodes = tree.nodes(data);

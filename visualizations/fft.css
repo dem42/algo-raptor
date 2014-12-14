@@ -72,5 +72,5 @@
 .fft-node-circle {
     fill: red;
     stroke: red;
-    display: inline;
+    display: none;
 }
