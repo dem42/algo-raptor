@@ -68,7 +68,9 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	}
 	return angle;
     }
-
+    Complex.equals = function(c1, c2) {
+	return (Math.abs(c1.real - c2.real) < 1e-6 && Math.abs(c1.imaginary - c2.imaginary) < 1e-6);
+    }
     Complex.create.prototype.toString = function() {
 	function addI(val) {
 	    if (val == 1) {
@@ -274,21 +276,22 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    elems.push({"val" : Math.abs(poly[i].real), "key": i, 
 			"sign": (poly[i].real < 0 ? ((i != poly.length-1) ? " - " : "-") : ((i != poly.length-1) ? " + " : ""))});
 	}
-	var textFields = d3.select(elem_to_draw_into)
-	    .append("text")
+	var textFields = elem_to_draw_into.append("text")
 	    .attr("class", "fft-poly")
 	    .attr("text-anchor", "middle")
 	    .text("" + poly);
     }
 
-    function drawPoly(poly, elem_to_draw_into) {
+    function drawPoly(poly, elem_to_draw_into, sin_zeroes) {
 	var elems = [];
 	for(var i=poly.length-1; i >= 0; i--) {
+	    if (sin_zeroes === true && Complex.equals(poly[i], Complex.ZERO)) { 
+		continue;
+	    }
 	    elems.push({"val" : Math.abs(poly[i].real), "key": i, 
 			"sign": (poly[i].real < 0 ? ((i != poly.length-1) ? " - " : "-") : ((i != poly.length-1) ? " + " : ""))});
 	}
-	var text = d3.select(elem_to_draw_into)
-	    .append("text")
+	var text = elem_to_draw_into.append("text")
 	    .attr("text-anchor", "middle")
 	var textFields = text
 	    .selectAll(".fft-poly-elem")
@@ -412,10 +415,14 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	return diagonal;
     } // end of roots of unity
 
-    function drawLayerLabel(N, rec_depth) {
-	d3.select("fft-layer-depth-node" + rec_depth)
+    function drawLayerLabel(svg, N, rec_depth, left_offset, top_offset) {
+	svg.selectAll("fft-layer-depth-node" + rec_depth)
+	    .data([rec_depth]) // we attach data and enter so that if we run this multiple it only gets added once
+	    .enter()
 	    .append("text")
-	    .attr("class", "n-value")
+	    .attr("x", left_offset)
+	    .attr("y", top_offset)
+	    .attr("class", "fft-n-value")
 	    .text("N = " + N + ":");
     }
 
@@ -428,16 +435,23 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	
     }
     var recursion_depth = 0;
-    var current_id = -1;
+    var current_id = 1;
     ev_calls[0] = function(poly, start, N) {
+	var tree_x_offset = 300;
+	var tree1_y_offset = 70;
+	var tree2_y_offset = 1900;
 	if (recursion_depth == 0) {
-	    prepareLayoutForPolys(4, 50, svg, "fft-poly_tree", 300, 70);
+	    prepareLayoutForPolys(4, 50, svg, "fft-poly_tree", tree_x_offset, tree1_y_offset);
 	    prepareLayoutForPolys(4, 50, svg, "fft-poly_tree_upside_down", 0, 0);
-	    d3.select("#fft-poly_tree_upside_down").attr("transform", "translate(300, 1900) rotate(180)");
+	    d3.select("#fft-poly_tree_upside_down").attr("transform", "translate(" + tree_x_offset + ", " + tree2_y_offset+") scale(-1,1) rotate(180)");
+
+	    drawPoly(poly.slice(start, start + N), d3.select("#fft-node-num" + 0), true);
+	    drawPoly(poly.slice(start, start + N), d3.select("#fft-node-num" + 1), false);
 	}
 	current_id++;
-	drawPoly(poly.slice(start, start + N), "#fft-node-num" + current_id);
-	//drawLayerLabel(N, recursion_depth);
+	var elem_to_draw_into = d3.select("#fft-node-num" + current_id);
+	drawCoefs(poly.slice(start, start + N), elem_to_draw_into);
+	drawLayerLabel(svg, N, recursion_depth, 2.5, elem_to_draw_into.datum().y + tree1_y_offset);
 
 	recursion_depth++;
     };

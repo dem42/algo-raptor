@@ -1,8 +1,8 @@
-.n-value {
-   font-size: 3.5em;
+.fft-n-value {
+   font-size: 2em;
     /*stroke-width: 0.5px;*/
-    stroke: red;
-    fill: red;
+    stroke: #a94442;
+    fill: #a94442;
     font-family: freeserif, serif; /*"Lucida Console", Courier, monospace;*/
 }
 
@@ -72,5 +72,5 @@
 .fft-node-circle {
     fill: red;
     stroke: red;
-    display: inline;
+    display: none;
 }
