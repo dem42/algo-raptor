@@ -220,13 +220,13 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     /***** this function creates a tree layout that we can then write the polynomials to and move them around in*/
     function prepareLayoutForPolys(N, node_size, svg, group_name, left_margin, top_margin) {
 	var node_num = 2*N - 1;
-	var last_level = Math.floor(Math.log2(N));
+	var last_level = Math.floor(Math.log2(N)) + 2;
 	var group = svg.append("g").attr("id", group_name). attr("transform", "translate(" + left_margin + ", " + top_margin + ")");
 	var data = [];
 	for (var i=1;i<=node_num;i++) {
 	    data.push({id: i, label: 0});    
 	};
-	var lbl_cnt = 0;
+	var lbl_cnt = 2;
 	function preorder_label(node) {
 	    if (node > data.length) return;
 	    data[node - 1].label = lbl_cnt;
@@ -235,12 +235,13 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    preorder_label(node*2 + 1);
 	};
 	preorder_label(1);
+	data.splice(0,0,{id: -1, label:0}, {id: 0, label:1});
 	var tree = d3.layout.tree()
 	    .children(function(d) {
-		if (d.v.id >= data.length / 2) {
-		    return [];   
-		}
-		return [{v: data[2*d.v.id - 1]}, {v: data[2*d.v.id]}];
+		console.log("computing child of ", d);
+		if (d.v.id <= 0) { return [{v: data[d.v.id + 2]}]; }
+		if (2*d.v.id + 1 >= data.length-1) { return []; }
+		return [{v: data[2*d.v.id + 1]}, {v: data[2*d.v.id + 2]}];
 	    })
 	    .nodeSize([node_size, 4*node_size])
 	    //.size([500, 500])
@@ -269,7 +270,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     /**** this function places a polynomial into the tree */
     function drawCoefs(poly, elem_to_draw_into) {
 	var elems = [];
-	for(var i=poly.length-1; i >= 0; i--) {
+	for(var i=0; i < poly.length; i++) {
 	    elems.push({"val" : Math.abs(poly[i].real), "key": i, 
 			"sign": (poly[i].real < 0 ? ((i != poly.length-1) ? " - " : "-") : ((i != poly.length-1) ? " + " : ""))});
 	}
@@ -294,7 +295,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    .data(elems, function(d) { return d.key; })
 	    .enter()
 	    .append("tspan")
-	    //.attr("y", 0)
+	    .attr("id", function(d) { return "fft-tspan" + d.key})
 	    .attr("class", "fft-poly")
 	    .text(function(d) { return d.sign + d.val + (d.key == 0 ? "" : "x"); });
 	textFields.filter(function(d) { return d.key >= 2; })
@@ -430,19 +431,12 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     var current_id = -1;
     ev_calls[0] = function(poly, start, N) {
 	if (recursion_depth == 0) {
-	    prepareLayoutForPolys(4, 50, svg, "fft-poly_tree", 300, 20);
+	    prepareLayoutForPolys(4, 50, svg, "fft-poly_tree", 300, 70);
 	}
 	current_id++;
 	drawPoly(poly.slice(start, start + N), "#fft-node-num" + current_id);
 	//drawLayerLabel(N, recursion_depth);
 
-	/*svg.selectAll("#n-line" + recursion_depth)
-	    .data([recursion_depth])
-	    .enter()
-	    .append("g")
-	    .attr("id", "n-line" + recursion_depth)
-	    .attr("transform", function(d) { return "translate(" + 0 + ", " + horiz_offset + ")"; })
-	    */
 	recursion_depth++;
     };
     ev_calls[23] = ev_calls[2] = { 
