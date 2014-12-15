@@ -4,7 +4,6 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     if (_my == undefined) {
 	throw "Algorithm module is not defined!";
     }
-    console.log(_my)
     var algorithmTabId = "fft-tab";
     var algorithmName = "Fast Fourier Transform";
 
@@ -139,6 +138,14 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     	if (N == 1) {
 	    return;
     	}
+	var nearest2Pow = 1 << Math.ceil(Math.log2(N));
+	if (N != nearest2Pow) {
+	    //zero pad
+	    for (var z = N; z < nearest2Pow; z++) { 
+		poly.push(Complex.ZERO);
+	    }
+	    N = nearest2Pow;
+	}
 	var half_N = Math.floor(N / 2);
     	for(var i=0; i < half_N; i++) {
     	    var x = start + 2*i;
@@ -165,8 +172,12 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	var N = p.length + q.length - 1;
     	var nearest2Pow = 1 << Math.ceil(Math.log2(N));
 	/* zero pad */
-	p.fill(Complex.ZERO, p.length, nearest2Pow);
-	q.fill(Complex.ZERO, q.length, nearest2Pow);
+	for (var z = p.length; z < nearest2Pow; z++) { 
+	    p.push(Complex.ZERO);
+	}
+	for (var z = q.length; z < nearest2Pow; z++) { 
+	    q.push(Complex.ZERO);
+	}
     	FFT_transform(p, 0, nearest2Pow, [], Complex);
     	FFT_transform(q, 0, nearest2Pow, [], Complex);
     	var res = [];
@@ -197,23 +208,10 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    /* reusable arrow marker to add to diagonals */
-    svg.append("svg:defs")
-	.append("svg:marker")
-	.attr("id", "arrow")
-	.attr("viewBox", "0 -5 10 10")
-	.attr("refX", 15)
-	.attr("refY", -1.5)
-	.attr("markerWidth", 6)
-	.attr("markerHeight", 6)
-	.attr("orient", "auto")
-	.append("svg:path")
-	.attr("d", "M0,-5L10,0L0,5");
-
     /**********************
      ** Wire up the Algos *
      **********************/
-    var poly_ev = [Complex.create(-1,0), Complex.ZERO, Complex.create(-5,0), Complex.ZERO];
+    var poly_ev = [Complex.create(-1,0), Complex.ZERO, Complex.create(-5,0)];
     var poly_p = [Complex.create(11,0), Complex.ZERO, Complex.create(-3,0), Complex.create(2,0)];
     var poly_q = [Complex.create(-3,0), Complex.create(3.4, 0), Complex.create(-7, 0)];
 
@@ -253,15 +251,13 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 		return (a.parent == b.parent ? ((a.depth == last_level) ? 1.5 : 6) : 2);
 	    })
 	var nodes = tree.nodes({v: data[0]})
-	console.log(data, nodes);
 	group.selectAll(".fft-link")
 	    .data(tree.links(nodes))
 	    .enter()
 	    .append("path")
 	    .attr("class", "fft-link")
 	    .attr("id", function(d) { return "fft-link-to" + d.target.v.label; })
-	    .attr("marker-end", function(d) { return "url(#" + "marker" + ")"; })
-	    .attr("d", d3.svg.diagonal())
+	    .attr("d", _my.vislib.interpolatableDiagonal("linear"))
 	var node_gs = 
 	    group.selectAll(".fft-node")
 	    .data(nodes)
@@ -329,11 +325,9 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 
 	for(var idx = 0; idx < N; idx++) {
 	    var ci = Complex.calc_unity(idx, N, Complex);
-	    console.log("" + ci, ci.getAngle());
 	    data.push({angle: (ci.getAngle() + Math.PI/2), text: ci.toString()});
 	}
 	data.push({angle: 5*Math.PI/2}); //we need to close the circle
-	console.log(data);
 
 	var radial = d3.svg.arc().innerRadius(radius).outerRadius(radius)
 	    .endAngle(function(d, i) { return data[(i+1) % data.length].angle; })
@@ -411,18 +405,19 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     } // end of roots of unity
 
     function drawLayerLabel(svg, N, rec_depth, left_offset, top_offset) {
-	svg.selectAll("fft-layer-depth-node" + rec_depth)
+	svg.selectAll("#fft-layer-depth-node" + rec_depth)
 	    .data([rec_depth]) // we attach data and enter so that if we run this multiple it only gets added once
 	    .enter()
 	    .append("text")
 	    .attr("x", left_offset)
 	    .attr("y", top_offset)
+	    .attr("id", "fft-layer-depth-node" + rec_depth)
 	    .attr("class", "fft-n-value")
 	    .text("N = " + N + ":");
     }
 
     /********* here we wire the callbacks ************/
-    rootsOfUnityCircle(svg, 4, 80, 3000, "test-circle", 200, 200);
+    //rootsOfUnityCircle(svg, 4, 80, 3000, "test-circle", 200, 200);
     var ev_calls = [];
     var calc_calls = [];
     calc_calls[20] = function() {
@@ -430,28 +425,58 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	//
 	
     }
+    /*
+    var emr = [{source: {x:10, y:10},target: {x:500, y:500}}];
+   var ppp = svg.append("path").style({"stroke": "black", "fill": "white"})
+	.attr("d", _my.vislib.interpolatableDiagonal("linear")(emr[0]))
+
+    _my.vislib.animateGrowingArrow(svg, ppp, 2000, 0);
+    */
+
     var recursion_depth = 0;
     var current_id = 1;
+    var tree_x_offset = 310;
+    var tree1_y_offset = 70;
+    var tree2_y_offset = 1900;
+
     ev_calls[0] = function(poly, start, N) {
-	var tree_x_offset = 310;
-	var tree1_y_offset = 70;
-	var tree2_y_offset = 1900;
 	if (recursion_depth == 0) {
-	    prepareLayoutForPolys(4, 50, svg, "fft-poly_tree", tree_x_offset, tree1_y_offset);
-	    prepareLayoutForPolys(4, 50, svg, "fft-poly_tree_upside_down", 0, 0);
-	    d3.select("#fft-poly_tree_upside_down").attr("transform", "translate(" + tree_x_offset + ", " + tree2_y_offset+") scale(-1,1) rotate(180)");
+	    prepareLayoutForPolys(4, 50, svg, "fft-poly-tree", tree_x_offset, tree1_y_offset);
+	    prepareLayoutForPolys(4, 50, svg, "fft-poly-tree-upside-down", 0, 0);
+	    d3.select("#fft-poly-tree-upside-down").attr("transform", "translate(" + tree_x_offset + ", " + tree2_y_offset+") scale(-1,1) rotate(180)");
+	    var top_down_tree = d3.select("#fft-poly-tree");
+	    drawPoly(poly.slice(start, start + N), top_down_tree.select("#fft-node-num" + 0), true);
+	    _my.vislib.animateGrowingArrow(top_down_tree, top_down_tree.select("#fft-link-to" + 1), 1000, 0, false, 0.7);
 
-	    drawPoly(poly.slice(start, start + N), d3.select("#fft-node-num" + 0), true);
-	    drawPoly(poly.slice(start, start + N), d3.select("#fft-node-num" + 1), false);
 	}
-	current_id++;
-	var elem_to_draw_into = d3.select("#fft-node-num" + current_id);
-	drawCoefs(poly.slice(start, start + N), elem_to_draw_into);
-	drawLayerLabel(svg, N, recursion_depth, 2.5, elem_to_draw_into.datum().y + tree1_y_offset);
-
+	else {
+	    current_id++;
+	    var top_down_tree = d3.select("#fft-poly-tree");
+	    var elem_to_draw_into = top_down_tree.select("#fft-node-num" + current_id);
+	    _my.vislib.animateGrowingArrow(top_down_tree, top_down_tree.select("#fft-link-to" + (current_id + 1)), 1000, 0, false, 0.7);
+	    drawCoefs(poly.slice(start, start + N), elem_to_draw_into);
+	    drawLayerLabel(svg, N, recursion_depth, 2.5, elem_to_draw_into.datum().y + tree1_y_offset);
+	}
 	recursion_depth++;
     };
-    ev_calls[24] = ev_calls[2] = { 
+    ev_calls[10] = function(poly, start, N) {
+	var top_down_tree = d3.select("#fft-poly-tree");
+	drawPoly(poly.slice(start, start + N), top_down_tree.select("#fft-node-num" + 1), false);
+	_my.vislib.animateGrowingArrow(top_down_tree, top_down_tree.select("#fft-link-to" + 2), 1000, 0, false, 0.7);
+	var elem_to_draw_into = top_down_tree.select("#fft-node-num" + current_id);
+	drawLayerLabel(svg, N, recursion_depth, 2.5, elem_to_draw_into.datum().y + tree1_y_offset);
+    }
+    ev_calls[13] = { "pre" : function(poly, start, N) {
+	if (recursion_depth == 1) {
+	    current_id++;
+	    var top_down_tree = d3.select("#fft-poly-tree");
+	    drawCoefs(poly.slice(start, start + N), top_down_tree.select("#fft-node-num" + current_id), false);
+	    _my.vislib.animateGrowingArrow(top_down_tree, top_down_tree.select("#fft-link-to" + (current_id + 1)), 1000, 0, false, 0.7);
+	    var elem_to_draw_into = top_down_tree.select("#fft-node-num" + current_id);
+	    drawLayerLabel(svg, N, recursion_depth, 2.5, elem_to_draw_into.datum().y + tree1_y_offset);
+	}
+    }};
+    ev_calls[32] = ev_calls[2] = { 
 	"pre": function() { 
 	    recursion_depth--;
 	}

@@ -65,7 +65,7 @@
 }
 
 .fft-link {
-    stroke: white;
+    stroke: #333;
     fill: white;
     display: none;
 }

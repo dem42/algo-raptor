@@ -104,7 +104,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    var selfie = this;
 	    this.animation_queue.push(new AnimationFrame("pre", row_num, this.return_rows, this.codeContainerId, function() {
 		var animation_duration;
-		if (row_num in selfie.callbacks && selfie.callbacks[row_num].pre != undefined)
+		if (row_num in selfie.callbacks && selfie.callbacks[row_num].pre !== undefined)
 		{
 		    var callback_obj = selfie.callbacks[row_num].pre;
 		    var fun_param = callback_obj.toString().match(/\(([^\(\)]*)\)/);
@@ -136,9 +136,12 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    var selfie = this;
 	    this.animation_queue.push(new AnimationFrame("post", row_num, this.return_rows, this.codeContainerId, function() {
 		var animation_duration;
-		if (row_num in selfie.callbacks)
+		var callback_obj = (row_num in selfie.callbacks) ? selfie.callbacks[row_num] : undefined;
+		if (typeof callback_obj === "object") {
+		    callback_obj = ("post" in callback_obj) ? callback_obj.post : undefined;
+		}
+		if (callback_obj !== undefined)
 		{
-		    var callback_obj = selfie.callbacks[row_num].post != undefined ? selfie.callbacks[row_num].post : selfie.callbacks[row_num];
 		    var fun_param = callback_obj.toString().match(/\(([^\(\)]*)\)/);
 		    var param_vals = [];
 		    fun_param[1].split(",").forEach(function(p) {
