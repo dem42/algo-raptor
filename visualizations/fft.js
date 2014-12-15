@@ -4,6 +4,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     if (_my == undefined) {
 	throw "Algorithm module is not defined!";
     }
+    console.log(_my)
     var algorithmTabId = "fft-tab";
     var algorithmName = "Fast Fourier Transform";
 
@@ -356,16 +357,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     
 	  var path = group.selectAll(".arc").data(data).enter().append("path").attr("class", "root-of-unity-circle").attr("d", radial).each(function(d, i) {
 	      // the stroke-dasharray trick to animate a line by decreasing the gap between in the stroke dashes
-	      var totalLength = this.getTotalLength();
-
-	      d3.select(this)
-		  .attr("stroke-dasharray", totalLength + " " + totalLength)
-		  .attr("stroke-dashoffset", totalLength)
-		  .transition()
-		  .duration(duration)
-		  .delay((duration / 2) * i)
-		  .ease("linear")
-		  .attr("stroke-dashoffset", 0);
+	      _my.vislib.animatePath(d3.select(this), duration, (duration / 2) * i);
 	  });
 
 	// our diagonal inside the circle that points at the roots of unity
@@ -430,11 +422,12 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     }
 
     /********* here we wire the callbacks ************/
+    rootsOfUnityCircle(svg, 4, 80, 3000, "test-circle", 200, 200);
     var ev_calls = [];
     var calc_calls = [];
     calc_calls[20] = function() {
 
-	//rootsOfUnityCircle(svg, 4, 80, 3000, "test-circle", 200, 200);
+	//
 	
     }
     var recursion_depth = 0;
