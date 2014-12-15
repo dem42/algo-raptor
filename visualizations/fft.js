@@ -221,7 +221,8 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 
 
     /***** this function creates a tree layout that we can then write the polynomials to and move them around in*/
-    function prepareLayoutForPolys(N, node_size, svg, group_name, left_margin, top_margin) {
+    function prepareLayoutForPolys(N, node_size, svg, group_name, left_margin, top_margin, inverted) {
+	N = 1 << Math.ceil(Math.log2(N));
 	var node_num = 2*N - 1;
 	var last_level = Math.floor(Math.log2(N)) + 2;
 	var group = svg.append("g").attr("id", group_name). attr("transform", "translate(" + left_margin + ", " + top_margin + ")");
@@ -250,6 +251,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    .separation(function(a, b) {
 		return (a.parent == b.parent ? ((a.depth == last_level) ? 1.5 : 6) : 2);
 	    })
+	var link_path_gen = (inverted === true) ? _my.vislib.interpolatableDiagonal("linear").inverted() : _my.vislib.interpolatableDiagonal("linear");
 	var nodes = tree.nodes({v: data[0]})
 	group.selectAll(".fft-link")
 	    .data(tree.links(nodes))
@@ -257,7 +259,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    .append("path")
 	    .attr("class", "fft-link")
 	    .attr("id", function(d) { return "fft-link-to" + d.target.v.label; })
-	    .attr("d", _my.vislib.interpolatableDiagonal("linear"))
+	    .attr("d", link_path_gen)
 	var node_gs = 
 	    group.selectAll(".fft-node")
 	    .data(nodes)
@@ -440,29 +442,31 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     var tree2_y_offset = 1900;
 
     ev_calls[0] = function(poly, start, N) {
-	if (recursion_depth == 0) {
+	recursion_depth++;
+	if (recursion_depth == 1) {
 	    prepareLayoutForPolys(4, 50, svg, "fft-poly-tree", tree_x_offset, tree1_y_offset);
-	    prepareLayoutForPolys(4, 50, svg, "fft-poly-tree-upside-down", 0, 0);
+	    prepareLayoutForPolys(4, 50, svg, "fft-poly-tree-upside-down", 0, 0, true);
 	    d3.select("#fft-poly-tree-upside-down").attr("transform", "translate(" + tree_x_offset + ", " + tree2_y_offset+") scale(-1,1) rotate(180)");
 	    var top_down_tree = d3.select("#fft-poly-tree");
 	    drawPoly(poly.slice(start, start + N), top_down_tree.select("#fft-node-num" + 0), true);
-	    _my.vislib.animateGrowingArrow(top_down_tree, top_down_tree.select("#fft-link-to" + 1), 1000, 0, false, 0.7);
-
 	}
 	else {
 	    current_id++;
 	    var top_down_tree = d3.select("#fft-poly-tree");
 	    var elem_to_draw_into = top_down_tree.select("#fft-node-num" + current_id);
-	    _my.vislib.animateGrowingArrow(top_down_tree, top_down_tree.select("#fft-link-to" + (current_id + 1)), 1000, 0, false, 0.7);
-	    drawCoefs(poly.slice(start, start + N), elem_to_draw_into);
+	    var transition = _my.vislib.animateGrowingArrow(top_down_tree, top_down_tree.select("#fft-link-to" + current_id), 1000, 0, false, 0.7);
+	    transition.each("end", function() {
+		drawCoefs(poly.slice(start, start + N), elem_to_draw_into);
+	    });
 	    drawLayerLabel(svg, N, recursion_depth, 2.5, elem_to_draw_into.datum().y + tree1_y_offset);
 	}
-	recursion_depth++;
     };
     ev_calls[10] = function(poly, start, N) {
 	var top_down_tree = d3.select("#fft-poly-tree");
-	drawPoly(poly.slice(start, start + N), top_down_tree.select("#fft-node-num" + 1), false);
-	_my.vislib.animateGrowingArrow(top_down_tree, top_down_tree.select("#fft-link-to" + 2), 1000, 0, false, 0.7);
+	var transition = _my.vislib.animateGrowingArrow(top_down_tree, top_down_tree.select("#fft-link-to" + 1), 1000, 0, false, 0.7);
+	transition.each("end", function() {
+	    drawPoly(poly.slice(start, start + N), top_down_tree.select("#fft-node-num" + 1), false);
+	});
 	var elem_to_draw_into = top_down_tree.select("#fft-node-num" + current_id);
 	drawLayerLabel(svg, N, recursion_depth, 2.5, elem_to_draw_into.datum().y + tree1_y_offset);
     }
@@ -470,21 +474,36 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	if (recursion_depth == 1) {
 	    current_id++;
 	    var top_down_tree = d3.select("#fft-poly-tree");
-	    drawCoefs(poly.slice(start, start + N), top_down_tree.select("#fft-node-num" + current_id), false);
-	    _my.vislib.animateGrowingArrow(top_down_tree, top_down_tree.select("#fft-link-to" + (current_id + 1)), 1000, 0, false, 0.7);
+	    var transition = _my.vislib.animateGrowingArrow(top_down_tree, top_down_tree.select("#fft-link-to" + current_id), 1000, 0, false, 0.7);
+	    transition.each("end", function() {
+		drawCoefs(poly.slice(start, start + N), top_down_tree.select("#fft-node-num" + current_id), false);
+	    });
 	    var elem_to_draw_into = top_down_tree.select("#fft-node-num" + current_id);
 	    drawLayerLabel(svg, N, recursion_depth, 2.5, elem_to_draw_into.datum().y + tree1_y_offset);
 	}
     }};
+    ev_calls[28] = function(poly, start, N) {
+	var lvl = Math.log2(N);
+	var subtree_nodenum = (1 << (lvl + 1)) - 2;
+	var our_id = current_id - subtree_nodenum;
+	console.log("" + poly.slice(start, start + N), current_id, subtree_nodenum, our_id);
+	var down_top_tree = d3.select("#fft-poly-tree-upside-down");
+	var elem_to_draw_into = down_top_tree.select("#fft-node-num" + our_id);
+	var transition = _my.vislib.animateGrowingArrow(down_top_tree, down_top_tree.select("#fft-link-to" + our_id), 1000, 0, false, 0.7);
+	transition.each("end", function() {
+	    drawCoefs(poly.slice(start, start + N), down_top_tree.select("#fft-node-num" + our_id), false);
+	    elem_to_draw_into.select("text").attr("transform", "scale(1,-1)");
+	});
+    };
     ev_calls[32] = ev_calls[2] = { 
 	"pre": function() { 
 	    recursion_depth--;
 	}
     };
-    var ev = new _my.Algorithm(FFT_transform, ev_calls, "eval-code", {default_animation_duration : 200}, function() {
+    var ev = new _my.Algorithm(FFT_transform, ev_calls, "eval-code", {default_animation_duration : 50}, function() {
 	_my.AlgorithmUtils.resetControls(algorithmTabId);
     }); 
-    var calc = new _my.Algorithm(Complex.calc_unity, calc_calls, "calc-code", {default_animation_duration : 200}); 
+    var calc = new _my.Algorithm(Complex.calc_unity, calc_calls, "calc-code", {default_animation_duration : 50}); 
     var fft_call = [];
     function digLen(val) {
 	return ("" + val).length;

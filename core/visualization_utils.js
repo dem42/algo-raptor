@@ -15,6 +15,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    duration = duration * totalLength;
 	}
 	path.style("display", "inline");
+	var transition = 
 	path.attr("stroke-dasharray", totalLength + " " + totalLength)
 	    .attr("stroke-dashoffset", totalLength)
 	    .transition()
@@ -22,6 +23,8 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    .delay(delay)
             .ease("linear")
             .attr("stroke-dashoffset", (1-length_to_show_percentage)*totalLength);
+
+	return transition;
     };
 
     /*** what it says ... cool growing arrow */
@@ -30,7 +33,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    .attr("d", d3.svg.symbol().type("triangle-down")(10,1));
 
 	_my.vislib.animatePath(path, duration, delay, make_proportional, length_to_show_percentage);
-	_my.vislib.animateMovingAlongAPath(arrow, path, duration, delay, make_proportional, length_to_show_percentage, true, -90);
+	return _my.vislib.animateMovingAlongAPath(arrow, path, duration, delay, make_proportional, length_to_show_percentage, true, -90);
     }
 
     /*** ice cold coolness!! takes a selection which should be translateable and animates it moving along a path
@@ -42,7 +45,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    // make duration proportional to totalLength to create a smoother animation
 	    duration = duration * totalLength;
 	}
-	movable_selection.transition()
+	var transition = movable_selection.transition()
 	    .duration(duration)
 	    .delay(delay)
 	    .ease("linear")
@@ -68,6 +71,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 		};
 	    };
 	}
+	return transition;
     };
     
     /** return a diagonal generator where the interpolation can be set
@@ -94,6 +98,12 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    ];
 	    return line(points);
 	}
+	lineData.inverted = function() {
+	    var temp = lineData.source;
+	    lineData.source = lineData.target;
+	    lineData.target = temp;
+	    return lineData;
+	};
 	return lineData;
     };
 
