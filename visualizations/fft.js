@@ -356,7 +356,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     
 	  var path = group.selectAll(".arc").data(data).enter().append("path").attr("class", "root-of-unity-circle").attr("d", radial).each(function(d, i) {
 	      // the stroke-dasharray trick to animate a line by decreasing the gap between in the stroke dashes
-	      _my.vislib.animatePath(d3.select(this), duration, (duration / 2) * i);
+	      _my.vislib.animatePath(d3.select(this), duration, (duration / 2) * i, false, 1);
 	  });
 
 	// our diagonal inside the circle that points at the roots of unity
@@ -492,10 +492,17 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	console.log("" + poly.slice(start, start + N), current_id, subtree_nodenum, our_id);
 	var down_top_tree = d3.select("#fft-poly-tree-upside-down");
 	var elem_to_draw_into = down_top_tree.select("#fft-node-num" + our_id);
+
+	var y_pos = elem_to_draw_into.datum().y;
+	rootsOfUnityCircle(svg, N, 80, 1000, "fft-circle-lvl" + lvl, tree_x_offset + 480, tree2_y_offset - y_pos - 1.25*80);
+	
 	var transition = _my.vislib.animateGrowingArrows(down_top_tree, down_top_tree.selectAll(".fft-link-to" + our_id), 1000, 0, false, 0.7);
 	transition.each("end", function() {
 	    drawCoefs(poly.slice(start, start + N), elem_to_draw_into, false);
 	    elem_to_draw_into.select("text").attr("transform", "scale(1,-1)");
+	    transition.each("end", function() {
+		d3.select("#fft-circle-lvl" + lvl).remove();
+	    });
 	});
     };
     ev_calls[32] = ev_calls[2] = { 
