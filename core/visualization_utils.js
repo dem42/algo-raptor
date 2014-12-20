@@ -87,9 +87,6 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	}
 
 	function lineData(d){
-	    // default accessors
-	    lineData.source = function(d) { return d.source; }
-	    lineData.target = function(d) { return d.target; }
 	    // i'm assuming here that supplied datum 
 	    // is a link between 'source' and 'target'
 	    var points = [
@@ -98,6 +95,9 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    ];
 	    return line(points);
 	}
+	// default accessors
+	lineData.source = function(d) { return d.source; };
+	lineData.target = function(d) { return d.target; };
 	lineData.inverted = function() {
 	    var temp = lineData.source;
 	    lineData.source = lineData.target;
@@ -123,5 +123,102 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    .append("svg:path")
 	    .attr("d", marker_path);
     };
+
+
+    /******* EXPERIMENTAL ***********/
+/** animate moving growing a path 
+     *
+     * it seems like this can randomly fail on firefox for bezier curves :/
+     */
+    _my.vislib.animatePaths = function(paths, duration, delay, make_proportional, length_to_show_percentage) {
+	// the stroke-dasharray trick to animate a line by decreasing the gap between in the stroke dashes
+	console.log("in animate paths 1");
+	var totalLength = 0;
+	for (var path in paths) {
+	    // the node() function is only available on the selection object and not its elements
+	    var this_path = d3.select(path);
+	    totalLength = Math.max(this_path.node().getTotalLength(), totalLength);
+	}
+	if (make_proportional !== undefined && make_proportional === true) {
+	    // make duration proportional to totalLength to create a smoother animation
+	    duration = duration * totalLength;
+	}
+	console.log("in animate paths 2");
+	paths.style("display", "inline");
+	var transition = 
+	paths.attr("stroke-dasharray", totalLength + " " + totalLength)
+	    .attr("stroke-dashoffset", totalLength)
+	    .transition()
+            .duration(duration)        
+	    .delay(delay)
+            .ease("linear")
+            .attr("stroke-dashoffset", (1-length_to_show_percentage)*totalLength);
+
+	return transition;
+    };
+
+    /*** what it says ... cool growing arrow */
+    _my.vislib.animateGrowingArrows = function(svg, paths, duration, delay, make_proportional, length_to_show_percentage) {
+	var arrows = [];
+	for (var path in paths) {
+	    var arrow = svg.append("svg:path")
+		.attr("d", d3.svg.symbol().type("triangle-down")(10,1));
+	}
+	_my.vislib.animatePaths(paths, duration, delay, make_proportional, length_to_show_percentage);
+	return _my.vislib.animateMovingAlongPaths(arrows, paths, duration, delay, make_proportional, length_to_show_percentage, true, -90);
+    }
+
+    /*** ice cold coolness!! takes a selection which should be translateable and animates it moving along a path
+     * .. with_rotate only works properly for straight paths .. we could calculate tangent more often too tho so
+     * maybe in the future
+     */
+    _my.vislib.animateMovingAlongPaths = function(movable_selections, paths, duration, delay, make_proportional, length_to_show_percentage, with_rotate, with_rotate_extra_angle) {
+	console.log("in animate along");
+	if (movable_selection.length != paths.length) {
+	    throw "In animateMovingAlongPaths, the length of movable_selections must match the length of paths. " + movable_selection.length + " != " + paths.length;
+	} 
+	if (make_proportional !== undefined && make_proportional === true) {
+	    // make duration proportional to totalLength to create a smoother animation
+	    duration = duration * totalLength;
+	}
+	console.log("before build functions");
+	var translateFunctions = [];
+	for (var path in paths) {
+	    // the node() function is only available on the selection object and not its elements
+	    var this_path = d3.select(path);
+	    translateFunctions.push({ "translateAlong" : translateAlong(this_path.node())});
+	}
+	
+	var transition = movable_selections
+	    .datum(translateFunctions)
+	    .transition()
+	    .duration(duration)
+	    .delay(delay)
+	    .ease("linear")
+	    .attrTween("transform", function(d) { console.log(d.translateAlong); return d.translateAlong(); })
+
+	// Returns an attrTween for translating along the specified path element.
+	function translateAlong(path) {
+	    var l = path.getTotalLength() * length_to_show_percentage;
+	    var rot_tran = "";
+	    if (with_rotate !== undefined && with_rotate === true) {
+		var ps = path.getPointAtLength(0);
+		var pe = path.getPointAtLength(l);
+		var angl = Math.atan2(pe.y - ps.y, pe.x - ps.x) * (180 / Math.PI);
+		if (with_rotate_extra_angle !== undefined) {
+		    angl += with_rotate_extra_angle;
+		}
+		rot_tran = "rotate(" + angl + ")";
+	    }
+	    return function(d, i, a) {
+		return function(t) {
+		    var p = path.getPointAtLength(t * l);
+		    return "translate(" + p.x + "," + p.y + ")" + rot_tran;
+		};
+	    };
+	}
+	return transition;
+    };
+
     return _my;
 }(ALGORITHM_MODULE || {}, d3, $));
