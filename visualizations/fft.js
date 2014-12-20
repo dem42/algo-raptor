@@ -277,7 +277,11 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    elems.push({"val" : Math.abs(poly[i].real), "key": i, 
 			"sign": (poly[i].real < 0 ? ((i != poly.length-1) ? " - " : "-") : ((i != poly.length-1) ? " + " : ""))});
 	}
-	var textFields = elem_to_draw_into.append("text")
+	var textFields = elem_to_draw_into
+	    .selectAll("text")
+	    .data([1]) // we just want this text field to be added once no mater how many times this function is called
+	    .enter()
+	    .append("text")
 	    .attr("class", "fft-poly")
 	    .attr("text-anchor", "middle")
 	    .text("" + poly);
@@ -438,7 +442,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     var current_id = 1;
     var tree_x_offset = 310;
     var tree1_y_offset = 70;
-    var tree2_y_offset = 1900;
+    var tree2_y_offset = 1680;
 
     ev_calls[0] = function(poly, start, N) {
 	recursion_depth++;
@@ -463,21 +467,21 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     ev_calls[10] = function(poly, start, N) {
 	var top_down_tree = d3.select("#fft-poly-tree");
 	var transition = _my.vislib.animateGrowingArrow(top_down_tree, top_down_tree.selectAll(".fft-link-to" + 1), 1000, 0, false, 0.7);
-	transition.each("end", function() {
-	    drawPoly(poly.slice(start, start + N), top_down_tree.select("#fft-node-num" + 1), false);
-	});
 	var elem_to_draw_into = top_down_tree.select("#fft-node-num" + current_id);
+	transition.each("end", function() {
+	    drawPoly(poly.slice(start, start + N), elem_to_draw_into, false);
+	});
 	drawLayerLabel(svg, N, recursion_depth, 2.5, elem_to_draw_into.datum().y + tree1_y_offset);
     }
     ev_calls[13] = { "pre" : function(poly, start, N) {
 	if (recursion_depth == 1) {
 	    current_id++;
 	    var top_down_tree = d3.select("#fft-poly-tree");
+	    var elem_to_draw_into = top_down_tree.select("#fft-node-num" + current_id);
 	    var transition = _my.vislib.animateGrowingArrow(top_down_tree, top_down_tree.selectAll(".fft-link-to" + current_id), 1000, 0, false, 0.7);
 	    transition.each("end", function() {
-		drawCoefs(poly.slice(start, start + N), top_down_tree.select("#fft-node-num" + current_id), false);
+		drawCoefs(poly.slice(start, start + N), elem_to_draw_into, false);
 	    });
-	    var elem_to_draw_into = top_down_tree.select("#fft-node-num" + current_id);
 	    drawLayerLabel(svg, N, recursion_depth, 2.5, elem_to_draw_into.datum().y + tree1_y_offset);
 	}
     }};
@@ -490,7 +494,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	var elem_to_draw_into = down_top_tree.select("#fft-node-num" + our_id);
 	var transition = _my.vislib.animateGrowingArrows(down_top_tree, down_top_tree.selectAll(".fft-link-to" + our_id), 1000, 0, false, 0.7);
 	transition.each("end", function() {
-	    drawCoefs(poly.slice(start, start + N), down_top_tree.select("#fft-node-num" + our_id), false);
+	    drawCoefs(poly.slice(start, start + N), elem_to_draw_into, false);
 	    elem_to_draw_into.select("text").attr("transform", "scale(1,-1)");
 	});
     };

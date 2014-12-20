@@ -132,18 +132,16 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
      */
     _my.vislib.animatePaths = function(paths, duration, delay, make_proportional, length_to_show_percentage) {
 	// the stroke-dasharray trick to animate a line by decreasing the gap between in the stroke dashes
-	console.log("in animate paths 1");
 	var totalLength = 0;
-	for (var path in paths) {
+	paths.each(function(d, i) {
 	    // the node() function is only available on the selection object and not its elements
-	    var this_path = d3.select(path);
+	    var this_path = d3.select(this);
 	    totalLength = Math.max(this_path.node().getTotalLength(), totalLength);
-	}
+	});
 	if (make_proportional !== undefined && make_proportional === true) {
 	    // make duration proportional to totalLength to create a smoother animation
 	    duration = duration * totalLength;
 	}
-	console.log("in animate paths 2");
 	paths.style("display", "inline");
 	var transition = 
 	paths.attr("stroke-dasharray", totalLength + " " + totalLength)
@@ -157,15 +155,19 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	return transition;
     };
 
+    var uniq_id = 0;
     /*** what it says ... cool growing arrow */
     _my.vislib.animateGrowingArrows = function(svg, paths, duration, delay, make_proportional, length_to_show_percentage) {
 	var arrows = [];
-	for (var path in paths) {
-	    var arrow = svg.append("svg:path")
-		.attr("d", d3.svg.symbol().type("triangle-down")(10,1));
-	}
+	uniq_id++;
+	paths.each(function() {
+	    arrows.push(svg.append("svg:path")
+		.attr("class", "fft-arrow fft-arrows-generated-with" + uniq_id) 
+		.attr("d", d3.svg.symbol().type("triangle-down")(10,1)));
+	});
+	var movable_selections = svg.selectAll(".fft-arrow.fft-arrows-generated-with" + uniq_id);
 	_my.vislib.animatePaths(paths, duration, delay, make_proportional, length_to_show_percentage);
-	return _my.vislib.animateMovingAlongPaths(arrows, paths, duration, delay, make_proportional, length_to_show_percentage, true, -90);
+	return _my.vislib.animateMovingAlongPaths(movable_selections, paths, duration, delay, make_proportional, length_to_show_percentage, true, -90);
     }
 
     /*** ice cold coolness!! takes a selection which should be translateable and animates it moving along a path
@@ -174,8 +176,8 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
      */
     _my.vislib.animateMovingAlongPaths = function(movable_selections, paths, duration, delay, make_proportional, length_to_show_percentage, with_rotate, with_rotate_extra_angle) {
 	console.log("in animate along");
-	if (movable_selection.length != paths.length) {
-	    throw "In animateMovingAlongPaths, the length of movable_selections must match the length of paths. " + movable_selection.length + " != " + paths.length;
+	if (movable_selections.size() != paths.size()) {
+	    throw "In animateMovingAlongPaths, the length of movable_selections must match the length of paths. " + movable_selections.size() + " != " + paths.size();
 	} 
 	if (make_proportional !== undefined && make_proportional === true) {
 	    // make duration proportional to totalLength to create a smoother animation
@@ -183,14 +185,15 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	}
 	console.log("before build functions");
 	var translateFunctions = [];
-	for (var path in paths) {
+	paths.each(function(d, i) {
 	    // the node() function is only available on the selection object and not its elements
-	    var this_path = d3.select(path);
+	    var this_path = d3.select(this);
 	    translateFunctions.push({ "translateAlong" : translateAlong(this_path.node())});
-	}
+	    console.log(translateFunctions[translateFunctions.length-1]);
+	});
 	
 	var transition = movable_selections
-	    .datum(translateFunctions)
+	    .data(translateFunctions)
 	    .transition()
 	    .duration(duration)
 	    .delay(delay)
