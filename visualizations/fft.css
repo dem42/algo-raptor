@@ -7,7 +7,23 @@
 }
 
 .fft-poly {
-    font-size: 3.5em;
+    font-size: 2em;
+    /*stroke-width: 0.5px;*/
+    stroke: #333;
+    font-family: freeserif, serif; /*"Lucida Console", Courier, monospace;*/
+}
+
+.fft-coefs-highlight {
+    font-size: 2em;
+    /*stroke-width: 0.5px;*/
+    stroke: red;
+    fill: red;
+    font-style: bold;
+    font-family: freeserif, serif; /*"Lucida Console", Courier, monospace;*/
+}
+
+.fft-coefs {
+    font-size: 2em;
     /*stroke-width: 0.5px;*/
     stroke: #333;
     font-family: freeserif, serif; /*"Lucida Console", Courier, monospace;*/
