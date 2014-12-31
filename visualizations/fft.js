@@ -283,6 +283,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    .enter()
 	    .append("text")
 	    .attr("class", "fft-poly fft-coef-text-" + invisible)
+	    .attr("font-size", "30")
 	    .attr("dy", (invisible === true) ? "0em" : "-1em")
 	    .attr("text-anchor", "middle")
 	    .selectAll("tspan")
@@ -308,6 +309,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	}
 	var text = elem_to_draw_into.append("text")
 	    .attr("text-anchor", "middle")
+	    .attr("font-size", "30")
 	    .attr("dy", "-0.6em");
 	var textFields = text
 	    .selectAll(".fft-poly-elem")
@@ -321,10 +323,11 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    .attr("class", "fft-poly fft-has-super")
 	    .append("tspan")
 	    .attr("class", "fft-super")
-	    .attr("dy", -20)
+	    .attr("font-size", 15)
+	    .attr("dy", -15)
 	    .text(function(d) { return d.key < 2 ? " " : d.key; })
 	//the dy is sticky and moves everything else up so we add another dy=20 to move down
-	text.selectAll(".fft-has-super + tspan").attr("dy", 20);
+	text.selectAll(".fft-has-super + tspan").attr("dy", 15);
     } // end of draw poly
      
     //drawPoly(poly_p, svg, "p-elem", 0);
@@ -427,6 +430,8 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    .append("text")
 	    .attr("x", left_offset)
 	    .attr("y", top_offset)
+	    .attr("font-size", 35)
+	    .attr("dy", "-1em")
 	    .attr("id", "fft-layer-depth-node" + rec_depth)
 	    .attr("class", "fft-n-value")
 	    .text("N = " + N + ":");
@@ -453,7 +458,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     var current_id = 1;
     var tree_x_offset = 310;
     var tree1_y_offset = 70;
-    var tree2_y_offset = 1680;
+    var tree2_y_offset = 1660;
 
     ev_calls[0] = function(poly, start, N) {
 	recursion_depth++;
@@ -507,22 +512,22 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	}
 	return 1200;
     }};
-    ev_calls[15] = function(poly, i, x, half_N) {
+    ev_calls[15] = function(poly, start, i, x, half_N) {
 	var top_down_tree = d3.select("#fft-poly-tree");
 	var elem_to_draw_into = top_down_tree.select("#fft-node-num" + current_id)
 	var visible_coefs = elem_to_draw_into.select(".fft-coef-text-false");
 	var invisible_coefs = elem_to_draw_into.select(".fft-coef-text-true");
 	invisible_coefs.select(".fft-coef-" + i).text("" + poly[x] + ",").style("visibility", "visible");
 
-	var ci = visible_coefs.select(".fft-coef-" + x).classed("fft-coefs-highlight", true)
+	var ci = visible_coefs.select(".fft-coef-" + (x - start)).classed("fft-coefs-highlight", true)
 	var cf = invisible_coefs.select(".fft-coef-" + i).classed("fft-coefs-highlight", true)
 	setTimeout(function() {
 	    ci.classed("fft-coefs-highlight", false)
 	    cf.classed("fft-coefs-highlight", false)
-	}, 200);
-	return 200;
+	}, 400);
+	return 400;
     };
-    ev_calls[16] = function(poly, i, x, half_N, N) {
+    ev_calls[16] = function(poly, start, i, x, half_N, N) {
 	var top_down_tree = d3.select("#fft-poly-tree");
 	var elem_to_draw_into = top_down_tree.select("#fft-node-num" + current_id);
 	var visible_coefs = elem_to_draw_into.select(".fft-coef-text-false");
@@ -530,13 +535,13 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	invisible_coefs.select(".fft-coef-" + (i + half_N)).text("" + poly[x+1] + ((i + half_N < N-1) ? "," : ""))
 	    .style("visibility", "visible");
 
-	var ci = visible_coefs.select(".fft-coef-" + (x+1)).classed("fft-coefs-highlight", true)
+	var ci = visible_coefs.select(".fft-coef-" + (x+1-start)).classed("fft-coefs-highlight", true)
 	var cf = invisible_coefs.select(".fft-coef-" + (i + half_N)).classed("fft-coefs-highlight", true)
 	setTimeout(function() {
 	    ci.classed("fft-coefs-highlight", false)
 	    cf.classed("fft-coefs-highlight", false)
-	}, 200);
-	return 200;
+	}, 400);
+	return 400;
     };
     ev_calls[28] = function(poly, start, N) {
 	var lvl = Math.log2(N);

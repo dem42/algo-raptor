@@ -40,8 +40,9 @@ pre.prettyprint {
 }
 
 .graphics {
-    font-size: 1em;
+/*    font-size: 1em;
     font-family: sans-serif;
+*/
 }
 
 /* Fix to make pretty-print print all line numbers */

@@ -1,5 +1,4 @@
 .fft-n-value {
-   font-size: 2em;
     /*stroke-width: 0.5px;*/
     stroke: #a94442;
     fill: #a94442;
@@ -7,23 +6,20 @@
 }
 
 .fft-poly {
-    font-size: 2em;
     /*stroke-width: 0.5px;*/
     stroke: #333;
     font-family: freeserif, serif; /*"Lucida Console", Courier, monospace;*/
 }
 
 .fft-coefs-highlight {
-    font-size: 2em;
     /*stroke-width: 0.5px;*/
     stroke: red;
     fill: red;
-    font-style: bold;
+    font-weight: bold;
     font-family: freeserif, serif; /*"Lucida Console", Courier, monospace;*/
 }
 
 .fft-coefs {
-    font-size: 2em;
     /*stroke-width: 0.5px;*/
     stroke: #333;
     font-family: freeserif, serif; /*"Lucida Console", Courier, monospace;*/
@@ -31,7 +27,7 @@
 
 .fft-super {
     vertical-align: super;
-    font-size: 0.8em;
+    font-size: 0.8;
     stroke-width: 0.5px;
     stroke: #333;
     font-family: freeserif, serif; /*"Lucida Console", Courier, monospace;*/
