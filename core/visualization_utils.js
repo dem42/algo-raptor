@@ -175,7 +175,6 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
      * maybe in the future
      */
     _my.vislib.animateMovingAlongPaths = function(movable_selections, paths, duration, delay, make_proportional, length_to_show_percentage, with_rotate, with_rotate_extra_angle) {
-	console.log("in animate along");
 	if (movable_selections.size() != paths.size()) {
 	    throw "In animateMovingAlongPaths, the length of movable_selections must match the length of paths. " + movable_selections.size() + " != " + paths.size();
 	} 
@@ -183,13 +182,11 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    // make duration proportional to totalLength to create a smoother animation
 	    duration = duration * totalLength;
 	}
-	console.log("before build functions");
 	var translateFunctions = [];
 	paths.each(function(d, i) {
 	    // the node() function is only available on the selection object and not its elements
 	    var this_path = d3.select(this);
 	    translateFunctions.push({ "translateAlong" : translateAlong(this_path.node())});
-	    console.log(translateFunctions[translateFunctions.length-1]);
 	});
 	
 	var transition = movable_selections
@@ -198,7 +195,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    .duration(duration)
 	    .delay(delay)
 	    .ease("linear")
-	    .attrTween("transform", function(d) { console.log(d.translateAlong); return d.translateAlong(); })
+	    .attrTween("transform", function(d) { return d.translateAlong(); })
 
 	// Returns an attrTween for translating along the specified path element.
 	function translateAlong(path) {

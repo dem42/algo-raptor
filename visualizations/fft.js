@@ -404,6 +404,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    .attr("transform", function(d) { return "rotate(" + -radToDeg(d.angle - Math.PI/2) + ")"; })
 	var text = unit_groups.append("text")
 	    .attr("class", "fft-text")
+	    .attr("id", function(d, i) { return "fft-root-of-unity" + i; })
 	    .attr("dx", (1 * scale_factor) + "em")
 	    .attr("dy", (8 * scale_factor) + "px")
 	    .attr("font-size", "1.5em")
@@ -463,6 +464,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     ev_calls[0] = function(poly, start, N) {
 	recursion_depth++;
 	if (recursion_depth == 1) {
+	    current_id = 1;
 	    svg.select("#fft-poly-tree").remove();
 	    svg.select("#fft-poly-tree-upside-down").remove();
 	    prepareLayoutForPolys(4, 50, svg, "fft-poly-tree", tree_x_offset, tree1_y_offset);
@@ -543,25 +545,76 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	}, 400);
 	return 400;
     };
-    ev_calls[28] = function(poly, start, N) {
+    ev_calls[22] = function(poly, start, N) {
 	var lvl = Math.log2(N);
 	var subtree_nodenum = (1 << (lvl + 1)) - 2;
 	var our_id = current_id - subtree_nodenum;
-	console.log("" + poly.slice(start, start + N), current_id, subtree_nodenum, our_id);
 	var down_top_tree = d3.select("#fft-poly-tree-upside-down");
 	var elem_to_draw_into = down_top_tree.select("#fft-node-num" + our_id);
 
-	var y_pos = elem_to_draw_into.datum().y;
-	rootsOfUnityCircle(svg, N, 80, 1000, "fft-circle-lvl" + lvl, tree_x_offset + 460, tree2_y_offset - y_pos - 1.25*80);
-	
 	var transition = _my.vislib.animateGrowingArrows(down_top_tree, down_top_tree.selectAll(".fft-link-to" + our_id), 1000, 0, false, 0.7);
 	transition.each("end", function() {
-	    drawCoefs(poly.slice(start, start + N), elem_to_draw_into, false);
-	    elem_to_draw_into.select("text").attr("transform", "scale(1,-1)");
-	    transition.each("end", function() {
-		//d3.select("#fft-circle-lvl" + lvl).remove();
-	    });
+	    drawCoefs(poly.slice(start, start + N), elem_to_draw_into, false)
+	    drawCoefs(poly.slice(start, start + N), elem_to_draw_into, true);
+	    elem_to_draw_into.selectAll("text").attr("transform", "scale(1,-1)");
 	});
+	return 1200;
+    };
+    ev_calls[23] = { "pre" : function(N) {
+	var lvl = Math.log2(N);
+	var elem_to_draw_into = getElemToDrawInto("#fft-poly-tree-upside-down", current_id, N);
+	var y_pos = elem_to_draw_into.datum().y;
+	rootsOfUnityCircle(svg, N, 80, 1000, "fft-circle-lvl" + lvl, tree_x_offset + 460, tree2_y_offset - y_pos - 1.25*80);
+	/*    transition.each("end", function() {
+		d3.select("#fft-circle-lvl" + lvl).remove();
+	    });*/
+    }};
+    ev_calls[26] = function(poly, unity, k, start, N, half_N, helper_arr) {
+	var lvl = Math.log2(N);
+	var elem_to_draw_into = getElemToDrawInto("#fft-poly-tree-upside-down", current_id, N);
+	var visible_coefs = elem_to_draw_into.select(".fft-coef-text-false");
+	var invisible_coefs = elem_to_draw_into.select(".fft-coef-text-true");
+	var equa = "(" + poly[start+k] + ") + (" + unity + ") * (" + poly[start + half_N + k] + ")";
+	invisible_coefs.select(".fft-coef-" + k).text(equa + ",")
+	    .style("visibility", "visible");
+
+	var ci1 = visible_coefs.select(".fft-coef-" + (k)).classed("fft-coefs-highlight", true)
+	var ci2 = visible_coefs.select(".fft-coef-" + (k + half_N)).classed("fft-coefs-highlight", true)
+	var cf = invisible_coefs.select(".fft-coef-" + (k)).classed("fft-coefs-highlight", true)
+	var target_bound_rect = cf.node().getBoundingClientRect();
+	var text_root_unity_bound = svg.select("#fft-circle-lvl" + lvl + " #fft-root-of-unity" + k).node().getBoundingClientRect();
+	var arc = d3.svg.diagonal()
+	    .target(function() { return {"x": target_bound_rect.x, "y": target_bound_rect.y}; })
+	    .source(function() { return {"x": text_root_unity_bound.x, "y": text_root_unity_bound.y}; });
+	svg.select("#fft-poly-tree-upside-down").append("path").style("fill", "white").style("stroke", "black").attr("d", arc(1));
+	setTimeout(function() {
+	    ci1.classed("fft-coefs-highlight", false)
+	    ci2.classed("fft-coefs-highlight", false)
+	    cf.classed("fft-coefs-highlight", false)
+	    cf.text("" + helper_arr[k] + ",");
+	}, 400);
+	return 400;
+    };
+    ev_calls[27] = function(poly, unity, k, start, N, half_N, helper_arr) {
+	var lvl = Math.log2(N);
+	var elem_to_draw_into = getElemToDrawInto("#fft-poly-tree-upside-down", current_id, N);
+	var visible_coefs = elem_to_draw_into.select(".fft-coef-text-false");
+	var invisible_coefs = elem_to_draw_into.select(".fft-coef-text-true");
+	var equa = "(" + poly[start+k] + ") - (" + unity + ") * (" + poly[start + half_N + k] + ")";
+	var comma = ((k + half_N < N-1) ? "," : "");
+	invisible_coefs.select(".fft-coef-" + (k + half_N)).text(equa + comma)
+	    .style("visibility", "visible");
+
+	var ci1 = visible_coefs.select(".fft-coef-" + (k)).classed("fft-coefs-highlight", true)
+	var ci2 = visible_coefs.select(".fft-coef-" + (k + half_N)).classed("fft-coefs-highlight", true)
+	var cf = invisible_coefs.select(".fft-coef-" + (k + half_N)).classed("fft-coefs-highlight", true)
+	setTimeout(function() {
+	    ci1.classed("fft-coefs-highlight", false)
+	    ci2.classed("fft-coefs-highlight", false)
+	    cf.classed("fft-coefs-highlight", false)
+	    cf.text("" + helper_arr[k + half_N] + comma);
+	}, 400);
+	return 400;
     };
     ev_calls[32] = ev_calls[2] = { 
 	"pre": function() { 
@@ -576,15 +629,26 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     function digLen(val) {
 	return ("" + val).length;
     }
+    function getElemToDrawInto(tree_id, current_id, N) {
+	var lvl = Math.log2(N);
+	var subtree_nodenum = (1 << (lvl + 1)) - 2;
+	var our_id = current_id - subtree_nodenum;
+	var down_top_tree = svg.select(tree_id);
+	var elem = down_top_tree.select("#fft-node-num" + our_id);
+	return elem;
+    }
     
     var fft = new _my.Algorithm(FFT_multiply, [], "fft-code", {default_animation_duration : 200}, function() {
 	_my.AlgorithmUtils.resetControls(algorithmTabId);
     }); 
+    function cleanup() {
+	svg.selectAll(".fft-n-value").remove();
+    }
 
     // we need a kickoff function that will start the multiply algorithm
     function kickoff_fft_multiply(executionFunction) {
 	console.log("Before fft multiply", "" + poly_p, "" + poly_q);
-	
+	cleanup();
 	var sharedEv = function(poly, len, start, helper_arr, Complex) {
 	    return ev.run(poly, len, start, helper_arr, Complex);
 	}
@@ -601,6 +665,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     // we need a kickoff function that will start the transform algorithm
     function kickoff_fft_trans(executionFunction) {
 	console.log("Before fft transform", "" + poly_ev);
+	cleanup();
 	var sharedEv = function(poly, len, start, helper_arr, Complex) {
 	    return ev.runWithSharedAnimationQueue(fft, poly, start, len, helper_arr, Complex);
 	}
