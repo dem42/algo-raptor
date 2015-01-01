@@ -372,10 +372,11 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 		return {"x": point_on_crc[0], "y": point_on_crc[1]}; })
 	
     
-	  var path = group.selectAll(".arc").data(data).enter().append("path").attr("class", "root-of-unity-circle").attr("d", radial).each(function(d, i) {
+	  var path = group.selectAll(".arc").data(data).enter().append("path").attr("d", radial).each(function(d, i) {
 	      // the stroke-dasharray trick to animate a line by decreasing the gap between in the stroke dashes
 	      _my.vislib.animatePath(d3.select(this), duration, (duration / 2) * i, false, 1);
-	  });
+	  })
+	      .attr("class", function(d, i) { return "root-of-unity-circle fft-root-of-unity-path-to-" + i});
 
 	// our diagonal inside the circle that points at the roots of unity
 	var diagonal = group.append("path").attr("d", d1(1)).attr("class","root-of-unity-arrow").attr("id", "unity-arrow")
@@ -589,23 +590,14 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	var ci1 = visible_coefs.select(".fft-coef-" + (k)).classed("fft-coefs-highlight", true)
 	var ci2 = visible_coefs.select(".fft-coef-" + (k + half_N)).classed("fft-coefs-highlight", true)
 	var cf = invisible_coefs.select(".fft-coef-" + (k)).classed("fft-coefs-highlight", true)
-	var target_bound_rect = elem_to_draw_into.datum();
-	var root_unity = fft_group.select("#fft-circle-lvl" + lvl + " #fft-root-of-unity" + k)
-	var text_root_traned = _my.vislib.getCoordWithTranApplied({"shape":root_unity.node(),"coord":{x:0,y:0}}, svg_elem.node());
-	var text_root_unity_bound = {x:text_root_traned.x,y:text_root_traned.y};
-	var highlight_circ = root_unity.insert("circle", "circle").attr("class", "fft-highlight-circle").attr("r", "40");
-
-	console.log("computed bounds", text_root_unity_bound);
-	var arc = d3.svg.diagonal()
-	    .target(function() { return {"x": target_bound_rect.x, "y": target_bound_rect.y}; })
-	    .source(function() { return {"x": text_root_unity_bound.x, "y": text_root_unity_bound.y}; });
-	var path = fft_group.select("#fft-poly-tree-upside-down").append("path").style({"fill": "none", "stroke": "black"}).attr("d", arc(1));
+	var drawing = drawArrowFromCircle(elem_to_draw_into, lvl, k);
 	setTimeout(function() {
 	    ci1.classed("fft-coefs-highlight", false)
 	    ci2.classed("fft-coefs-highlight", false)
 	    cf.classed("fft-coefs-highlight", false)
 	    cf.text("" + helper_arr[k] + ",");
-	    highlight_circ.remove();
+	    drawing.circle.remove();
+	    drawing.path.remove();
 	}, 2000);
 	return 2000;
     };
@@ -618,21 +610,19 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	var comma = ((k + half_N < N-1) ? "," : "");
 	invisible_coefs.select(".fft-coef-" + (k + half_N)).text(equa + comma)
 	    .style("visibility", "visible");
-	var root_unity = fft_group.select("#fft-circle-lvl" + lvl + " #fft-root-of-unity" + (k + half_N))
-	var text_root_unity_bound = _my.vislib.getOffsetRect(root_unity.node());
-	var highlight_circ = root_unity.insert("circle", "circle").attr("class", "fft-highlight-circle").attr("r", "40");
-
 	var ci1 = visible_coefs.select(".fft-coef-" + (k)).classed("fft-coefs-highlight", true)
 	var ci2 = visible_coefs.select(".fft-coef-" + (k + half_N)).classed("fft-coefs-highlight", true)
 	var cf = invisible_coefs.select(".fft-coef-" + (k + half_N)).classed("fft-coefs-highlight", true)
+	var drawing = drawArrowFromCircle(elem_to_draw_into, lvl, k + half_N);
 	setTimeout(function() {
 	    ci1.classed("fft-coefs-highlight", false)
 	    ci2.classed("fft-coefs-highlight", false)
 	    cf.classed("fft-coefs-highlight", false)
 	    cf.text("" + helper_arr[k + half_N] + comma);
-	    highlight_circ.remove();
-	}, 400);
-	return 400;
+	    drawing.circle.remove();
+	    drawing.path.remove();
+	}, 2000);
+	return 2000;
     };
     ev_calls[32] = ev_calls[2] = { 
 	"pre": function() { 
@@ -644,6 +634,21 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     }); 
     var calc = new _my.Algorithm(Complex.calc_unity, calc_calls, "calc-code", {default_animation_duration : 10}); 
     var fft_call = [];
+
+    function drawArrowFromCircle(elem_to_draw_into, lvl, k) {
+	var target_bound_rect = elem_to_draw_into.datum();
+	var root_unity = fft_group.select("#fft-circle-lvl" + lvl + " #fft-root-of-unity" + k)
+	var text_root_traned = fft_group.select("#fft-circle-lvl" + lvl + " .fft-root-of-unity-path-to-" + k).node().getPointAtLength(0);
+	var text_root_unity_bound = {x:450 + text_root_traned.x,y: elem_to_draw_into.datum().y + text_root_traned.y};
+	var highlight_circ = root_unity.insert("circle", "circle").attr("class", "fft-highlight-circle").attr("r", "40");
+
+	var arc = d3.svg.diagonal()
+	    .target(function() { return {"x": target_bound_rect.x, "y": target_bound_rect.y}; })
+	    .source(function() { return {"x": text_root_unity_bound.x, "y": text_root_unity_bound.y}; });
+	var path = fft_group.select("#fft-poly-tree-upside-down").append("path").style({"fill": "none", "stroke": "black"}).attr("d", arc(1));
+	_my.vislib.animatePath(path, 1000, 0, false, 0.85);
+	return {path: path, circle: highlight_circ};
+    }
     function digLen(val) {
 	return ("" + val).length;
     }
