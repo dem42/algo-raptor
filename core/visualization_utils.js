@@ -220,5 +220,43 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	return transition;
     };
 
+    /** fetch the window coordinates of an element accounting for scroll */
+    _my.vislib.getOffsetRect = function(elem) {
+	// (1)
+	var box = elem.getBoundingClientRect()
+	
+	var body = document.body
+	var docElem = document.documentElement
+	
+	// (2)
+	var scrollTop = window.pageYOffset || docElem.scrollTop || body.scrollTop
+	var scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft
+	
+	// (3)
+	var clientTop = docElem.clientTop || body.clientTop || 0
+	var clientLeft = docElem.clientLeft || body.clientLeft || 0
+	
+	// (4)
+	var top  = box.top +  scrollTop - clientTop
+	var left = box.left + scrollLeft - clientLeft
+	
+	return { y: Math.round(top), x: Math.round(left) }
+    }
+    _my.vislib.getCoordsInSvg = function(elem, svg_elem) {
+	var document_coords_elem = _my.vislib.getOffsetRect(elem);
+	var document_coords_svg = _my.vislib.getOffsetRect(svg_elem.node());
+	return { "y": document_coords_elem.y - document_coords_svg.y, "x": document_coords_elem.x - document_coords_svg.x};
+    }
+    _my.vislib.getCoordWithTranApplied = function(shape_and_coord, svg) {
+	console.log(svg);
+	var matrix = shape_and_coord.shape.getCTM();
+	// transform a point using the transformed matrix
+	var position = svg.createSVGPoint();
+	position.x = shape_and_coord.coord.x;
+	position.y = shape_and_coord.coord.y;
+	position = position.matrixTransform(matrix);
+	return position;
+    }
+
     return _my;
 }(ALGORITHM_MODULE || {}, d3, $));

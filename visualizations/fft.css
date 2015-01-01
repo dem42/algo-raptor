@@ -87,3 +87,9 @@
     stroke: red;
     display: none;
 }
+
+.fft-highlight-circle {
+    fill: none;
+    stroke: red;
+    opacity: 0.6;
+}
