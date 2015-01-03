@@ -278,8 +278,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     function drawCoefs(poly, elem_to_draw_into, invisible, invert) {
 	var elems = [];
 	for(var i=0; i < poly.length; i++) {
-	    elems.push({"val" : "" + poly[i], "key": i, 
-			"sign": (poly[i].real < 0 ? ((i != poly.length-1) ? " - " : "-") : ((i != poly.length-1) ? " + " : ""))});
+	    elems.push({"val" : "" + poly[i], "key": i});
 	}
 	var textFields = elem_to_draw_into
 	    .selectAll(".fft-coef-text-" + invisible)
@@ -308,12 +307,19 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 
     function drawPoly(poly, elem_to_draw_into, sin_zeroes, invert) {
 	var elems = [];
+	var f_non_zero = true;
 	for(var i=poly.length-1; i >= 0; i--) {
 	    if (sin_zeroes === true && Complex.equals(poly[i], Complex.ZERO)) { 
 		continue;
 	    }
-	    elems.push({"val" : Math.abs(poly[i].real), "key": i, 
-			"sign": (poly[i].real < 0 ? ((i != poly.length-1) ? " - " : "-") : ((i != poly.length-1) ? " + " : ""))});
+	    elems.push({"value": poly[i], "real_sign" : Math.sign(poly[i].real), "key": i, "has_img" : (Math.round(poly[i].imaginary, -2) != 0), "f_non_z" : f_non_zero});
+	    f_non_zero = false;
+	}
+	function signString(elem) {
+	    return (elem.real_sign > 0 || elem.has_img) ? (elem.f_non_z ? "" : " + ") : (elem.f_non_z ? "-" : " - ");
+	}
+	function wrapComplex(elem) {
+	    return elem.has_img ? "(" + elem.value + ")" : "" + Math.abs(Math.round(elem.value.real, -2));
 	}
 	var text = elem_to_draw_into.append("text")
 	    .attr("text-anchor", "middle")
@@ -326,7 +332,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    .append("tspan")
 	    .attr("id", function(d) { return "fft-tspan" + d.key})
 	    .attr("class", "fft-poly")
-	    .text(function(d) { return d.sign + d.val + (d.key == 0 ? "" : "x"); });
+	    .text(function(d) { return signString(d, i) + wrapComplex(d) + (d.key == 0 ? "" : "x"); });
 	textFields.filter(function(d) { return d.key >= 2; })
 	    .attr("class", "fft-poly fft-has-super")
 	    .append("tspan")
