@@ -1,6 +1,7 @@
 // this is jquery syntax for adding this as a callback to run on a document ready event
-$(function () {
-    
+$(function (ALGORITHM_MODULE) {
+
+
     // alias our algorithm module -- since we are running this as callback on doc ready it should already be defined
     var _my = ALGORITHM_MODULE;
     if (_my == undefined) {
@@ -10,6 +11,12 @@ $(function () {
     $.ajaxSetup({
 	cache: false
     });
+
+    if (_my.RUNNING_IN_STATIC_MODE === true) {
+	prettyPrint.call({});
+	$('a[data-toggle="tab"]').off();
+	$('a[data-toggle="tab"]').on('shown.bs.tab', resizingSvg);
+    }
 
     var loadedVisualizations = {};
     var newAlgoAdded = false;
@@ -84,4 +91,4 @@ $(function () {
 		.attr("data-adjusted", "true");
 	});
     }
-});
+}(ALGORITHM_MODULE));
