@@ -85,7 +85,7 @@
 .fft-node-circle {
     fill: red;
     stroke: red;
-    display: none;
+    display: inline;
 }
 
 .fft-highlight-circle {

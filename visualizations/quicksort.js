@@ -354,7 +354,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
     // setup the controls
     _my.AlgorithmUtils.attachAlgoToControls(qual_algo, algorithmTabId, kickoff);
 
-    Array.prototype.shuffle = function() {
+    function shuffle() {
 	var N = this.length;
 	for (var i = 0, j = N - 1, x = 0; j >= 0; j--) {
 	    i = Math.floor(Math.random() * (j+1));
@@ -367,7 +367,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	.attr("class", "btn btn-default btn-sm")
 	.attr("title", "Permute the quicksort input data. (The balls!)")
         .on("click", function() {
-	    sequence_to_sort.shuffle();
+	    shuffle(sequence_to_sort);
 	    sequence_to_sort.forEach(function(d, i) {
 		data[i].val = d;
 		data[i].old_idx = i;
