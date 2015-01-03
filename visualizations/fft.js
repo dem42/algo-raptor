@@ -329,15 +329,14 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	//the dy is sticky and moves everything else up so we add another dy=20 to move down
 	text.selectAll(".fft-has-super + tspan").attr("dy", 15);
     } // end of draw poly
-     
-    //drawPoly(poly_p, fft_group, "p-elem", 0);
-    //drawPoly(poly_q, fft_group, "q-elem", 500);
-
 
     function radToDeg(val) { return val * 180 / Math.PI; }
 
     /******* this function draws a roots of unity circle and returns a diagonal that can be moved around the circle */
     function rootsOfUnityCircle(fft_group, N, radius, duration, group_name, left_margin, top_margin, invert) {
+	if (fft_group.select("#" + group_name).size() >= 1) {
+	    return;
+	}
 	var data = [];
 
 	var transform_string = "translate(" + left_margin + ", " + top_margin + ")";
@@ -381,12 +380,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	// our diagonal inside the circle that points at the roots of unity
 	var diagonal = group.append("path").attr("d", d1(1)).attr("class","root-of-unity-arrow").attr("id", "unity-arrow")
 	    .style("display", "none")
-	    /*.transition()
-	    .duration(duration)
-	    .attr("transform", "rotate(359.99 " + center_of_crc[0] + " " + center_of_crc[1] + ")")*/
 
-
-	/*var radial0 = d3.svg.line.radial().radius(10).angle(function(d,i) { return d.a; })*/
 	var scale_factor = radius / 80;
 	var unit_groups = group.selectAll("fft-unit-circle-roots")
 	    .data(data.slice(0, data.length-1))
@@ -444,22 +438,8 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     }
 
     /********* here we wire the callbacks ************/
-    //rootsOfUnityCircle(fft_group, 4, 80, 3000, "test-circle", 200, 200);
     var ev_calls = [];
     var calc_calls = [];
-    calc_calls[20] = function() {
-
-	//
-	
-    }
-    /*
-    var emr = [{source: {x:10, y:10},target: {x:500, y:500}}];
-   var ppp = fft_group.append("path").style({"stroke": "black", "fill": "white"})
-	.attr("d", _my.vislib.interpolatableDiagonal("linear")(emr[0]))
-
-    _my.vislib.animateGrowingArrow(fft_group, ppp, 2000, 0);
-    */
-
     var recursion_depth = 0;
     var current_id = 1;
     var tree_x_offset = 310;
@@ -660,31 +640,9 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	var elem = down_top_tree.select("#fft-node-num" + our_id);
 	return elem;
     }
-    
-    var fft = new _my.Algorithm(FFT_multiply, [], "fft-code", {default_animation_duration : 200}, function() {
-	_my.AlgorithmUtils.resetControls(algorithmTabId);
-    }); 
     function cleanup() {
 	fft_group.selectAll(".fft-n-value").remove();
     }
-
-    // we need a kickoff function that will start the multiply algorithm
-    function kickoff_fft_multiply(executionFunction) {
-	console.log("Before fft multiply", "" + poly_p, "" + poly_q);
-	cleanup();
-	var sharedEv = function(poly, len, start, helper_arr, Complex) {
-	    return ev.run(poly, len, start, helper_arr, Complex);
-	}
-	var sharedCalc = function(idx, N, Complex) {
-	    return calc.run(idx, N, Complex);
-	}
-	Complex.calc_unity = sharedCalc;
-	var result = fft.startAnimation(poly_p.slice(), poly_q.slice(), sharedEv, Complex);
-	//var result = ev.startAnimation(poly_ev, poly_ev.length, 0, [], Complex);
-	console.log("After fft multiply", "" + result);
-	executionFunction();
-    };
-
     // we need a kickoff function that will start the transform algorithm
     function kickoff_fft_trans(executionFunction) {
 	console.log("Before fft transform", "" + poly_ev);
@@ -699,6 +657,26 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	var p = poly_ev.slice();
 	var result = ev.startAnimation(p, 0, p.length, [], Complex);
 	console.log("After fft transform", "" + p);
+	executionFunction();
+    };
+
+    var fft = new _my.Algorithm(FFT_multiply, [], "fft-code", {default_animation_duration : 200}, function() {
+	_my.AlgorithmUtils.resetControls(algorithmTabId);
+    }); 
+    // we need a kickoff function that will start the multiply algorithm
+    function kickoff_fft_multiply(executionFunction) {
+	console.log("Before fft multiply", "" + poly_p, "" + poly_q);
+	cleanup();
+	var sharedEv = function(poly, len, start, helper_arr, Complex) {
+	    return ev.run(poly, len, start, helper_arr, Complex);
+	}
+	var sharedCalc = function(idx, N, Complex) {
+	    return calc.run(idx, N, Complex);
+	}
+	Complex.calc_unity = sharedCalc;
+	var result = fft.startAnimation(poly_p.slice(), poly_q.slice(), sharedEv, Complex);
+	//var result = ev.startAnimation(poly_ev, poly_ev.length, 0, [], Complex);
+	console.log("After fft multiply", "" + result);
 	executionFunction();
     };
 
