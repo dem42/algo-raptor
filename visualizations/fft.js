@@ -275,7 +275,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     }// end of prepareLayout
 
     /**** this function places a polynomial into the tree */
-    function drawCoefs(poly, elem_to_draw_into, invisible) {
+    function drawCoefs(poly, elem_to_draw_into, invisible, invert) {
 	var elems = [];
 	for(var i=0; i < poly.length; i++) {
 	    elems.push({"val" : "" + poly[i], "key": i, 
@@ -300,9 +300,13 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    .append("tspan")
 	    .attr("style", function(d, i) { return i == elems.length-1 ? "display:none" : "display:inline"; })
 	    .text(",");
+
+	if (invert === true) {
+	    elem_to_draw_into.selectAll("text").attr("transform", "scale(1,-1)");
+	}
     }
 
-    function drawPoly(poly, elem_to_draw_into, sin_zeroes) {
+    function drawPoly(poly, elem_to_draw_into, sin_zeroes, invert) {
 	var elems = [];
 	for(var i=poly.length-1; i >= 0; i--) {
 	    if (sin_zeroes === true && Complex.equals(poly[i], Complex.ZERO)) { 
@@ -332,6 +336,10 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    .text(function(d) { return d.key < 2 ? " " : d.key; })
 	//the dy is sticky and moves everything else up so we add another dy=20 to move down
 	text.selectAll(".fft-has-super + tspan").attr("dy", 15);
+
+	if (invert === true) {
+	    text.attr("transform", "scale(1,-1)");
+	}
     } // end of draw poly
 
     function radToDeg(val) { return val * 180 / Math.PI; }
@@ -669,8 +677,8 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	var node_num = 2*N - 1;
 	var last_level = Math.floor(Math.log2(N)) + 2;
 	var group = fft_group.append("g").attr("id", group_name). attr("transform", "translate(" + left_margin + ", " + top_margin + ")");
-	var data = [{v:0, children:[1]}, {v:1, children:[2]}, {v:2, children:[3,5]}, {v:3, children:[4]},
-		   {v:4, children: []}, {v:5, children:[6]}, {v:6, children: []}];
+	var data = [{v:0, children:[1]}, {v:1, children:[2]}, {v:2, children:[3,6]}, {v:3, children:[4]},
+		   {v:4, children: [5]}, {v:5, children:[]}, {v:6, children: [7]}, {v:7, children: [8]}, {v:8, children: []}];
 
 	var tree = d3.layout.tree()
 	    .children(function(d) {
@@ -701,25 +709,76 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    .attr("id", function(d) { return "fft-node-num" + d.v; })
 	    .attr("transform", function(d) { return "translate(" + d.x + " " + d.y + ")";})
 	node_gs.append("circle").attr("class", "fft-node-circle").attr("r", node_size / 2);
-    }// end of prepareLayout
+    }// end of prepareMultiplyLayout
+    function animateNodeMultDrawing(node_id, draw_function, polynom, third_argument_bool_value) {
+    	var mult_tree = d3.select("#multiply-poly-tree");
+	var nodea = mult_tree.select("#fft-node-num" + node_id);
+	var transition = _my.vislib.animateGrowingArrows(mult_tree, mult_tree.selectAll(".fft-link-to" + node_id), 1000, 0, false, 0.7);
+	transition.each("end", function() {
+	    draw_function.call(null, polynom, nodea, third_argument_bool_value, true); // in non-strict mode if this==null it's replaced by global
+	});
+	return 1000;
+    }
 
     tree_mult_offset_x = 410;
-    tree_mult_offset_y = 865;
+    tree_mult_offset_y = 1080;
     var fft_calls = [];
     fft_calls[2] = function(p, q, N, nearest2Pow) {
 	prepareMultiplyLayout(nearest2Pow, 50, multiply_group, "multiply-poly-tree", 0, 0);
 	var mult_tree = d3.select("#multiply-poly-tree");
 	mult_tree.attr("transform", "translate(" + tree_mult_offset_x + ", " + tree_mult_offset_y +") scale(-1,1) rotate(180)");
-	var node6 = mult_tree.select("#fft-node-num6");
-	drawPoly(p, node6, true);
-	node6.selectAll("text").attr("transform", "scale(1,-1)");
-	var node4 = mult_tree.select("#fft-node-num4");
-	drawPoly(q, node4, true);
-	node4.selectAll("text").attr("transform", "scale(1,-1)");
+	var nodea = mult_tree.select("#fft-node-num5");
+	drawPoly(p, nodea, true, true);
+	var nodeb = mult_tree.select("#fft-node-num8");
+	drawPoly(q, nodeb, true, true);
     }
+    fft_calls[6] = function(p) {
+	return animateNodeMultDrawing(4, drawPoly, p, false);
+    };
+    fft_calls[9] = function(q) {
+	return animateNodeMultDrawing(7, drawPoly, q, false);
+    };
+    fft_calls[10] = function(p) {
+	return animateNodeMultDrawing(3, drawCoefs, p, false);
+    };
+    fft_calls[11] = function(q) {
+	return animateNodeMultDrawing(6, drawCoefs, q, false);
+    };
+    fft_calls[13] = {"pre" : function(nearest2Pow) {
+	var empty_pol = new Array(nearest2Pow);
+	empty_pol.fill(0);
+	return animateNodeMultDrawing(2, drawCoefs, empty_pol, true);
+    }};
+    fft_calls[14] = function(res, p, q, i) {
+	var mult_tree = d3.select("#multiply-poly-tree");
+	var elem_to_draw_from1 = mult_tree.select("#fft-node-num3")
+	var elem_to_draw_from2 = mult_tree.select("#fft-node-num6")
+	var elem_to_draw_into = mult_tree.select("#fft-node-num2")
+	var visible_coefs1 = elem_to_draw_from1.select(".fft-coef-text-false");
+	var visible_coefs2 = elem_to_draw_from2.select(".fft-coef-text-false");
+	var invisible_coefs = elem_to_draw_into.select(".fft-coef-text-true");
+	invisible_coefs.select(".fft-coef-" + i).text("" + res[i] + ",").style("visibility", "visible");
+
+	var ci1 = visible_coefs1.select(".fft-coef-" + i).classed("fft-coefs-highlight", true)
+	var ci2 = visible_coefs2.select(".fft-coef-" + i).classed("fft-coefs-highlight", true)
+	var cf = invisible_coefs.select(".fft-coef-" + i).classed("fft-coefs-highlight", true)
+	setTimeout(function() {
+	    ci1.classed("fft-coefs-highlight", false)
+	    ci2.classed("fft-coefs-highlight", false)
+	    cf.classed("fft-coefs-highlight", false)
+	}, 400);
+	return 400;
+    };
+    fft_calls[16] = function(res) {
+	return animateNodeMultDrawing(1, drawCoefs, res, false);
+    };
+    fft_calls[26] = { "pre": function(res) {
+	return animateNodeMultDrawing(0, drawPoly, res, true);
+    }};
     var fft = new _my.Algorithm(FFT_multiply, fft_calls, "fft-code", {default_animation_duration : 200}, function() {
 	_my.AlgorithmUtils.resetControls(algorithmTabId);
     }); 
+
     // we need a kickoff function that will start the multiply algorithm
     function kickoff_fft_multiply(executionFunction) {
 	console.log("Before fft multiply", "" + poly_p, "" + poly_q);
