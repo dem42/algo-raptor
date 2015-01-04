@@ -142,7 +142,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 	var clone = $(selector).clone();
 	var ds = d3.select(selector);
 	ds.style({"overflow": "hidden", "margin-bottom": "5px"}).attr("data-oldheight", height + "px");
-	ds.transition().duration(duration).style("height", frow_height + "px");
+	ds.style("height", frow_height + "px");
 	setTimeout(function() {
 	    clone.insertAfter(selector);
 	    AlgorithmUtils.clearComments(codeContainerId);
