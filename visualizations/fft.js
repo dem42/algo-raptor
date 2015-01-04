@@ -202,15 +202,19 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
      *********************/
     var margin = { left: 10, top: 30, right: 10, bottom: 100};
     var width = 900;
-    var svg_elem = d3.select("#" + algorithmTabId + " .graphics").append("svg")
+    var svg_fft_elem = d3.select("#" + algorithmTabId + " .graphics").append("svg")
 	.attr("width",  width + "px")
 	.attr("height", "1050px")
-    var fft_group = svg_elem.append("g")
-	.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 	.style("display", "inline");
-    var multiply_group = svg_elem.append("g")
+    var fft_group = svg_fft_elem.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+    var svg_multiply_elem = d3.select("#" + algorithmTabId + " .graphics").append("svg")
+	.attr("width",  1.42*width + "px")
+	.attr("height", "1050px")
 	.style("display", "none");
+    var multiply_group = svg_multiply_elem.append("g")
+	.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
     /**********************
      ** Wire up the Algos *
@@ -638,7 +642,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	var target_bound_rect = elem_to_draw_into.datum();
 	var root_unity = fft_group.select("#fft-circle-lvl" + lvl + " #fft-root-of-unity" + k)
 	var text_root_traned = fft_group.select("#fft-circle-lvl" + lvl + " .fft-root-of-unity-path-to-" + k).node().getPointAtLength(0);
-	var text_root_unity_bound = {x:450 + text_root_traned.x,y: elem_to_draw_into.datum().y + text_root_traned.y};
+	var text_root_unity_bound = {x:450 + text_root_traned.x,y: elem_to_draw_into.datum().y - text_root_traned.y};
 	var highlight_circ = root_unity.insert("circle", "circle").attr("class", "fft-highlight-circle").attr("r", "40");
 
 	var arc = d3.svg.diagonal()
@@ -694,7 +698,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 		}
 		return children;
 	    })
-	    .nodeSize([node_size, 4*node_size])
+	    .nodeSize([1.57*node_size, 4*node_size])
 	    .separation(function(a, b) {
 		return (a.parent == b.parent ? ((a.depth == last_level) ? 1.5 : 8) : 2);
 	    })
@@ -726,7 +730,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	return 1000;
     }
 
-    tree_mult_offset_x = 410;
+    tree_mult_offset_x = 600;
     tree_mult_offset_y = 1080;
     var fft_calls = [];
     fft_calls[2] = function(p, q, N, nearest2Pow) {
@@ -844,8 +848,8 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	$(".eval-code").css("display", "none");
 	$(".calc-code").css("display", "none");
 	$(".fft-code").css("display", "inline");
-	fft_group.style("display", "none");
-	multiply_group.style("display", "inline");
+	svg_fft_elem.style("display", "none");
+	svg_multiply_elem.style("display", "inline");
 	//we attach the kickoff_fft_multiply to the default controls
 	_my.AlgorithmUtils.attachAlgoToControls(fft, algorithmTabId, kickoff_fft_multiply);
 
@@ -857,8 +861,8 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	$(".eval-code").css("display", "inline");
 	$(".calc-code").css("display", "inline");
 	$(".fft-code").css("display", "none");
-	fft_group.style("display", "inline");
-	multiply_group.style("display", "none");
+	svg_fft_elem.style("display", "inline");
+	svg_multiply_elem.style("display", "none");
 	//we attach the kickoff_fft_multiply to the default controls
 	_my.AlgorithmUtils.attachAlgoToControls(ev, algorithmTabId, kickoff_fft_trans);
     });
