@@ -14,7 +14,7 @@ How do I use it?
 * To use the dynamic version with a `node.js` instanc running on your machine use `vagrant` and `virutal-box`. Have a look at the instructions below.
 
 
-How do I run it locally
+How do I run it locally?
 -----------------------
 Download `vagrant` and `virtual box` and run
     
