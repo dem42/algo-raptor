@@ -11,7 +11,7 @@ How do I use it?
 
 * To see it in action simply visit http://dem42.github.io/algoviz/
 
-* To use the dynamic version with a `node.js` instanc running on your machine use `vagrant` and `virutal-box`. Have a look at the instructions below.
+* To use the dynamic version with a `node.js` instance running on your machine use `vagrant` and `virutal-box` have a look at the instructions below.
 
 
 How do I run it locally?
