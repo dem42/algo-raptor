@@ -81,8 +81,8 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    }
 	    return val + "i";
 	}
-	var ri = Math.round(this.imaginary, -2);
-	var rr = Math.round(this.real, -2);
+	var ri = Math.round10(this.imaginary, -2);
+	var rr = Math.round10(this.real, -2);
 	if (ri == 0) {
 	    return "" + rr;
 	}
@@ -185,7 +185,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     	    res[i] = Complex.mult(p[i], q[i]);
     	}
     	FFT_transform(res, 0, nearest2Pow, [], Complex);
-    	// rearrange roots of unity
+    	// rearrange coefficients after the inverse fft transform
     	for (var i=1; i < nearest2Pow / 2; i++) {
     	    var temp = res[i];
     	    res[i] = res[nearest2Pow - i];
@@ -316,14 +316,14 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    if (sin_zeroes === true && Complex.equals(poly[i], Complex.ZERO)) { 
 		continue;
 	    }
-	    elems.push({"value": poly[i], "real_sign" : Math.sign(poly[i].real), "key": i, "has_img" : (Math.round(poly[i].imaginary, -2) != 0), "f_non_z" : f_non_zero});
+	    elems.push({"value": poly[i], "real_sign" : Math.sign(poly[i].real), "key": i, "has_img" : (Math.round10(poly[i].imaginary, -2) != 0), "f_non_z" : f_non_zero});
 	    f_non_zero = false;
 	}
 	function signString(elem) {
 	    return (elem.real_sign > 0 || elem.has_img) ? (elem.f_non_z ? "" : " + ") : (elem.f_non_z ? "-" : " - ");
 	}
 	function wrapComplex(elem) {
-	    return elem.has_img ? "(" + elem.value + ")" : "" + Math.abs(Math.round(elem.value.real, -2));
+	    return elem.has_img ? "(" + elem.value + ")" : "" + Math.abs(Math.round10(elem.value.real, -2));
 	}
 	var text = elem_to_draw_into.append("text")
 	    .attr("text-anchor", "middle")
@@ -730,11 +730,12 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	return 1000;
     }
 
-    tree_mult_offset_x = 600;
-    tree_mult_offset_y = 1080;
+    var tree_mult_offset_x = 600;
+    var tree_mult_offset_y = 1080;
+    var mult_node_size = 50;
     var fft_calls = [];
     fft_calls[2] = function(p, q, N, nearest2Pow) {
-	prepareMultiplyLayout(nearest2Pow, 50, multiply_group, "multiply-poly-tree", 0, 0);
+	prepareMultiplyLayout(nearest2Pow, mult_node_size, multiply_group, "multiply-poly-tree", 0, 0);
 	var mult_tree = d3.select("#multiply-poly-tree");
 	mult_tree.attr("transform", "translate(" + tree_mult_offset_x + ", " + tree_mult_offset_y +") scale(-1,1) rotate(180)");
 	var nodea = mult_tree.select("#fft-node-num5");
@@ -759,7 +760,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	empty_pol.fill(0);
 	return animateNodeMultDrawing(2, drawCoefs, empty_pol, true);
     }};
-    fft_calls[14] = function(res, p, q, i) {
+    fft_calls[14] = function(res, p, q, i, nearest2Pow) {
 	var mult_tree = d3.select("#multiply-poly-tree");
 	var elem_to_draw_from1 = mult_tree.select("#fft-node-num3")
 	var elem_to_draw_from2 = mult_tree.select("#fft-node-num6")
@@ -767,7 +768,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	var visible_coefs1 = elem_to_draw_from1.select(".fft-coef-text-false");
 	var visible_coefs2 = elem_to_draw_from2.select(".fft-coef-text-false");
 	var invisible_coefs = elem_to_draw_into.select(".fft-coef-text-true");
-	invisible_coefs.select(".fft-coef-" + i).text("" + res[i] + ",").style("visibility", "visible");
+	invisible_coefs.select(".fft-coef-" + i).text("" + res[i] + (i!=nearest2Pow-1 ? "," : "")).style("visibility", "visible");
 
 	var ci1 = visible_coefs1.select(".fft-coef-" + i).classed("fft-coefs-highlight", true)
 	var ci2 = visible_coefs2.select(".fft-coef-" + i).classed("fft-coefs-highlight", true)
@@ -781,6 +782,30 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     };
     fft_calls[16] = function(res) {
 	return animateNodeMultDrawing(1, drawCoefs, res, false);
+    };
+    fft_calls[21] = function(res, i, nearest2Pow, temp) {
+	var mult_tree = d3.select("#multiply-poly-tree");
+	var elem_to_draw_into = mult_tree.select("#fft-node-num1")
+	var ci1 = elem_to_draw_into.select(".fft-coef-" + i).classed("fft-coefs-highlight", true);
+	var ci2 = elem_to_draw_into.select(".fft-coef-" + (nearest2Pow - i)).classed("fft-coefs-highlight-green", true);
+	setTimeout(function() {
+	    ci1.text("" + res[i] + ",");
+	    ci1.classed("fft-coefs-highlight", false).classed("fft-coefs-highlight-green", true)
+	    ci2.text("" + res[nearest2Pow - i] + (i != 0 ? "," : ""));
+	    ci2.classed("fft-coefs-highlight-green", false).classed("fft-coefs-highlight", true)
+	    setTimeout(function() {
+		ci1.classed("fft-coefs-highlight-green", false)
+		ci2.classed("fft-coefs-highlight", false)
+	    },400);
+	}, 400);
+	return 800;
+    };
+    fft_calls[24] = function(res, i, nearest2Pow) {
+	var idx = (i == 0) ? 0 : (i < nearest2Pow / 2) ? nearest2Pow - i : i;
+	var mult_tree = d3.select("#multiply-poly-tree");
+	var elem_to_draw_into = mult_tree.select("#fft-node-num1")
+	var ci1 = elem_to_draw_into.select(".fft-coef-" + idx)
+	    .text("" + Math.round10(res[i].real, -2) + (i != nearest2Pow-1 ? "," : ""));
     };
     fft_calls[26] = { "pre": function(res) {
 	return animateNodeMultDrawing(0, drawPoly, res, true);

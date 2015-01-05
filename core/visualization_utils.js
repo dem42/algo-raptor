@@ -2,6 +2,34 @@
 var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
     var _my = ALGORITHM_MODULE;
     _my.vislib = {};
+
+    /** animate the swapping of two selections 
+      * NOTE: these selections need to support svg transform!
+      */
+    _my.vislib.swapSelections = function(sel1, coord1, sel2, coord2, durations, y_offset, x_offset) {
+	var tran1 = sel1.transition()
+	    .duration(durations[0])
+	    .attr("transform", "translate(" + (coord1.x - x_offset) + " " + (coord1.y - y_offset) + ")");
+	var tran2 = sel2.transition()
+	    .duration(durations[0])
+	    .attr("transform", "translate(" + (coord2.x + x_offset) + " " + (coord2.y + y_offset) + ")");
+
+	//here we chain the transitions. this is a shorthand for transition.each("end")
+	tran1 = tran1.transition()
+	    .duration(durations[1])
+	    .attr("transform", "translate(" + (coord2.x + x_offset) + " " + (coord1.y - y_offset) + ")");
+	tran2 = tran2.transition()
+	    .duration(durations[1])
+	    .attr("transform", "translate(" + (coord1.x - x_offset) + " " + (coord2.y + y_offset) + ")");
+
+	//here we chain the transitions. this is a shorthand for transition.each("end")
+	tran1.transition()
+	    .duration(durations[2])
+	    .attr("transform", "translate(" + coord2.x + " " + coord1.y + ")");
+	tran2.transition()
+	    .duration(durations[2])
+	    .attr("transform", "translate(" + coord1.x + " " + coord2.y + ")");
+    };
     
     /** animate moving growing a path 
      *

@@ -281,9 +281,8 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
     var swapping_animation_duration = 3000;
     q_callbacks[16] = {
 	post: function(data, new_left, new_right) {
-	    var self = this;
-	    updateLeft.call(self, data, new_left);
-	    updateRight.call(self, data, new_right);
+	    updateLeft.call(this, data, new_left);
+	    updateRight.call(this, data, new_right);
 	    return swapping_animation_duration;
 	},
 	pre: function(data, new_left, new_right) {
@@ -298,23 +297,17 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	    var di = gi.datum();
 	    var dj = gj.datum();
 
-	    var trns1 = [di.x_off, di.y_off];
-	    var trns2 = [dj.x_off, dj.y_off];
-	    gi.transition().duration(step_duration).attr("transform", "translate(" + trns1[0] + " " + (trns1[1] - maxi_width) + ")");
-	    gj.transition().duration(step_duration).attr("transform", "translate(" + trns2[0] + " " + (trns2[1] + maxi_width) + ")");
+	    var trns1 = {x: di.x_off, y: di.y_off};
+	    var trns2 = {x: dj.x_off, y: dj.y_off};
 
-	    gi.transition().delay(step_duration).duration(step_duration).attr("transform", "translate(" + trns2[0] + " " + (trns1[1] - maxi_width) + ")");
-	    gj.transition().delay(step_duration).duration(step_duration).attr("transform", "translate(" + trns1[0] + " " + (trns2[1] + maxi_width) + ")");
+	    _my.vislib.swapSelections(gi, trns1, gj, trns2, [step_duration, step_duration, step_duration], maxi_width, 0);
 
-	    gi.transition().delay(2*step_duration).duration(step_duration).attr("transform", "translate(" + trns2[0] + " " + trns1[1] + ")");
-	    gj.transition().delay(2*step_duration).duration(step_duration).attr("transform", "translate(" + trns1[0] + " " + trns2[1] + ")");
+	    di.x_off = trns2.x;
+	    di.y_off = trns1.y;
 
-	    di.x_off = trns2[0];
-	    di.y_off = trns1[1];
-
-	    dj.x_off = trns1[0];
-	    dj.y_off = trns2[1];
-
+	    dj.x_off = trns1.x;
+	    dj.y_off = trns2.y;
+	    // the swapping animation duration is returned in the post callback
 	    return 0;
 	}
     };
