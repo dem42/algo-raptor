@@ -805,7 +805,11 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	var mult_tree = d3.select("#multiply-poly-tree");
 	var elem_to_draw_into = mult_tree.select("#fft-node-num1")
 	var ci1 = elem_to_draw_into.select(".fft-coef-" + idx)
-	    .text("" + Math.round10(res[i].real, -2) + (i != nearest2Pow-1 ? "," : ""));
+	    .text("" + Math.round10(res[i].real, -2) + (i != nearest2Pow-1 ? "," : "")).classed("fft-coefs-highlight", true);
+	setTimeout(function() {
+	    ci1.classed("fft-coefs-highlight", false)
+	}, 100);
+	return 100;
     };
     fft_calls[26] = { "pre": function(res) {
 	return animateNodeMultDrawing(0, drawPoly, res, true);
