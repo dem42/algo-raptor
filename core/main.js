@@ -84,6 +84,9 @@ $(function (ALGORITHM_MODULE) {
 	    if ($(this).attr("data-adjusted") == "true") {
 		return;
 	    }
+	    if ($(this).attr("class") == "gauge") {
+		return;
+	    }
 	    var viewBox = _my.AlgorithmUtils.calcViewBox(tabz + " .graphics", $(this).width(), $(this).height());
 	    d3.select(this).attr("width", viewBox.width)
 		.attr("height", viewBox.height)

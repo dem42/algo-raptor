@@ -50,11 +50,20 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 	}
 
 	controlsDiv.append("div").attr("class", "controls-header").text("General Controls:");
-	var defaultControls = controlsDiv.append("div").attr("class", "default-controls");
-	var exRadioDiv = defaultControls.append("div").attr("class", "execution-type-radios");
+	var defaultControls = controlsDiv.append("table").attr("class", "default-controls table").append("tr");
+	var exRadioDiv = defaultControls.append("td")
+	    .style("vertical-align", "top")
+	    .append("div").attr("class", "execution-type-radios");
 	exRadioDiv.append("p").attr("class", "controls-info-text").text("Choose how to execute the algorithm:");
 	appendButton(exRadioDiv, "play-btn", algorithmId, "Start the algorithm in continuous mode (the algorithm will run on its own)");
 	appendButton(exRadioDiv, "next-btn", algorithmId, "Take the next step in the algorithm in step-by-step mode (you have to click for the algorithm to keep going)");
+	var speedDialCell = defaultControls.append("td").attr("id", algorithmId + "speed-dial-div");
+	speedDialCell.append("p").attr("class", "controls-info-text").text("Select the speed at which to run the algorithm:");
+//	speedDialCell.append("div")
+	_my.vislib.addSpeedGauge("#" + algorithmId + "speed-dial-div", 0.6);
+	var buttonsDiv = speedDialCell.append("div").attr("class", "speed-controls-buttons-div");
+	buttonsDiv.append("p").append("button").attr("class", "btn btn-info btn-sm").append("span").attr("class", "glyphicon glyphicon-plus");
+	buttonsDiv.append("p").append("button").attr("class", "btn btn-info btn-sm").append("span").attr("class", "glyphicon glyphicon-minus");
     }
 
     AlgorithmUtils.resetControls = function(algorithmId) {
