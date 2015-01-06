@@ -236,7 +236,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	var group = fft_group.append("g").attr("id", group_name). attr("transform", "translate(" + left_margin + ", " + top_margin + ")");
 	var data = [];
 	for (var i=1;i<=node_num;i++) {
-	    data.push({id: i, label: 0});    
+	    data.push({id: i, label: 0, node_width: node_size});    
 	};
 	var lbl_cnt = 2;
 	function preorder_label(node) {
@@ -284,7 +284,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	for(var i=0; i < poly.length; i++) {
 	    elems.push({"val" : "" + poly[i], "key": i});
 	}
-	var textFields = elem_to_draw_into
+	var textField = elem_to_draw_into
 	    .selectAll(".fft-coef-text-" + invisible)
 	    .data([1]) // we just want this text field to be added once no mater how many times this function is called
 	    .enter()
@@ -292,8 +292,8 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    .attr("class", "fft-poly fft-coef-text-" + invisible)
 	    .attr("font-size", "30")
 	    .attr("dy", (invisible === true) ? "0em" : "-1em")
-	    .attr("text-anchor", "middle")
-	    .selectAll("tspan")
+	    .attr("text-anchor", "middle");
+	textField.selectAll("tspan")
 	    .data(elems)
 	    .enter()
 	    .append("tspan")
@@ -305,7 +305,18 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    .text(",");
 
 	if (invert === true) {
-	    elem_to_draw_into.selectAll("text").attr("transform", "scale(1,-1)");
+	    textField.attr("transform", "scale(1,-1)");
+	}
+	var max_width = 6 * elem_to_draw_into.datum().node_width;
+	var text_width = elem_to_draw_into.select(".fft-coef-text-" + invisible).node().getComputedTextLength();
+	var cut_num = Math.round(text_width / max_width);
+	//console.log(max_width, text_width, cut_num, "cut this");
+	if (text_width > max_width) {
+	    var cut_offset = Math.round(elems.length / cut_num);
+	    for (var cn = cut_offset; cn  < elems.length; cn+=cut_offset) {
+		var sel_val = textField.select(".fft-coef-" + cn);
+		sel_val.attr("x", 0).attr("dy", "1.4em");
+	    }
 	}
     }
 
@@ -685,10 +696,12 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 
     function prepareMultiplyLayout(N, node_size, fft_group, group_name, left_margin, top_margin) {
 	var node_num = 2*N - 1;
+	var node_width_coef = 1.57;
 	var last_level = Math.floor(Math.log2(N)) + 2;
 	var group = fft_group.append("g").attr("id", group_name). attr("transform", "translate(" + left_margin + ", " + top_margin + ")");
 	var data = [{v:0, children:[1]}, {v:1, children:[2]}, {v:2, children:[3,6]}, {v:3, children:[4]},
 		   {v:4, children: [5]}, {v:5, children:[]}, {v:6, children: [7]}, {v:7, children: [8]}, {v:8, children: []}];
+	data.forEach(function(d) { d.node_width = node_width_coef * node_size; });
 
 	var tree = d3.layout.tree()
 	    .children(function(d) {
@@ -698,7 +711,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 		}
 		return children;
 	    })
-	    .nodeSize([1.57*node_size, 4*node_size])
+	    .nodeSize([node_width_coef*node_size, 4*node_size])
 	    .separation(function(a, b) {
 		return (a.parent == b.parent ? ((a.depth == last_level) ? 1.5 : 8) : 2);
 	    })
