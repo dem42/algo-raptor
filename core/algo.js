@@ -22,6 +22,13 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     }
 
     console.debug("executing definitions of algo.js")
+    
+    // used for transition refactoring from default to baseline speed
+    function getAnimationDuration(algoContext) {
+	var andur = algoContext.getBaselineAnimationSpeed !== undefined ? algoContext.getBaselineAnimationSpeed() : algoContext.default_animation_duration;
+	console.log("computed animation duration", andur);
+	return andur;
+    }
 
     function Algorithm(func, callbacks, codeContainerId, algorithmContext, resetControlsFunction)
     {
@@ -123,7 +130,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 		}
 		else
 		{
-		    animation_duration = selfie.AlgorithmContext.default_animation_duration;
+		    animation_duration = getAnimationDuration(selfie.AlgorithmContext);
 		}
 		return animation_duration;
 	    }));
@@ -158,11 +165,11 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 		}
 		else
 		{
-		    animation_duration = selfie.AlgorithmContext.default_animation_duration;
+		    animation_duration = getAnimationDuration(selfie.AlgorithmContext);
 		}
 
 		if (animation_duration == undefined) {
-		    animation_duration = selfie.AlgorithmContext.default_animation_duration;
+		    animation_duration = getAnimationDuration(selfie.AlgorithmContext);
 		}
 
 		var_array.forEach(function(var_elem, idx) {

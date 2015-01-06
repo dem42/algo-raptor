@@ -1,6 +1,5 @@
 /*** this module contains helper functions for visualizations */
 var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
-    console.log("loaded vislib");
     var _my = ALGORITHM_MODULE;
     _my.vislib = {};
 
@@ -286,7 +285,9 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	position = position.matrixTransform(matrix);
 	return position;
     }
-
+    
+    /**** based off of a gist by msqr on github ****/
+    // draws a speed gauge and returns an object to update and query the gauge for the speed values
     _my.vislib.addSpeedGauge = function(holder_selector, scale) {
 	var labelData = [{l:'Very Slow', o: '0.8em'},
 			 {l:'Slow', o: '1.8em'},
@@ -312,7 +313,8 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 			  maxAngle: 90,
 			  transitionMs: 750,
 			  fontSize: 8,
-			  scale: 1
+			  scale: 1,
+			  speedModifier: 100
 	    };
 	    var range = undefined;
 	    var r = undefined;
@@ -342,7 +344,11 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 		return value;
 	    }
 	    that.getValue = getValue;
-	    
+	    function getSpeed() {
+		return (maxValue - value) * config.speedModifier;
+	    }
+	    that.getSpeed = getSpeed;
+
 	    var prop = undefined;
 	    for ( prop in configuration ) {
 		config[prop] = configuration[prop];

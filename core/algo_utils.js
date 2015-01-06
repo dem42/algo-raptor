@@ -58,7 +58,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 	appendButton(exRadioDiv, "play-btn", algorithmId, "Start the algorithm in continuous mode (the algorithm will run on its own)");
 	appendButton(exRadioDiv, "next-btn", algorithmId, "Take the next step in the algorithm in step-by-step mode (you have to click for the algorithm to keep going)");
 	var speedDialCell = defaultControls.append("td").attr("id", algorithmId + "speed-dial-div");
-	speedDialCell.append("p").attr("class", "controls-info-text").text("Select the speed at which to run the algorithm:");
+	speedDialCell.append("p").attr("class", "controls-info-text").text("Adjust the speed at which to run the algorithm:");
 //	speedDialCell.append("div")
 	var gaugeObj = _my.vislib.addSpeedGauge("#" + algorithmId + "speed-dial-div", 0.6);
 	var buttonsDiv = speedDialCell.append("div").attr("class", "speed-controls-buttons-div");
@@ -74,6 +74,8 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 		var current = gaugeObj.getValue();
 		gaugeObj.update(current-1);
 	    }).append("span").attr("class", "glyphicon glyphicon-minus");
+
+	return {"speedGauge" : gaugeObj};
     }
 
     AlgorithmUtils.resetControls = function(algorithmId) {
@@ -244,6 +246,13 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 	};
     }
 
+    AlgorithmUtils.createAlgorithmContext = function(controlsObj) {
+	return { 
+	    getBaselineAnimationSpeed : function() {
+		return controlsObj.speedGauge.getSpeed();
+	    }
+	};
+    }
     //return the augmented module
     _my.AlgorithmUtils = AlgorithmUtils;
     return _my;

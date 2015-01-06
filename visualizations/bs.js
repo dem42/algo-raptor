@@ -28,7 +28,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 
     var leftPanelBody = controlsPanel.append("div").attr("class", "panel-body");
     var ops = leftPanelBody.append("div").attr("class", "options");
-    _my.AlgorithmUtils.insertDefaultControls(ops, algorithmTabId);
+    var defaultControlsObj = _my.AlgorithmUtils.insertDefaultControls(ops, algorithmTabId);
     _my.AlgorithmUtils.insertCustomControls(ops, algorithmTabId, algorithmName);
     ops.append("div").attr("class", "forms");
     
@@ -88,7 +88,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
      * it initializes the data
      */
     cbs[0] = function(data) { 
-	var animation_duration = 1000;
+	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	svgg = svg.append("g")
 	    .attr("transform", "translate(" + margin.left + "," + (margin.top + cumulative_height) +  ")");
 	cumulative_height += height;
@@ -131,7 +131,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
      * it draws the data
      */
     cbs[2] = function(data) { 
-	var animation_duration = 1000;
+	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 
 	/* the gs have an old_i which is their old order .. we move the gs to where they are
 	 * in the old order
@@ -154,14 +154,14 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
      * updates the arrow pointer
      */
     cbs[8] = function(mid) { 
-	var animation_duration = 1000;
+	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	arrow.style("visibility","visible").transition().duration(animation_duration).attr("x",2*w*mid-3);
 	return animation_duration;
     };
     /*callback called after a match was found
      */
     cbs[16] = function(low) { 
-	var animation_duration = 1000;
+	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	arrow.style("visibility","visible").transition().duration(animation_duration).attr("x",2*w*low-3);
 	svgg.append("text")
 	    .attr("dy", "100px")
@@ -172,7 +172,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     /*callback called if a match was NOT found
      */
     cbs[18] = function() { 
-	var animation_duration = 1000;
+	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	svgg.append("text")
 	    .attr("dy", "100px")
 	    .attr("class", "not-found-label")
@@ -199,15 +199,9 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     }
 
 
-    // this object determines the behaviour of the algorighm code
-    var algorithmContext = {
-	// animation duration for row highlights
-	default_animation_duration : 500,
-    };
     /* create an Algorithm instance wired with callbacks */
-    var balgo = new _my.Algorithm(bsearch, cbs, "bs-code", algorithmContext, function() {
-	_my.AlgorithmUtils.resetControls(algorithmTabId);
-    });
+    var balgo = new _my.Algorithm(bsearch, cbs, "bs-code", _my.AlgorithmUtils.createAlgorithmContext(defaultControlsObj),
+				  function() { _my.AlgorithmUtils.resetControls(algorithmTabId); });
     _my.AlgorithmUtils.attachAlgoToControls(balgo, algorithmTabId, function kickOff(executionFunction) {
 	/* The function that starts the simulation.
 	 * It creates a dialog and the dialog starts the execution
