@@ -341,7 +341,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    function getValue() {
 		return value;
 	    }
-	    that.getValue = getValue();
+	    that.getValue = getValue;
 	    
 	    var prop = undefined;
 	    for ( prop in configuration ) {
@@ -439,12 +439,20 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    that.render = render;
 	    
 	    function update(newValue) {
+		console.log("update called with", newValue);
+		if (newValue > maxValue) {
+		    newValue = maxValue;
+		}
+		if (newValue < minValue) {
+		    newValue = minValue;
+		}
 		var ratio = scale(newValue);
 		var newAngle = config.minAngle + (ratio * range);
 		pointer.transition()
 		    .duration(config.transitionMs)
 		    .ease('elastic')
 		    .attr('transform', 'rotate(' +newAngle +')');
+		value = newValue;
 	    }
 	    that.update = update;
 	    return that;

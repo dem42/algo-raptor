@@ -60,10 +60,20 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 	var speedDialCell = defaultControls.append("td").attr("id", algorithmId + "speed-dial-div");
 	speedDialCell.append("p").attr("class", "controls-info-text").text("Select the speed at which to run the algorithm:");
 //	speedDialCell.append("div")
-	_my.vislib.addSpeedGauge("#" + algorithmId + "speed-dial-div", 0.6);
+	var gaugeObj = _my.vislib.addSpeedGauge("#" + algorithmId + "speed-dial-div", 0.6);
 	var buttonsDiv = speedDialCell.append("div").attr("class", "speed-controls-buttons-div");
-	buttonsDiv.append("p").append("button").attr("class", "btn btn-info btn-sm").append("span").attr("class", "glyphicon glyphicon-plus");
-	buttonsDiv.append("p").append("button").attr("class", "btn btn-info btn-sm").append("span").attr("class", "glyphicon glyphicon-minus");
+	buttonsDiv.append("p").append("button").attr("class", "btn btn-info btn-sm")
+	    .on("click", function() {
+		var current = gaugeObj.getValue();
+		gaugeObj.update(current+1);
+	    })
+	    .append("span").attr("class", "glyphicon glyphicon-plus");
+	buttonsDiv.append("p").append("button").attr("class", "btn btn-info btn-sm")
+	    .on("click", function() {
+		console.log("clicked minus");
+		var current = gaugeObj.getValue();
+		gaugeObj.update(current-1);
+	    }).append("span").attr("class", "glyphicon glyphicon-minus");
     }
 
     AlgorithmUtils.resetControls = function(algorithmId) {
