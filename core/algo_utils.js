@@ -70,7 +70,6 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 	    .append("span").attr("class", "glyphicon glyphicon-plus");
 	buttonsDiv.append("p").append("button").attr("class", "btn btn-info btn-sm")
 	    .on("click", function() {
-		console.log("clicked minus");
 		var current = gaugeObj.getValue();
 		gaugeObj.update(current-1);
 	    }).append("span").attr("class", "glyphicon glyphicon-minus");

@@ -26,7 +26,6 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     // used for transition refactoring from default to baseline speed
     function getAnimationDuration(algoContext) {
 	var andur = algoContext.getBaselineAnimationSpeed !== undefined ? algoContext.getBaselineAnimationSpeed() : algoContext.default_animation_duration;
-	console.log("computed animation duration", andur);
 	return andur;
     }
 

@@ -445,7 +445,6 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    that.render = render;
 	    
 	    function update(newValue) {
-		console.log("update called with", newValue);
 		if (newValue > maxValue) {
 		    newValue = maxValue;
 		}
