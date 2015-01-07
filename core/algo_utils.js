@@ -246,6 +246,11 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
     }
 
     AlgorithmUtils.createAlgorithmContext = function(controlsObj) {
+	if (controlsObj === undefined) {
+	    return {
+		getBaselineAnimationSpeed : function() { return 0; }
+	    };
+	}
 	return { 
 	    getBaselineAnimationSpeed : function() {
 		return controlsObj.speedGauge.getSpeed();
