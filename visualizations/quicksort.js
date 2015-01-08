@@ -354,7 +354,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	    d3.selectAll("defs").remove();
 	    init_circles(data);
 	})
-    .text("Shuffle Data");
+	.text("Shuffle Data");
 
     return {"quicksort": quicksort, "quicksort-algorithm": qual_algo};
 
