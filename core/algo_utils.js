@@ -153,9 +153,9 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
     }
 
     // for adding a new frame for a recursive algorithm
-    AlgorithmUtils.visualizeNewStackFrame = function(codeContainerId) {
-	var duration = 1000;
-	var delay = 500;
+    AlgorithmUtils.visualizeNewStackFrame = function(codeContainerId, algorithmCtx) {
+	var duration = 2 * algorithmCtx.getBaselineAnimationSpeed();
+	var delay = algorithmCtx.getBaselineAnimationSpeed();
 	var selector = "." + codeContainerId + " div:last-of-type";
 	var height = $(selector).height();
 	var frow_height = $(selector + " li:nth-child(1)").height();
@@ -171,16 +171,10 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 	return duration + delay;
     }
 
-    //remove dynamic comments (values of variables appended with // during execution of the algorithm)
-    AlgorithmUtils.clearComments = function(codeContainerId) {
-	var selector = "." + codeContainerId + " div:last-of-type";
-	d3.select(selector).selectAll("span.com.dynamic").remove();
-    }
-
-    //remove an old stack frame and expand the previous one
-    AlgorithmUtils.popStackFrame = function(codeContainerId) {
-	var duration = 1000;
-	var delay = 500;
+   //remove an old stack frame and expand the previous one
+    AlgorithmUtils.popStackFrame = function(codeContainerId, algorithmCtx) {
+	var duration = 2 * algorithmCtx.getBaselineAnimationSpeed();
+	var delay = algorithmCtx.getBaselineAnimationSpeed();
 	var selector = "." + codeContainerId + " div:last-of-type";
 	d3.select(selector).remove();
 	var ds = d3.select(selector);
@@ -190,6 +184,12 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 	return duration + delay;
     }
 
+    //remove dynamic comments (values of variables appended with // during execution of the algorithm)
+    AlgorithmUtils.clearComments = function(codeContainerId) {
+	var selector = "." + codeContainerId + " div:last-of-type";
+	d3.select(selector).selectAll("span.com.dynamic").remove();
+    }
+ 
     //comupte a viewBox to scale svg contents properly on smaller screen sizes
     AlgorithmUtils.calcViewBox = function(parentId, width, height) {
 	var parentWidth = $(parentId).width() * 1.0;
