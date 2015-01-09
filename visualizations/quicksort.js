@@ -283,18 +283,8 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
     var swap_context = _my.AlgorithmUtils.createAlgorithmContext(); // not linked to the controls object
     var swap_algo = new _my.Algorithm(swap_function, swap_callbacks, "swap_function-code", swap_context);
 
-    d3.select("#" + algorithmTabId + " .code")
-	.append("div")
-	.attr("class", "quicksort-code")
-        .append("div")
-	.attr("class", "function-code-holder")
-	.append("pre")
-        .attr("class", "prettyprint lang-js linenums:1")
-	.append("code")
-        .attr("class", "language-js")
-        .text(qual_algo);
+    _my.AlgorithmUtils.appendCode(algorithmTabId, "quicksort-code", qual_algo);
 
-    
     function kickoff(executionFunction) {
 	console.log("Before", data.map(function(d) { return d.val; }));
 	qual_algo.startAnimation(data, 0, data.length - 1, function(data, i, j) {

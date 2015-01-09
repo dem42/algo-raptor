@@ -832,40 +832,9 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	console.log("After fft multiply", "" + result);
 	executionFunction();
     };
-
-    d3.select("#" + algorithmTabId + " .code")
-    	.append("div")
-    	.attr("class", "fft-code")
-	.style("display", "none")
-        .append("div")
-    	.attr("class", "function-code-holder")
-    	.append("pre")
-    	.attr("class", "prettyprint lang-js linenums:1")
-    	.append("code")
-    	.attr("class", "language-js")
-    	.text(fft.toString());
-
-    d3.select("#" + algorithmTabId + " .code")
-    	.append("div")
-    	.attr("class", "calc-code")
-        .append("div")
-    	.attr("class", "function-code-holder")
-    	.append("pre")
-    	.attr("class", "prettyprint lang-js linenums:1")
-    	.append("code")
-    	.attr("class", "language-js")
-    	.text(calc.toString());
-
-    d3.select("#" + algorithmTabId + " .code")
-    	.append("div")
-    	.attr("class", "eval-code")
-        .append("div")
-    	.attr("class", "function-code-holder")
-    	.append("pre")
-    	.attr("class", "prettyprint lang-js linenums:1")
-    	.append("code")
-    	.attr("class", "language-js")
-    	.text(ev.toString());
+    _my.AlgorithmUtils.appendCode(algorithmTabId, "calc-code", calc);
+    _my.AlgorithmUtils.appendCode(algorithmTabId, "eval-code", ev);
+    _my.AlgorithmUtils.appendCode(algorithmTabId, "fft-code", fft).style("display", "none");
 
     $(".fft-radio-button").click(function() {
 	$(this).addClass("active").siblings().removeClass("active");

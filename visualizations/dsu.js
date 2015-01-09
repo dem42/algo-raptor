@@ -324,29 +324,8 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	_my.AlgorithmUtils.resetControls(algorithmTabId);
     });
 
-
-    d3.select("#" + algorithmTabId + " .code")
-	.append("div")
-	.attr("class", "dsu-find-code")
-        .append("div")
-	.attr("class", "function-code-holder")
-	.append("pre")
-        .attr("class", "prettyprint lang-js linenums:1")
-	.append("code")
-        .attr("class", "language-js")
-        .text(dsuFind);
-
-    d3.select("#" + algorithmTabId + " .code")
-	.append("div")
-	.attr("class", "dsu-union-code")
-        .append("div")
-	.attr("class", "function-code-holder")
-	.append("pre")
-        .attr("class", "prettyprint lang-js linenums:1")
-	.append("code")
-        .attr("class", "language-js")
-        .text(dsuUnion);
-
+    _my.AlgorithmUtils.appendCode(algorithmTabId, "dsu-find-code", dsuFind);
+    _my.AlgorithmUtils.appendCode(algorithmTabId, "dsu-union-code", dsuUnion);
 
     function kickOff(executionFunction) {
 	/* The function that starts the simulation.

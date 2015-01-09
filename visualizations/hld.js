@@ -45,17 +45,7 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     var hld_context = _my.AlgorithmUtils.createAlgorithmContext(); // not linked to the controls object
     var hld_algo = new _my.Algorithm(heavyLightDecomposition, hld_callbacks, "hld-code", hld_context);
 
-    d3.select("#" + algorithmTabId + " .code")
-	.append("div")
-	.attr("class", "hld-code")
-        .append("div")
-	.attr("class", "function-code-holder")
-	.append("pre")
-        .attr("class", "prettyprint lang-js linenums:1")
-	.append("code")
-        .attr("class", "language-js")
-        .text(hld_algo);
-
+    _my.AlgorithmUtils.appendCode(algorithmTabId, "hld-code", hld_algo);
 
     layout.customControlsLayout.append("button")
 	.attr("class", "btn btn-default btn-sm")

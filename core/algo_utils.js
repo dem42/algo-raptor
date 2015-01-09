@@ -294,6 +294,20 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 
 	return layout;
     };
+
+    AlgorithmUtils.appendCode = function(algorithmTabId, codeContainerId, algo) {
+	var code_holder = d3.select("#" + algorithmTabId + " .code")
+	    .append("div")
+	    .attr("class", codeContainerId)
+	code_holder.append("div")
+	    .attr("class", "function-code-holder")
+	    .append("pre")
+            .attr("class", "prettyprint lang-js linenums:1")
+	    .append("code")
+            .attr("class", "language-js")
+            .text(algo);
+	return code_holder;
+    };
     //return the augmented module
     _my.AlgorithmUtils = AlgorithmUtils;
     return _my;
