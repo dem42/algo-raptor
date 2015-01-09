@@ -88,7 +88,6 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 
 	this.highlightRow = function highlightRow(codeContainerId, rowNumber, startDelay, durationOfHighlight) {
 	    var rowToHighlightSelector = getRowToHighlightSelector(rowNumber, codeContainerId);
-	    console.log("highlighting", rowNumber, codeContainerId, startDelay, durationOfHighlight);
 	    setTimeout(function() {
 		$(rowToHighlightSelector).toggleClass("highlighted-row");
 	    }, startDelay);
@@ -304,7 +303,6 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	var c = "("+this.getDecorated()+")("+Algorithm.paramArg(N)+");";
 	//preserve this for the eval inside var self
 	var self = this;
-	//console.log(c);
 	return eval(c);
     }
 
@@ -312,6 +310,8 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     // this will be the animation queue of the function that you started with startAnimation
     // if you have multiple functions and want to visualize the calling of these other functions you 
     // can use the runWithSharedAnimationQueue function to attach them
+    //
+    // This function is meant to be used inside a wrapper of your original function
     //
     // IF YOU DONT WANT TO RUN WITH A SHARED ANIMATION QUEUE USE run TO WRAP THE INNER ALGO INSTEAD OF THIS
     Algorithm.prototype.runWithSharedAnimationQueue = function(algorithmToShareWith) {
