@@ -12,33 +12,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
     /*******************************/
     console.debug("downloaded quicksort");
 
-    _my.AlgorithmUtils.insertIntoHeaderList("#" + algorithmTabId, algorithmName, "sorting-1-quicksort");
- 
-    var row0 = d3.select("#algoContainer")
-	.append("div").attr("class", "tab-pane").attr("id", algorithmTabId)
-        .append("div").attr("class", "container-fluid")
-	.append("div").attr("class", "row")
-    var leftPanel = row0.append("div").attr("class", "col-md-6")
-    var controlsPanel = leftPanel.append("div").attr("class", "row")
-	.append("div").attr("class", "col-md-12")
-	.append("div").attr("class", "panel panel-default");
-    controlsPanel.append("div").attr("class", "panel-heading").text("Controls:");
-    var ops = controlsPanel.append("div").attr("class", "panel-body")
-	.append("div").attr("class", "options");
-    var defaultControlsObj = _my.AlgorithmUtils.insertDefaultControls(ops, algorithmTabId);
-    _my.AlgorithmUtils.insertCustomControls(ops, algorithmTabId, algorithmName);
-    
-    var visPanel = leftPanel.append("div").attr("class", "row")
-	.append("div").attr("class", "col-md-12")
-	.append("div").attr("class", "panel panel-default");
-    visPanel.append("div").attr("class", "panel-heading").text("Algorithm Visualization");
-    visPanel.append("div").attr("class", "panel-body graphics");
-
-    var codePanel = row0.append("div").attr("class", "col-md-6")
-	.append("div").attr("class", "panel panel-default");
-    codePanel.append("div").attr("class", "panel-heading").text("Code");
-    codePanel.append("div").attr("class", "panel-body code");
-
+    var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName, "sorting-quick", [6, 6]);
 
     /*******************************/
     /*      Define the functions   */
@@ -112,9 +86,9 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	}
 	return color; 
     }
-
+    var defs_id = "qsort-circle-gradient-defs";
     var init_circles = function(data) {
-	svg.append("defs").selectAll(".gradients")
+	svg.append("defs").attr("id", defs_id).selectAll(".gradients")
 	    .data(data)
 	    .enter()
 	    .append("radialGradient")
@@ -300,7 +274,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	    return 0;
 	}
     };
-    var algo_context = _my.AlgorithmUtils.createAlgorithmContext(defaultControlsObj);
+    var algo_context = _my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj);
     var qual_algo = new _my.Algorithm(quicksort, q_callbacks, "quicksort-code", algo_context, function() {
 	_my.AlgorithmUtils.resetControls(algorithmTabId);
     });
@@ -341,7 +315,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	    this[i] = x;
 	}
     };
-    d3.select("#" + algorithmTabId + " .options").append("button")
+    layout.customControlsLayout.append("button")
 	.attr("class", "btn btn-default btn-sm")
 	.attr("title", "Permute the quicksort input data. (The balls!)")
         .on("click", function() {
@@ -351,7 +325,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 		data[i].old_idx = i;
 	    });
 	    d3.selectAll(".circle-group").remove();
-	    d3.selectAll("defs").remove();
+	    d3.select("#" + defs_id).remove();
 	    init_circles(data);
 	})
 	.text("Shuffle Data");

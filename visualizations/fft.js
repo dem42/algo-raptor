@@ -12,43 +12,13 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     /*******************************/
     console.debug("downloaded fft");
 
-
-    _my.AlgorithmUtils.insertIntoHeaderList("#" + algorithmTabId, algorithmName, "fft");
-    
-    var row0 = d3.select("#algoContainer")
-    	.append("div").attr("class", "tab-pane").attr("id", algorithmTabId)
-        .append("div").attr("class", "container-fluid")
-    	.append("div").attr("class", "row")
-    var leftPanel = row0.append("div").attr("class", "col-md-5")
-    var controlsPanel = leftPanel.append("div").attr("class", "row controls")
-    	.append("div").attr("class", "col-md-12")
-    	.append("div").attr("class", "panel panel-default");
-    controlsPanel.append("div").attr("class", "panel-heading").text("Controls:");
-
-    var leftPanelBody = controlsPanel.append("div").attr("class", "panel-body");
-    var ops = leftPanelBody.append("div").attr("class", "options");
-    var defaultControlsObj = _my.AlgorithmUtils.insertDefaultControls(ops, algorithmTabId);
-    _my.AlgorithmUtils.insertCustomControls(ops, algorithmTabId, algorithmName, "Select which algorithm you would like to see visualized:");
-    var radios = ops.append("div").attr("class", "buttons")
+    var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName, "fft", [5, 7], "Select which algorithm you would like to see visualized:");
+    var radios = layout.ops.append("div").attr("class", "buttons")
 	.append("div").attr("class", "btn-group-sm").attr("role", "group");
-
-    radios.append("button").attr("id", "fft-trans-btn").attr("class", "btn btn-default fft-radio-button active").attr("type", "button")
-	.text("FFT Transform Algorithm");
-    radios.append("button").attr("id", "fft-mult-btn").attr("class", "btn btn-default fft-radio-button").attr("type", "button")
-	.text("Polynomial Multiplication with FFT");
-    
-    var visPanel = leftPanel.append("div").attr("class", "row")
-    	.append("div").attr("class", "col-md-12")
-    	.append("div").attr("class", "panel panel-default");
-    visPanel.append("div").attr("class", "panel-heading").text("Algorithm Visualization");
-    visPanel.append("div").attr("class", "panel-body graphics");
-
-    var codePanel = row0.append("div").attr("class", "col-md-7")
-    	.append("div").attr("class", "panel panel-default");
-    codePanel.append("div").attr("class", "panel-heading").text("Code");
-    codePanel.append("div").attr("class", "panel-body code");
-
-    
+    radios.append("button").attr("id", "fft-trans-btn").attr("class", "btn btn-default fft-radio-button active")
+	.attr("type", "button").text("FFT Transform Algorithm");
+    radios.append("button").attr("id", "fft-mult-btn").attr("class", "btn btn-default fft-radio-button")
+	.attr("type", "button").text("Polynomial Multiplication with FFT");
     
     /*******************************/
     /*      Complex number type    */
@@ -651,7 +621,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    recursion_depth--;
 	}
     };
-    var fft_algo_context = _my.AlgorithmUtils.createAlgorithmContext(defaultControlsObj);
+    var fft_algo_context = _my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj);
     var ev = new _my.Algorithm(FFT_transform, ev_calls, "eval-code", fft_algo_context, function() {
 	_my.AlgorithmUtils.resetControls(algorithmTabId);
     }); 
@@ -841,7 +811,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     fft_calls[26] = { "pre": function(res) {
 	return animateNodeMultDrawing(0, drawPoly, res, true, this.AlgorithmContext);
     }};
-    var mult_algo_ctx = _my.AlgorithmUtils.createAlgorithmContext(defaultControlsObj);
+    var mult_algo_ctx = _my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj);
     var fft = new _my.Algorithm(FFT_multiply, fft_calls, "fft-code", mult_algo_ctx, function() {
 	_my.AlgorithmUtils.resetControls(algorithmTabId);
     });

@@ -13,32 +13,8 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     /*******************************/
     console.log("downloaded dsu");
 
-    _my.AlgorithmUtils.insertIntoHeaderList("#" + algorithmTabId, algorithmName, "graphs-1-dsu");
- 
-    var row0 = d3.select("#algoContainer")
-	.append("div").attr("class", "tab-pane").attr("id", algorithmTabId)
-        .append("div").attr("class", "container-fluid")
-	.append("div").attr("class", "row")
-
-    var leftPanel = row0.append("div").attr("class", "col-md-7")
-    var controlsPanel = leftPanel.append("div").attr("class", "row")
-	.append("div").attr("class", "col-md-12")
-	.append("div").attr("class", "panel panel-default");
-    controlsPanel.append("div").attr("class", "panel-heading").text("Controls:");
-    var ops = controlsPanel.append("div").attr("class", "panel-body")
-	.append("div").attr("class", "options");
-    var defaultControlsObj = _my.AlgorithmUtils.insertDefaultControls(ops, algorithmTabId);
-
-    var treeNodesPanel = leftPanel.append("div").attr("class", "row")
-	.append("div").attr("class", "col-md-12")
-	.append("div").attr("class", "panel panel-default");
-    treeNodesPanel.append("div").attr("class", "panel-heading").text("Algorithm Visualization");
-    treeNodesPanel.append("div").attr("class", "panel-body graphics");
-     var codePanel = row0.append("div").attr("class", "col-md-5")
-	.append("div").attr("class", "panel panel-default");
-    codePanel.append("div").attr("class", "panel-heading").text("Code");
-    codePanel.append("div").attr("class", "panel-body code");
-
+    var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName, "graphs-1-dsu", [7, 5]);
+    layout.customControlsLayout.style("display", "none");
     
     /*******************************/
     /*      Setup the svg stuff    */
@@ -342,7 +318,7 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	return this.AlgorithmContext.getBaselineAnimationSpeed();
     }
     // this object determines the behaviour of the algorighm code
-    var algorithmContext = _my.AlgorithmUtils.createAlgorithmContext(defaultControlsObj);
+    var algorithmContext = _my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj);
     var dsuFind = new _my.Algorithm(find, cbsFind, "dsu-find-code", algorithmContext);
     var dsuUnion = new _my.Algorithm(union, cbsUnion, "dsu-union-code", algorithmContext, function() {
 	_my.AlgorithmUtils.resetControls(algorithmTabId);

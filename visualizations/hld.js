@@ -11,36 +11,7 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     /*      Setup the panels       */
     /*******************************/
     console.debug("downloaded hld");
-
-
-    _my.AlgorithmUtils.insertIntoHeaderList("#" + algorithmTabId, algorithmName, "hld");
-    
-    var row0 = d3.select("#algoContainer")
-    	.append("div").attr("class", "tab-pane").attr("id", algorithmTabId)
-        .append("div").attr("class", "container-fluid")
-    	.append("div").attr("class", "row")
-    var leftPanel = row0.append("div").attr("class", "col-md-5")
-    var controlsPanel = leftPanel.append("div").attr("class", "row controls")
-    	.append("div").attr("class", "col-md-12")
-    	.append("div").attr("class", "panel panel-default");
-    controlsPanel.append("div").attr("class", "panel-heading").text("Controls:");
-
-    var leftPanelBody = controlsPanel.append("div").attr("class", "panel-body");
-    var ops = leftPanelBody.append("div").attr("class", "options");
-    var defaultControlsObj = _my.AlgorithmUtils.insertDefaultControls(ops, algorithmTabId);
-    _my.AlgorithmUtils.insertCustomControls(ops, algorithmTabId, algorithmName);
-    
-    var visPanel = leftPanel.append("div").attr("class", "row")
-    	.append("div").attr("class", "col-md-12")
-    	.append("div").attr("class", "panel panel-default");
-    visPanel.append("div").attr("class", "panel-heading").text("Algorithm Visualization");
-    visPanel.append("div").attr("class", "panel-body graphics");
-
-    var codePanel = row0.append("div").attr("class", "col-md-7")
-    	.append("div").attr("class", "panel panel-default");
-    codePanel.append("div").attr("class", "panel-heading").text("Code");
-    codePanel.append("div").attr("class", "panel-body code");
-
+    var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName, "hld", [5, 7]);
 
     /*********************/
     /*** HLD functions ***/
@@ -76,7 +47,7 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 
     d3.select("#" + algorithmTabId + " .code")
 	.append("div")
-	.attr("class", "quicksort-code")
+	.attr("class", "hld-code")
         .append("div")
 	.attr("class", "function-code-holder")
 	.append("pre")
@@ -86,7 +57,7 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
         .text(hld_algo);
 
 
-    d3.select("#" + algorithmTabId + " .options").append("button")
+    layout.customControlsLayout.append("button")
 	.attr("class", "btn btn-default btn-sm")
 	.attr("title", "Permute the tree input data. (You want to do this .. Trust me!")
         .on("click", function() {

@@ -13,37 +13,9 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     /*      Setup the panels       */
     /*******************************/
     console.debug("downloaded bs", _my);
-    
-    _my.AlgorithmUtils.insertIntoHeaderList("#" + algorithmTabId, algorithmName, "search-1-binary");
 
-    var row0 = d3.select("#algoContainer")
-	.append("div").attr("class", "tab-pane").attr("id", algorithmTabId)
-        .append("div").attr("class", "container-fluid")
-	.append("div").attr("class", "row")
-    var leftPanel = row0.append("div").attr("class", "col-md-6")
-    var controlsPanel = leftPanel.append("div").attr("class", "row controls")
-	.append("div").attr("class", "col-md-12")
-	.append("div").attr("class", "panel panel-default");
-    controlsPanel.append("div").attr("class", "panel-heading").text("Controls:");
-
-    var leftPanelBody = controlsPanel.append("div").attr("class", "panel-body");
-    var ops = leftPanelBody.append("div").attr("class", "options");
-    var defaultControlsObj = _my.AlgorithmUtils.insertDefaultControls(ops, algorithmTabId);
-    _my.AlgorithmUtils.insertCustomControls(ops, algorithmTabId, algorithmName);
-    ops.append("div").attr("class", "forms");
-    
-    
-    var visPanel = leftPanel.append("div").attr("class", "row")
-	.append("div").attr("class", "col-md-12")
-	.append("div").attr("class", "panel panel-default");
-    visPanel.append("div").attr("class", "panel-heading").text("Algorithm Visualization");
-    visPanel.append("div").attr("class", "panel-body graphics");
-
-    var codePanel = row0.append("div").attr("class", "col-md-6")
-	.append("div").attr("class", "panel panel-default");
-    codePanel.append("div").attr("class", "panel-heading").text("Code");
-    codePanel.append("div").attr("class", "panel-body code");
-
+    var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName, "search-1-binary", [6, 6], "Algorithm input data may be modified below:");
+    layout.customControlsLayout.append("div").attr("class", "forms");
     /*******************************/
     /*      Setup the svg stuff    */
     /*******************************/
@@ -200,7 +172,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 
 
     /* create an Algorithm instance wired with callbacks */
-    var balgo = new _my.Algorithm(bsearch, cbs, "bs-code", _my.AlgorithmUtils.createAlgorithmContext(defaultControlsObj),
+    var balgo = new _my.Algorithm(bsearch, cbs, "bs-code", _my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj),
 				  function() { _my.AlgorithmUtils.resetControls(algorithmTabId); });
     _my.AlgorithmUtils.attachAlgoToControls(balgo, algorithmTabId, function kickOff(executionFunction) {
 	/* The function that starts the simulation.

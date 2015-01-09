@@ -88,6 +88,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 
 	this.highlightRow = function highlightRow(codeContainerId, rowNumber, startDelay, durationOfHighlight) {
 	    var rowToHighlightSelector = getRowToHighlightSelector(rowNumber, codeContainerId);
+	    console.log("highlighting", rowNumber, codeContainerId, startDelay, durationOfHighlight);
 	    setTimeout(function() {
 		$(rowToHighlightSelector).toggleClass("highlighted-row");
 	    }, startDelay);

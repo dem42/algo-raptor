@@ -33,12 +33,14 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
     }
 
     AlgorithmUtils.insertCustomControls = function(controlsDiv, algorithmId, algorithmName, comments) {
-	controlsDiv.append("div").attr("class", "custom-controls-header").text(algorithmName + " Controls:");
+	var customControlsHolder = controlsDiv.append("div").attr("class", "custom-controls-holder");
+	customControlsHolder.append("div").attr("class", "custom-controls-header").text(algorithmName + " Controls:");
 
 	if (comments !== undefined) {
-	    var exRadioDiv = controlsDiv.append("div").attr("class", "custom-controls-comments-section");
-	    exRadioDiv.append("p").attr("class", "controls-info-text").text(comments);
+	    customControlsHolder.append("div").attr("class", "custom-controls-comments-section")
+		.append("p").attr("class", "controls-info-text").text(comments);
 	}
+	return customControlsHolder;
     }
 
     // create and populate a section for standard algorithm controls
@@ -256,7 +258,42 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 		return controlsObj.speedGauge.getSpeed();
 	    }
 	};
-    }
+    };
+
+    AlgorithmUtils.setupLayout = function(algorithmTabId, algorithmName, algorithmPriorityCode, columnWidths, comments) {
+	var layout = {};
+	
+	AlgorithmUtils.insertIntoHeaderList("#" + algorithmTabId, algorithmName, algorithmPriorityCode);
+	
+	layout.row0 = d3.select("#algoContainer")
+    	    .append("div").attr("class", "tab-pane").attr("id", algorithmTabId)
+            .append("div").attr("class", "container-fluid")
+    	    .append("div").attr("class", "row")
+	layout.leftPanel = layout.row0.append("div").attr("class", "col-md-" + columnWidths[0])
+	layout.controlsPanel = layout.leftPanel.append("div").attr("class", "row controls")
+    	    .append("div").attr("class", "col-md-12")
+    	    .append("div").attr("class", "panel panel-default");
+	layout.controlsPanel.append("div").attr("class", "panel-heading").text("Controls:");
+
+	layout.leftPanelBody = layout.controlsPanel.append("div").attr("class", "panel-body");
+	layout.ops = layout.leftPanelBody.append("div").attr("class", "options");
+	layout.defaultControlsObj = AlgorithmUtils.insertDefaultControls(layout.ops, algorithmTabId);
+	layout.customControlsLayout = AlgorithmUtils.insertCustomControls(layout.ops, algorithmTabId, algorithmName, comments);
+	
+	layout.visPanel = layout.leftPanel.append("div").attr("class", "row")
+    	    .append("div").attr("class", "col-md-12")
+    	    .append("div").attr("class", "panel panel-default");
+	layout.visPanel.append("div").attr("class", "panel-heading").text("Algorithm Visualization");
+	layout.visPanel.append("div").attr("class", "panel-body graphics");
+
+	layout.codePanel = layout.row0.append("div").attr("class", "col-md-" + columnWidths[1])
+    	    .append("div").attr("class", "panel panel-default");
+	layout.codePanel.append("div").attr("class", "panel-heading").text("Code");
+	layout.codePanel.append("div").attr("class", "panel-body code");
+
+
+	return layout;
+    };
     //return the augmented module
     _my.AlgorithmUtils = AlgorithmUtils;
     return _my;
