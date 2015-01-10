@@ -10,3 +10,10 @@
     stroke: #333;
     stroke-width: 1.5px;
 }
+
+.hld-root-id {
+    fill: #f00;
+    stroke: #f00;
+    font-size: small;
+    font-family: monospace;
+}

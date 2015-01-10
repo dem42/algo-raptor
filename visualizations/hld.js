@@ -6,17 +6,18 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
     }
     var algorithmTabId = "hld-tab";
     var algorithmName = "Heavy-Light Decomposition";
-
+    var TREE_SIZE = 15;
     /*******************************/
     /*      Setup the panels       */
     /*******************************/
     console.debug("downloaded hld");
-    var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName, "hld", [5, 7]);
+    var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName, "a-hld", [5, 7]);
     layout.customControlsLayout.append("button")
 	.attr("class", "btn btn-default btn-sm")
 	.attr("title", "Permute the tree input data. (You want to do this .. Trust me!")
         .on("click", function() {
-
+	    d3.select("#hld-tree-group").remove();
+	    initialize(createRandomTree(TREE_SIZE));
 	})
 	.text("Shuffle Data");
     /*********************/
@@ -90,6 +91,7 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
 	return links;
     }
     function initialize(tree) {
+	var tree_group = svg.append("g").attr("id", "hld-tree-group");
 	var nodes = createNodes(tree);
 	var links = createLinks(tree);
 	var force = d3.layout.force()
@@ -97,30 +99,37 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
 	    .nodes(nodes)
 	    .links(links)
 	    .charge(-600)
-	    .linkDistance(200)
+	    .linkDistance(100)
+	    .gravity(0.05)
 	    .start();
 
 	var diag = d3.svg.diagonal();
-	var flinks = svg.selectAll("hld-link")
+	var flinks = tree_group.selectAll("hld-link")
 	    .data(links)
 	    .enter()
 	   .append("line")
 	    .attr("class", "hld-link")
 	    .attr("id", function(d) { return "hld-link-from-" + d.source.idx + "-to-" + d.target.idx; });
 
-	var fnodes = svg.selectAll("hld-circle")
+	var fnodes = tree_group.selectAll("hld-circle")
 	    .data(nodes)
 	    .enter()
-	   .append("circle")
-	    .attr("class", "hld-circle")
+	   .append("g")
 	    .attr("id", function(d) { return "hld-node-" + d.idx; })
-	    .attr("r", 20)
 	    .call(force.drag())
+	fnodes.append("circle")
+	     .attr("class", "hld-circle")
+	     .attr("r", 20)
 
+	tree_group.select("#hld-node-" + 0).append("text").attr("class", "hld-root-id")
+	    .attr("dx", "-1em").text("Root");
+
+	// this function is called on tick events inside the force graph and it's how we simulate node movement
 	force.on("tick", function() {
 	    fnodes
-		.attr("cx", function(d) { return d.x; })
-		.attr("cy", function(d) { return d.y; })
+		// .attr("cx", function(d) { return d.x; })
+		// .attr("cy", function(d) { return d.y; })
+	    .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")";})
 	    
 	    flinks
 		.attr("x1", function(d) { return d.source.x; })
@@ -143,21 +152,37 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
     _my.AlgorithmUtils.appendCode(algorithmTabId, "ss-code", ss_algo);
     _my.AlgorithmUtils.appendCode(algorithmTabId, "hld-code", hld_algo);
 
-    var tree = {};
-    tree[0] = {idx: 0, children: [1, 3, 5]};
-    tree[1] = {idx: 1, children: [2, 4]};
-    tree[2] = {idx: 2, children: []};
-    tree[3] = {idx: 3, children: []};
-    tree[4] = {idx: 4, children: [6]};
-    tree[5] = {idx: 5, children: [7]};
-    tree[6] = {idx: 6, children: [8]};
-    tree[7] = {idx: 7, children: []};
-    tree[8] = {idx: 8, children: []};
-    tree.size = 8;
-    tree.isLeafNode = function(val) { return this[val].children.length == 0; };
+    // the randomness here isn't good i think .. certain shapes are very improbable whereas
+    // all shapes should have the same probablitity
+    function createRandomTree(N) {
+	var nodes = {};
+	for (var i = 0; i < N; i++) {
+	    nodes[i] = {idx: i, children: []};
+	    if (i > 0) {
+		var parent = Math.floor(Math.random() * (i - 1));
+		nodes[parent].children.push(i);
+	    }
+	}
+	nodes.size = N - 1;
+	nodes.isLeafNode = function(val) { return this[val].children.length == 0; };
+	return nodes;
+    }
+
+    var tree = createRandomTree(TREE_SIZE);
+    initialize(tree);
+    // tree[0] = {idx: 0, children: [1, 3, 5]};
+    // tree[1] = {idx: 1, children: [2, 4]};
+    // tree[2] = {idx: 2, children: []};
+    // tree[3] = {idx: 3, children: []};
+    // tree[4] = {idx: 4, children: [6]};
+    // tree[5] = {idx: 5, children: [7]};
+    // tree[6] = {idx: 6, children: [8]};
+    // tree[7] = {idx: 7, children: []};
+    // tree[8] = {idx: 8, children: []};
+    // tree.size = 8;
+    // tree.isLeafNode = function(val) { return this[val].children.length == 0; };
 
     _my.AlgorithmUtils.attachAlgoToControls(ss_algo, algorithmTabId, function(){
-	initialize(tree);
 	ss_algo.run(tree, 0);
 	chains = {chainLengths: undefined, 
 		  chainHeads: undefined, 
