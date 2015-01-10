@@ -192,7 +192,8 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
 	.attr("title", "Permute the tree input data. (You want to do this .. Trust me!")
         .on("click", function() {
 	    d3.select("#hld-tree-group").remove();
-	    tree = initialize(createRandomTree(TREE_SIZE));
+	    tree = createRandomTree(TREE_SIZE)
+	    initialize(tree);
 	})
 	.text("Shuffle Data");
 
