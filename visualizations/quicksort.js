@@ -12,33 +12,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
     /*******************************/
     console.debug("downloaded quicksort");
 
-    _my.AlgorithmUtils.insertIntoHeaderList("#" + algorithmTabId, algorithmName, "sorting-1-quicksort");
- 
-    var row0 = d3.select("#algoContainer")
-	.append("div").attr("class", "tab-pane").attr("id", algorithmTabId)
-        .append("div").attr("class", "container-fluid")
-	.append("div").attr("class", "row")
-    var leftPanel = row0.append("div").attr("class", "col-md-6")
-    var controlsPanel = leftPanel.append("div").attr("class", "row")
-	.append("div").attr("class", "col-md-12")
-	.append("div").attr("class", "panel panel-default");
-    controlsPanel.append("div").attr("class", "panel-heading").text("Controls:");
-    var ops = controlsPanel.append("div").attr("class", "panel-body")
-	.append("div").attr("class", "options");
-    _my.AlgorithmUtils.insertDefaultControls(ops, algorithmTabId);
-    _my.AlgorithmUtils.insertCustomControls(ops, algorithmTabId, algorithmName);
-    
-    var visPanel = leftPanel.append("div").attr("class", "row")
-	.append("div").attr("class", "col-md-12")
-	.append("div").attr("class", "panel panel-default");
-    visPanel.append("div").attr("class", "panel-heading").text("Algorithm Visualization");
-    visPanel.append("div").attr("class", "panel-body graphics");
-
-    var codePanel = row0.append("div").attr("class", "col-md-6")
-	.append("div").attr("class", "panel panel-default");
-    codePanel.append("div").attr("class", "panel-heading").text("Code");
-    codePanel.append("div").attr("class", "panel-body code");
-
+    var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName, "sorting-quick", [6, 6]);
 
     /*******************************/
     /*      Define the functions   */
@@ -112,9 +86,9 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	}
 	return color; 
     }
-
+    var defs_id = "qsort-circle-gradient-defs";
     var init_circles = function(data) {
-	svg.append("defs").selectAll(".gradients")
+	svg.append("defs").attr("id", defs_id).selectAll(".gradients")
 	    .data(data)
 	    .enter()
 	    .append("radialGradient")
@@ -163,25 +137,25 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
     /*************************/
     var q_callbacks = [];
     q_callbacks[0] = function(data, left, right) {
+	var animationDuration = this.AlgorithmContext.getBaselineAnimationSpeed();
 	d3.selectAll("text.left-text").remove();
 	d3.selectAll("text.right-text").remove();
 	if (left == 0 && right == data.length - 1) {
-	    return this.AlgorithmContext.default_animation_duration; // we don't want to move the entire array down, only subarrays
+	    return animationDuration; // we don't want to move the entire array down, only subarrays
 	}
 	for (var i=left; i<=right; i++) {
 	    var gi = d3.select("#q-g-" + data[i].old_idx);
 	    var dat = gi.datum();
 	    gi.transition()
-		.duration(this.AlgorithmContext.default_animation_duration)
+		.duration(animationDuration)
 		.attr("transform", "translate(" + dat.x_off + ", " + (dat.y_off + 2.5*maxi_width) + ")");
 	    dat.y_off = 2.5 * maxi_width + dat.y_off;
 	}
 
-	return this.AlgorithmContext.default_animation_duration;
+	return animationDuration;
     }
     // pivot animation
     q_callbacks[4] = function(pivot, data) {
-	
 	var pi = data[pivot].old_idx;
 	var g = d3.select("#q-g-" + pi)
 	var radius = g.select(".quicksort-circle").attr("r");
@@ -194,8 +168,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	    .attr("height", 2*radius)
 	    .attr("x", -radius)
 	    .attr("y", -radius);
-
-	return this.AlgorithmContext.default_animation_duration;
+	return this.AlgorithmContext.getBaselineAnimationSpeed();
     }
     // left animation
     function updateLeft(data, new_left) {
@@ -205,20 +178,17 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	var new_left_i = data[new_left].old_idx;
 	var g = d3.select("#q-g-" + new_left_i);
 	var radius = g.select("circle").attr("r");
-
 	d3.selectAll("g.left")
 	    .classed("left", false)
 	    .select("text.left-text")
 	    .remove();
-
 	g.append("text")
 	    .attr("class", "left-text")
 	    .attr("dx", -radius)
 	    .attr("dy", -radius)
 	    .text("Left");
 	g.classed("left", true);
-
-	return this.AlgorithmContext.default_animation_duration;
+	return this.AlgorithmContext.getBaselineAnimationSpeed();
     };
     q_callbacks[6] = q_callbacks[10] = q_callbacks[19] = function(data, new_left) {
 	return updateLeft.apply(this, arguments);
@@ -242,7 +212,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	    .attr("dy", radius)
 	    .text("Right");
 	g.classed("right", true);
-	return this.AlgorithmContext.default_animation_duration;
+	return this.AlgorithmContext.getBaselineAnimationSpeed();
     };
     q_callbacks[7] = q_callbacks[13] = q_callbacks[20] = function(data, new_right) {
 	return updateRight.apply(this, arguments);
@@ -250,44 +220,36 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
     // end of while cleanup
     q_callbacks[22] = function() {
 	svg.selectAll("#pivot-rect").remove();
-	return 10;
+	return 0.5 * this.AlgorithmContext.getBaselineAnimationSpeed();
     };
 
-    function visualizeStack(data, left, right) {
-
-
-    }
-
-    q_callbacks[23] = function(data, left, right) {
-	visualizeStack.apply(this, arguments);
-    }
     // move subarray back
     q_callbacks[24] = q_callbacks[1] = function(data, left, right) {
+	var animationDuration = this.AlgorithmContext.getBaselineAnimationSpeed();
 	if (left == 0 && right == data.length - 1) {
-	    return this.AlgorithmContext.default_animation_duration; // we don't want to move the entire array up, only subarrays
+	    return animationDuration; // we don't want to move the entire array up, only subarrays
 	}
 	for (var i=left; i<=right; i++) {
 	    var gi = d3.select("#q-g-" + data[i].old_idx);
 	    var dat = gi.datum();
 	    gi.transition()
-		.duration(this.AlgorithmContext.default_animation_duration)
+		.duration(animationDuration)
 		.attr("transform", "translate(" + dat.x_off + ", " + (dat.y_off - 2.5*maxi_width) + ")");
 	    dat.y_off = dat.y_off - 2.5 * maxi_width;
 	}
-	return this.AlgorithmContext.default_animation_duration;
+	return animationDuration;
     }
     // we are going to do the animation inside swap and return the length of that
     // animation in the post swap callbacks to correctly animate the delay
-    var swapping_animation_duration = 3000;
     q_callbacks[16] = {
 	post: function(data, new_left, new_right) {
-	    var self = this;
-	    updateLeft.call(self, data, new_left);
-	    updateRight.call(self, data, new_right);
-	    return swapping_animation_duration;
+	    var animationDuration = 6 * this.AlgorithmContext.getBaselineAnimationSpeed();
+	    updateLeft.call(this, data, new_left);
+	    updateRight.call(this, data, new_right);
+	    return animationDuration;
 	},
 	pre: function(data, new_left, new_right) {
-	    var step_duration = 1000;
+	    var step_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	    var i = new_left;
 	    var j = new_right;
 	    if (i == j) return;
@@ -298,51 +260,31 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	    var di = gi.datum();
 	    var dj = gj.datum();
 
-	    var trns1 = [di.x_off, di.y_off];
-	    var trns2 = [dj.x_off, dj.y_off];
-	    gi.transition().duration(step_duration).attr("transform", "translate(" + trns1[0] + " " + (trns1[1] - maxi_width) + ")");
-	    gj.transition().duration(step_duration).attr("transform", "translate(" + trns2[0] + " " + (trns2[1] + maxi_width) + ")");
+	    var trns1 = {x: di.x_off, y: di.y_off};
+	    var trns2 = {x: dj.x_off, y: dj.y_off};
 
-	    gi.transition().delay(step_duration).duration(step_duration).attr("transform", "translate(" + trns2[0] + " " + (trns1[1] - maxi_width) + ")");
-	    gj.transition().delay(step_duration).duration(step_duration).attr("transform", "translate(" + trns1[0] + " " + (trns2[1] + maxi_width) + ")");
+	    _my.vislib.swapSelections(gi, trns1, gj, trns2, [step_duration, step_duration, step_duration], maxi_width, 0);
 
-	    gi.transition().delay(2*step_duration).duration(step_duration).attr("transform", "translate(" + trns2[0] + " " + trns1[1] + ")");
-	    gj.transition().delay(2*step_duration).duration(step_duration).attr("transform", "translate(" + trns1[0] + " " + trns2[1] + ")");
+	    di.x_off = trns2.x;
+	    di.y_off = trns1.y;
 
-	    di.x_off = trns2[0];
-	    di.y_off = trns1[1];
-
-	    dj.x_off = trns1[0];
-	    dj.y_off = trns2[1];
-
+	    dj.x_off = trns1.x;
+	    dj.y_off = trns2.y;
+	    // the swapping animation duration is returned in the post callback
 	    return 0;
 	}
     };
-    var algo_context = {
-	default_animation_duration : 300,
-    };
+    var algo_context = _my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj);
     var qual_algo = new _my.Algorithm(quicksort, q_callbacks, "quicksort-code", algo_context, function() {
 	_my.AlgorithmUtils.resetControls(algorithmTabId);
     });
 
     var swap_callbacks = [];
-    var swap_context = {
-	default_animation_duration: 0, 
-    }
+    var swap_context = _my.AlgorithmUtils.createAlgorithmContext(); // not linked to the controls object
     var swap_algo = new _my.Algorithm(swap_function, swap_callbacks, "swap_function-code", swap_context);
 
-    d3.select("#" + algorithmTabId + " .code")
-	.append("div")
-	.attr("class", "quicksort-code")
-        .append("div")
-	.attr("class", "function-code-holder")
-	.append("pre")
-        .attr("class", "prettyprint lang-js linenums:1")
-	.append("code")
-        .attr("class", "language-js")
-        .text(qual_algo);
+    _my.AlgorithmUtils.appendCode(algorithmTabId, "quicksort-code", qual_algo);
 
-    
     function kickoff(executionFunction) {
 	console.log("Before", data.map(function(d) { return d.val; }));
 	qual_algo.startAnimation(data, 0, data.length - 1, function(data, i, j) {
@@ -363,7 +305,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	    this[i] = x;
 	}
     };
-    d3.select("#" + algorithmTabId + " .options").append("button")
+    layout.customControlsLayout.append("button")
 	.attr("class", "btn btn-default btn-sm")
 	.attr("title", "Permute the quicksort input data. (The balls!)")
         .on("click", function() {
@@ -373,10 +315,10 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 		data[i].old_idx = i;
 	    });
 	    d3.selectAll(".circle-group").remove();
-	    d3.selectAll("defs").remove();
+	    d3.select("#" + defs_id).remove();
 	    init_circles(data);
 	})
-    .text("Shuffle Data");
+	.text("Shuffle Data");
 
     return {"quicksort": quicksort, "quicksort-algorithm": qual_algo};
 

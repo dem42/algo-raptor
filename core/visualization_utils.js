@@ -2,6 +2,34 @@
 var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
     var _my = ALGORITHM_MODULE;
     _my.vislib = {};
+
+    /** animate the swapping of two selections 
+      * NOTE: these selections need to support svg transform!
+      */
+    _my.vislib.swapSelections = function(sel1, coord1, sel2, coord2, durations, y_offset, x_offset) {
+	var tran1 = sel1.transition()
+	    .duration(durations[0])
+	    .attr("transform", "translate(" + (coord1.x - x_offset) + " " + (coord1.y - y_offset) + ")");
+	var tran2 = sel2.transition()
+	    .duration(durations[0])
+	    .attr("transform", "translate(" + (coord2.x + x_offset) + " " + (coord2.y + y_offset) + ")");
+
+	//here we chain the transitions. this is a shorthand for transition.each("end")
+	tran1 = tran1.transition()
+	    .duration(durations[1])
+	    .attr("transform", "translate(" + (coord2.x + x_offset) + " " + (coord1.y - y_offset) + ")");
+	tran2 = tran2.transition()
+	    .duration(durations[1])
+	    .attr("transform", "translate(" + (coord1.x - x_offset) + " " + (coord2.y + y_offset) + ")");
+
+	//here we chain the transitions. this is a shorthand for transition.each("end")
+	tran1.transition()
+	    .duration(durations[2])
+	    .attr("transform", "translate(" + coord2.x + " " + coord1.y + ")");
+	tran2.transition()
+	    .duration(durations[2])
+	    .attr("transform", "translate(" + coord1.x + " " + coord2.y + ")");
+    };
     
     /** animate moving growing a path 
      *
@@ -257,6 +285,186 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	position = position.matrixTransform(matrix);
 	return position;
     }
+    
+    /**** based off of a gist by msqr on github ****/
+    // draws a speed gauge and returns an object to update and query the gauge for the speed values
+    _my.vislib.addSpeedGauge = function(holder_selector, scale) {
+	var labelData = [{l:'Very Slow', o: '0.8em'},
+			 {l:'Slow', o: '1.8em'},
+			 {l:'Medium', o:'1.1em'},
+			 {l:'Fast', o:'2.1em'},
+			 {l:'Very Fast', o:'1em'}];
+	var arcColorFn = ['#0eb149', '#8ac441', '#ffef00', '#f5801e', '#ee1e26'];
+
+	var gaugeObj = gauge(labelData, arcColorFn, holder_selector, {scale: scale}); 
+	gaugeObj.render(5);
+
+	function gauge(labelData, arcColorFn, container, configuration) {
+	    var that = {};
+	    var config = {size: 200,
+			  clipWidth: 260,
+			  clipHeight: 100,
+			  ringInset: 20,
+			  ringWidth: 20,
+			  pointerWidth: 10,
+			  pointerTailLength: 5,
+			  pointerHeadLengthPercent: 0.9,
+			  minAngle: -90,
+			  maxAngle: 90,
+			  transitionMs: 750,
+			  fontSize: 8,
+			  scale: 1,
+			  speedModifier: 100
+	    };
+	    var range = undefined;
+	    var r = undefined;
+	    var pointerHeadLength = undefined;
+	    var value = 0;
+	    var majorTicks = labelData.length;
+	    var minValue = 0;
+	    var maxValue = 2*labelData.length;
+	    
+	    var svg = undefined;
+	    var arc = undefined;
+	    var scale = undefined;
+	    var ticks = undefined;
+	    var tickData = undefined;
+	    var pointer = undefined;
+
+	    function deg2rad(deg) {
+		return deg * Math.PI / 180;
+	    }
+	    
+	    function newAngle(d) {
+		var ratio = scale(d);
+		var newAngle = config.minAngle + (ratio * range);
+		return newAngle;
+	    }
+	    function getValue() {
+		return value;
+	    }
+	    that.getValue = getValue;
+	    function getSpeed() {
+		return (maxValue - value) * config.speedModifier;
+	    }
+	    that.getSpeed = getSpeed;
+
+	    var prop = undefined;
+	    for ( prop in configuration ) {
+		config[prop] = configuration[prop];
+	    }
+	    
+	    range = config.maxAngle - config.minAngle;
+	    r = config.size / 2;
+	    pointerHeadLength = Math.round(r * config.pointerHeadLengthPercent);
+
+	    // a linear scale that maps domain values to a percent from 0..1
+	    scale = d3.scale.linear()
+		.range([0,1])
+		.domain([minValue, maxValue]);
+	    
+	    ticks = scale.ticks(majorTicks);
+	    tickData = d3.range(majorTicks).map(function() {return 1/majorTicks;});
+	    
+	    arc = d3.svg.arc()
+		.innerRadius(r - config.ringWidth - config.ringInset)
+		.outerRadius(r - config.ringInset)
+		.startAngle(function(d, i) {
+		    var ratio = d * i;
+		    return deg2rad(config.minAngle + (ratio * range));
+		})
+		.endAngle(function(d, i) {
+		    var ratio = d * (i+1);
+		    return deg2rad(config.minAngle + (ratio * range));
+		})
+		.padAngle(0.01)
+
+	    
+	    function render(newValue) {
+		svg = d3.select(container)
+		    .append('svg:svg')
+		    .attr('class', 'gauge')
+		    .attr('width', config.clipWidth*config.scale)
+		    .attr('height', config.clipHeight*config.scale)
+		    .attr("transform", "scale(" + config.scale + ")")
+		    .append("g")
+		    .attr("transform", "translate(" + (r*1) + "," + (r*.95) + ")");		
+		var defs = svg.append('defs')
+		var arcs = svg.append('g')
+		    .attr('class', 'arc')
+		
+		defs.selectAll('path')
+		    .data(tickData)
+		    .enter().append('path')
+		    .attr('id', function(d, i) { return "mypath" + i + "-of(" + holder_selector + ")"; })
+		    .attr('d', arc);
+		arcs.selectAll('use')
+		    .data(tickData)
+		    .enter().append('use')
+		    .attr('xlink:href', function(d, i) { return "#mypath" + i + "-of(" + holder_selector + ")"; })
+		    .attr('fill', function(d, i) {
+			return arcColorFn[i % arcColorFn.length];
+		    })
+		svg.selectAll('.arc-label')
+		    .data(labelData)
+		    .enter().append('text')
+		    .attr('dx', function(d) { return d.o; })
+		    .attr('dy', '-0.7em')
+		    .attr('font-size', config.fontSize + "px")
+		    .attr('class', 'arc-label')
+		    .append('textPath')
+		    .attr('xlink:href', function(d, i) { return "#mypath" + i + "-of(" + holder_selector + ")"; })
+		    .text(function(d) { return d.l; });
+
+		var lineData1 = [[0, -pointerHeadLength], 
+				 [config.pointerWidth / 2, 0],
+				 [0, config.pointerTailLength],
+				 [0, -pointerHeadLength] ];
+		var lineData2 = [[0, -pointerHeadLength], 
+				 [-config.pointerWidth / 2, 0],
+				 [0, config.pointerTailLength],
+				 [0, -pointerHeadLength] ];
+		var pointerLine = d3.svg.line().interpolate('monotone');
+		pointer = svg.append('g')
+		    .attr('transform', 'rotate(' +config.minAngle +')')
+		pointer.append('circle').attr('class', 'circle-big')
+		    .attr('r', config.pointerWidth / 2);
+		var pg1 = pointer.append('g').data([lineData1])
+		    .attr('class', 'pointer_dark')
+		var pg2 = pointer.append('g').data([lineData2])
+		    .attr('class', 'pointer_light')
+		pointer.append('circle').attr('class', 'circle-small')
+		    .attr('r', config.pointerWidth / 4);
+		pg1.append('path')
+		    .attr('d', pointerLine)
+		pg2.append('path')
+		    .attr('d', pointerLine)
+		
+		update(newValue === undefined ? 0 : newValue);
+	    }
+	    that.render = render;
+	    
+	    function update(newValue) {
+		if (newValue > maxValue) {
+		    newValue = maxValue;
+		}
+		if (newValue < minValue) {
+		    newValue = minValue;
+		}
+		var ratio = scale(newValue);
+		var newAngle = config.minAngle + (ratio * range);
+		pointer.transition()
+		    .duration(config.transitionMs)
+		    .ease('elastic')
+		    .attr('transform', 'rotate(' +newAngle +')');
+		value = newValue;
+	    }
+	    that.update = update;
+	    return that;
+	};
+
+	return gaugeObj;
+    };
 
     return _my;
 }(ALGORITHM_MODULE || {}, d3, $));

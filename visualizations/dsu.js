@@ -13,32 +13,8 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     /*******************************/
     console.log("downloaded dsu");
 
-    _my.AlgorithmUtils.insertIntoHeaderList("#" + algorithmTabId, algorithmName, "graphs-1-dsu");
- 
-    var row0 = d3.select("#algoContainer")
-	.append("div").attr("class", "tab-pane").attr("id", algorithmTabId)
-        .append("div").attr("class", "container-fluid")
-	.append("div").attr("class", "row")
-
-    var leftPanel = row0.append("div").attr("class", "col-md-7")
-    var controlsPanel = leftPanel.append("div").attr("class", "row")
-	.append("div").attr("class", "col-md-12")
-	.append("div").attr("class", "panel panel-default");
-    controlsPanel.append("div").attr("class", "panel-heading").text("Controls:");
-    var ops = controlsPanel.append("div").attr("class", "panel-body")
-	.append("div").attr("class", "options");
-    _my.AlgorithmUtils.insertDefaultControls(ops, algorithmTabId);
-
-    var treeNodesPanel = leftPanel.append("div").attr("class", "row")
-	.append("div").attr("class", "col-md-12")
-	.append("div").attr("class", "panel panel-default");
-    treeNodesPanel.append("div").attr("class", "panel-heading").text("Algorithm Visualization");
-    treeNodesPanel.append("div").attr("class", "panel-body graphics");
-     var codePanel = row0.append("div").attr("class", "col-md-5")
-	.append("div").attr("class", "panel panel-default");
-    codePanel.append("div").attr("class", "panel-heading").text("Code");
-    codePanel.append("div").attr("class", "panel-body code");
-
+    var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName, "graphs-1-dsu", [7, 5]);
+    layout.customControlsLayout.style("display", "none");
     
     /*******************************/
     /*      Setup the svg stuff    */
@@ -107,9 +83,9 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     /**
      * tree rendering function, called to draw a d3 tree hierarchy 
      */
-    function drawTreeFun(data, i, child) {
+    function drawTreeFun(data, i, algorithmContext, child) {
+	var animation_duration = 2*algorithmContext.getBaselineAnimationSpeed();
 
-	var animation_duration = 1000;
 	var tree = d3.layout.tree().size([treew - margin.right, treeh - margin.bottom])
 	    .children(function(d) {
 		return d.children;
@@ -193,25 +169,27 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	// we added a moveToFront function to d3.selection that changes the order of elements
 	setTimeout(function() {
 	    svg.select("#dsu-node-" + data.name).moveToFront();
-	    if (child != undefined) svg.select("#dsu-node-" + child.name).moveToFront();
+	    if (child !== undefined) svg.select("#dsu-node-" + child.name).moveToFront();
 	}, animation_duration + 10);
 
 	return 2*animation_duration;
     }
-
+    // adds elem to the children list of obj
     function push(obj, elem) {
 	(obj.children = obj.children || []).push(elem);
     }
-    function cleanup(winner_num, loser_num) {
+    // draws the new winner tree and adds a new node in the place where the loser tree used to be
+    function cleanup(winner_num, loser_num, algorithmContext) {
 	var winner = d3.select("#dsu-node-" + winner_num).datum();
 	var loser = d3.select("#dsu-node-" + loser_num).datum();
 	//remove_merged_nodes([winner_num,loser_num]);
 	push(winner, loser);
-	drawTreeFun(winner, winner_num, loser);
+	drawTreeFun(winner, winner_num, algorithmContext, loser);
+	// draw a new loser node
 	var loser_order = loser.order;
 	var new_node = {"name": next_num, "rank": 0, "root": next_num, "children": [], "order": loser_order};
 	data.push(new_node);
-	var animation_duration = drawTreeFun(_my.AlgorithmUtils.clone(new_node), next_num);
+	var animation_duration = drawTreeFun(_my.AlgorithmUtils.clone(new_node), next_num, algorithmContext);
 	next_num++;
 
 	return animation_duration;
@@ -239,21 +217,23 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     });
 
     cbsFind[2] = function(ptr, data) {
+	var animationDuration = this.AlgorithmContext.getBaselineAnimationSpeed();
 	setTimeout(function() {
 	    d3.select("#from-" + data[ptr].root + "-to-" + ptr).classed("highlight-elem", true);
-	}, this.AlgorithmContext.default_animation_duration);
-	return this.AlgorithmContext.default_animation_duration;
+	}, animationDuration);
+	return animationDuration;
     }
     cbsFind[3] = function(ptr, data) {
+	var animationDuration = this.AlgorithmContext.getBaselineAnimationSpeed();
 	setTimeout(function() {
 	    d3.select("#dsu-node-" + ptr).classed("highlight-elem", true);
-	}, this.AlgorithmContext.default_animation_duration);
-	return this.AlgorithmContext.default_animation_duration;
+	}, animationDuration);
+	return animationDuration;
     }
     cbsUnion[2] = function(r1,r2,a,b) {
-	return this.AlgorithmContext.default_animation_duration;
+	return this.AlgorithmContext.getBaselineAnimationSpeed();
     }
-    cbsUnion[3] = function(data, r1, r2) {
+    cbsUnion[3] = function(r1, r2) {
 	d3.select("#dsu-node-" + r1).select(".dsu-node-rank").transition()
 	    .attr("dx","-30")
 	    .attr("dy","60")
@@ -262,32 +242,21 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    .attr("dx","-30")
 	    .attr("dy","60")
 	    .style("font-size", "26");
+	return this.AlgorithmContext.getBaselineAnimationSpeed();
     }
-    cbsUnion[5] = function(b, r1, r2, data) {
-	d3.select("#dsu-node-" + r2).select(".dsu-node-rank").transition().remove();
-	return cleanup(r1, r2);
+    cbsUnion[5] = function(r1, r2) {
+	d3.select("#dsu-node-" + r2).select(".dsu-node-rank").remove();
+	return cleanup(r1, r2, this.AlgorithmContext);
     }
-    cbsUnion[8] = function(a, r2, r1, data) {
-	d3.select("#dsu-node-" + r1).select(".dsu-node-rank").transition().remove();
-	return cleanup(r2, r1);
+    cbsUnion[8] = function(r2, r1) {
+	d3.select("#dsu-node-" + r1).select(".dsu-node-rank").remove();
+	return cleanup(r2, r1, this.AlgorithmContext);
     }
-    cbsUnion[13] = function(r2, r1, data) {
-	return cleanup(r2, r1);
-    }
-    cbsUnion[14] = cbsUnion[18] = function(r2, r1, data) {
-	var a = r1, b = r2;
-	if (data[r2].rank > data[r1].rank) {
-	    a = r2;
-	    b = r1;
-	}
-	d3.select("#dsu-node-" + a).select(".dsu-node-rank").transition().text("Rank = " + data[a].rank);
-	d3.select("#dsu-node-" + b).select(".dsu-node-rank").transition().remove();
-	return 0;
-    }
+
     cbsUnion[4] = cbsUnion[7] = cbsUnion[11] = function(data, r2, r1, prob) {
 
-	var animation_duration = 4*this.AlgorithmContext.default_animation_duration;
-	var transition_duration = this.AlgorithmContext.default_animation_duration;
+	var animation_duration = 4*this.AlgorithmContext.getBaselineAnimationSpeed();
+	var transition_duration = this.AlgorithmContext.getBaselineAnimationSpeed;
 
 	var data_r1 = d3.select("#dsu-node-" + r1).datum();
 	var data_r2 = d3.select("#dsu-node-" + r2).datum();
@@ -327,48 +296,36 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 
 	return animation_duration + transition_duration;
     }
+    cbsUnion[13] = function(r2, r1, data) {
+	return cleanup(r2, r1, this.AlgorithmContext);
+    }
+    cbsUnion[14] = cbsUnion[18] = function(r2, r1, data) {
+	var a = r1, b = r2;
+	if (data[r2].rank > data[r1].rank) {
+	    a = r2;
+	    b = r1;
+	}
+	d3.select("#dsu-node-" + a).select(".dsu-node-rank").transition().text("Rank = " + data[a].rank);
+	d3.select("#dsu-node-" + b).select(".dsu-node-rank").remove();
+	return this.AlgorithmContext.getBaselineAnimationSpeed();
+    }
     cbsUnion[17] = function(r1, r2, data) {
-	return cleanup(r1, r2);
+	return cleanup(r1, r2, this.AlgorithmContext);
     }
     cbsUnion[21] = function(r1, r2, data) {
 	d3.selectAll(".dsu-link").classed("highlight-elem", false);
 	d3.selectAll(".dsu-node").classed("highlight-elem", false);
-	return this.AlgorithmContext.default_animation_duration;
+	return this.AlgorithmContext.getBaselineAnimationSpeed();
     }
     // this object determines the behaviour of the algorighm code
-    var algorithmContext = {
-	// animation duration for row highlights
-	default_animation_duration : 500,
-    };
-
+    var algorithmContext = _my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj);
     var dsuFind = new _my.Algorithm(find, cbsFind, "dsu-find-code", algorithmContext);
     var dsuUnion = new _my.Algorithm(union, cbsUnion, "dsu-union-code", algorithmContext, function() {
 	_my.AlgorithmUtils.resetControls(algorithmTabId);
     });
 
-
-    d3.select("#" + algorithmTabId + " .code")
-	.append("div")
-	.attr("class", "dsu-find-code")
-        .append("div")
-	.attr("class", "function-code-holder")
-	.append("pre")
-        .attr("class", "prettyprint lang-js linenums:1")
-	.append("code")
-        .attr("class", "language-js")
-        .text(dsuFind);
-
-    d3.select("#" + algorithmTabId + " .code")
-	.append("div")
-	.attr("class", "dsu-union-code")
-        .append("div")
-	.attr("class", "function-code-holder")
-	.append("pre")
-        .attr("class", "prettyprint lang-js linenums:1")
-	.append("code")
-        .attr("class", "language-js")
-        .text(dsuUnion);
-
+    _my.AlgorithmUtils.appendCode(algorithmTabId, "dsu-find-code", dsuFind);
+    _my.AlgorithmUtils.appendCode(algorithmTabId, "dsu-union-code", dsuUnion);
 
     function kickOff(executionFunction) {
 	/* The function that starts the simulation.
@@ -434,7 +391,7 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     // we set the viewBox parameters here since this is when the divs are ready (dom ready)
     data.forEach(function(d) { d.rank = 0;});
     data.forEach(function(d, i) {
-	drawTreeFun(_my.AlgorithmUtils.clone(d), i);
+	drawTreeFun(_my.AlgorithmUtils.clone(d), i, { getBaselineAnimationSpeed: function() { return 1000; }});
     });
 
     return {"find": find, "union": union,  "find-algorithm": dsuFind, "union-algorithm": dsuUnion};

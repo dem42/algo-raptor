@@ -12,13 +12,15 @@
 }
 
 .fft-coefs-highlight {
-    /*stroke-width: 0.5px;*/
     stroke: red;
     fill: red;
     font-weight: bold;
-    font-family: freeserif, serif; /*"Lucida Console", Courier, monospace;*/
 }
-
+.fft-coefs-highlight-green {
+    stroke: green;
+    fill: green;
+    font-weight: bold;
+}
 .fft-coefs {
     /*stroke-width: 0.5px;*/
     stroke: #333;

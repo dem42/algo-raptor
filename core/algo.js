@@ -22,6 +22,12 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     }
 
     console.debug("executing definitions of algo.js")
+    
+    // used for transition refactoring from default to baseline speed
+    function getAnimationDuration(algoContext) {
+	var andur = algoContext.getBaselineAnimationSpeed !== undefined ? algoContext.getBaselineAnimationSpeed() : algoContext.default_animation_duration;
+	return andur;
+    }
 
     function Algorithm(func, callbacks, codeContainerId, algorithmContext, resetControlsFunction)
     {
@@ -102,7 +108,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	this.preRowExecute = function(row_num, var_array0) {
 	    var var_array = _my.AlgorithmUtils.clone(var_array0);
 	    var selfie = this;
-	    this.animation_queue.push(new AnimationFrame("pre", row_num, this.return_rows, this.codeContainerId, function() {
+	    this.animation_queue.push(new AnimationFrame("pre", row_num, this.return_rows, this.codeContainerId, this.AlgorithmContext, function() {
 		var animation_duration;
 		if (row_num in selfie.callbacks && selfie.callbacks[row_num].pre !== undefined)
 		{
@@ -123,7 +129,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 		}
 		else
 		{
-		    animation_duration = selfie.AlgorithmContext.default_animation_duration;
+		    animation_duration = getAnimationDuration(selfie.AlgorithmContext);
 		}
 		return animation_duration;
 	    }));
@@ -134,7 +140,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    
 	    var var_array = _my.AlgorithmUtils.clone(var_array0);
 	    var selfie = this;
-	    this.animation_queue.push(new AnimationFrame("post", row_num, this.return_rows, this.codeContainerId, function() {
+	    this.animation_queue.push(new AnimationFrame("post", row_num, this.return_rows, this.codeContainerId, this.AlgorithmContext, function() {
 		var animation_duration;
 		var callback_obj = (row_num in selfie.callbacks) ? selfie.callbacks[row_num] : undefined;
 		if (typeof callback_obj === "object") {
@@ -158,11 +164,11 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 		}
 		else
 		{
-		    animation_duration = selfie.AlgorithmContext.default_animation_duration;
+		    animation_duration = getAnimationDuration(selfie.AlgorithmContext);
 		}
 
 		if (animation_duration == undefined) {
-		    animation_duration = selfie.AlgorithmContext.default_animation_duration;
+		    animation_duration = getAnimationDuration(selfie.AlgorithmContext);
 		}
 
 		var_array.forEach(function(var_elem, idx) {
@@ -297,7 +303,6 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	var c = "("+this.getDecorated()+")("+Algorithm.paramArg(N)+");";
 	//preserve this for the eval inside var self
 	var self = this;
-	//console.log(c);
 	return eval(c);
     }
 
@@ -305,6 +310,8 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     // this will be the animation queue of the function that you started with startAnimation
     // if you have multiple functions and want to visualize the calling of these other functions you 
     // can use the runWithSharedAnimationQueue function to attach them
+    //
+    // This function is meant to be used inside a wrapper of your original function
     //
     // IF YOU DONT WANT TO RUN WITH A SHARED ANIMATION QUEUE USE run TO WRAP THE INNER ALGO INSTEAD OF THIS
     Algorithm.prototype.runWithSharedAnimationQueue = function(algorithmToShareWith) {
@@ -345,8 +352,10 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     Algorithm.prototype.__executeNextRow = function(prevRowNum) {
 	
 	if (this.animation_queue.length > 0) {
+	    /* the algorithm_queue might be shared (see runWithSharedQueue) so we need to use pull the data about the algorithm from the animationFrame object */
 	    var rownum = this.animation_queue[0].rowNumber;
 	    var codeId = this.animation_queue[0].codeContainerId;
+	    var frameAlgoCtx = this.animation_queue[0].algorithmCtx;
 
 	    if (!this.runningInContMode && rownum != prevRowNum) {
 		return;
@@ -355,7 +364,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    var preanimation_extra_time = 0;
 	    if (rownum == 0) {
 		if (existsOnTheStack(codeId, this.functionStack)) {
-		    preanimation_extra_time += _my.AlgorithmUtils.visualizeNewStackFrame(codeId);
+		    preanimation_extra_time += _my.AlgorithmUtils.visualizeNewStackFrame(codeId, frameAlgoCtx);
 		}
 		this.functionStack.push(codeId);
 	    }
@@ -379,7 +388,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 		    if (doFrameRemoval) {
 			// a function has returned so we need to handle that
 			if(isRecursionFrame(codeId, this_obj.functionStack)) {
-			    var removal_duration = _my.AlgorithmUtils.popStackFrame(codeId);
+			    var removal_duration = _my.AlgorithmUtils.popStackFrame(codeId, frameAlgoCtx);
 			    setTimeout(function() {
 				this_obj.__executeNextRow(rownum);
 			    }, removal_duration);
@@ -426,12 +435,13 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	}
     }
 
-    function AnimationFrame(type, rowNumber, returnRows, codeContainerId, animationFunction) {
+    function AnimationFrame(type, rowNumber, returnRows, codeContainerId, algorithmCtx, animationFunction) {
 	this.type = type;
 	this.rowNumber = rowNumber;
 	this.animationFunction = animationFunction;
 	this.codeContainerId = codeContainerId;
-	this.returnRows = returnRows
+	this.returnRows = returnRows;
+	this.algorithmCtx = algorithmCtx;
     }
     AnimationFrame.prototype.isReturnRow = function() {
 	return this.returnRows[this.rowNumber];

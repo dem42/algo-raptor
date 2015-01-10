@@ -13,37 +13,9 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     /*      Setup the panels       */
     /*******************************/
     console.debug("downloaded bs", _my);
-    
-    _my.AlgorithmUtils.insertIntoHeaderList("#" + algorithmTabId, algorithmName, "search-1-binary");
 
-    var row0 = d3.select("#algoContainer")
-	.append("div").attr("class", "tab-pane").attr("id", algorithmTabId)
-        .append("div").attr("class", "container-fluid")
-	.append("div").attr("class", "row")
-    var leftPanel = row0.append("div").attr("class", "col-md-6")
-    var controlsPanel = leftPanel.append("div").attr("class", "row controls")
-	.append("div").attr("class", "col-md-12")
-	.append("div").attr("class", "panel panel-default");
-    controlsPanel.append("div").attr("class", "panel-heading").text("Controls:");
-
-    var leftPanelBody = controlsPanel.append("div").attr("class", "panel-body");
-    var ops = leftPanelBody.append("div").attr("class", "options");
-    _my.AlgorithmUtils.insertDefaultControls(ops, algorithmTabId);
-    _my.AlgorithmUtils.insertCustomControls(ops, algorithmTabId, algorithmName);
-    ops.append("div").attr("class", "forms");
-    
-    
-    var visPanel = leftPanel.append("div").attr("class", "row")
-	.append("div").attr("class", "col-md-12")
-	.append("div").attr("class", "panel panel-default");
-    visPanel.append("div").attr("class", "panel-heading").text("Algorithm Visualization");
-    visPanel.append("div").attr("class", "panel-body graphics");
-
-    var codePanel = row0.append("div").attr("class", "col-md-6")
-	.append("div").attr("class", "panel panel-default");
-    codePanel.append("div").attr("class", "panel-heading").text("Code");
-    codePanel.append("div").attr("class", "panel-body code");
-
+    var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName, "search-1-binary", [6, 6], "Algorithm input data may be modified below:");
+    layout.customControlsLayout.append("div").attr("class", "forms");
     /*******************************/
     /*      Setup the svg stuff    */
     /*******************************/
@@ -88,7 +60,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
      * it initializes the data
      */
     cbs[0] = function(data) { 
-	var animation_duration = 1000;
+	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	svgg = svg.append("g")
 	    .attr("transform", "translate(" + margin.left + "," + (margin.top + cumulative_height) +  ")");
 	cumulative_height += height;
@@ -131,7 +103,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
      * it draws the data
      */
     cbs[2] = function(data) { 
-	var animation_duration = 1000;
+	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 
 	/* the gs have an old_i which is their old order .. we move the gs to where they are
 	 * in the old order
@@ -154,14 +126,14 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
      * updates the arrow pointer
      */
     cbs[8] = function(mid) { 
-	var animation_duration = 1000;
+	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	arrow.style("visibility","visible").transition().duration(animation_duration).attr("x",2*w*mid-3);
 	return animation_duration;
     };
     /*callback called after a match was found
      */
     cbs[16] = function(low) { 
-	var animation_duration = 1000;
+	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	arrow.style("visibility","visible").transition().duration(animation_duration).attr("x",2*w*low-3);
 	svgg.append("text")
 	    .attr("dy", "100px")
@@ -172,7 +144,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     /*callback called if a match was NOT found
      */
     cbs[18] = function() { 
-	var animation_duration = 1000;
+	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	svgg.append("text")
 	    .attr("dy", "100px")
 	    .attr("class", "not-found-label")
@@ -199,15 +171,9 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     }
 
 
-    // this object determines the behaviour of the algorighm code
-    var algorithmContext = {
-	// animation duration for row highlights
-	default_animation_duration : 500,
-    };
     /* create an Algorithm instance wired with callbacks */
-    var balgo = new _my.Algorithm(bsearch, cbs, "bs-code", algorithmContext, function() {
-	_my.AlgorithmUtils.resetControls(algorithmTabId);
-    });
+    var balgo = new _my.Algorithm(bsearch, cbs, "bs-code", _my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj),
+				  function() { _my.AlgorithmUtils.resetControls(algorithmTabId); });
     _my.AlgorithmUtils.attachAlgoToControls(balgo, algorithmTabId, function kickOff(executionFunction) {
 	/* The function that starts the simulation.
 	 * It creates a dialog and the dialog starts the execution
@@ -241,17 +207,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	    }
 	});
     });
-    
-    d3.select("#" + algorithmTabId + " .code")
-	.append("div")
-	.attr("class", "bs-code")
-        .append("div")
-	.attr("class", "function-code-holder")
-	.append("pre")
-	.attr("class", "prettyprint lang-js linenums:1")
-	.append("code")
-	.attr("class", "language-js")
-	.text(balgo.toString());
+    _my.AlgorithmUtils.appendCode(algorithmTabId, "bs-code", balgo);
     
     return {"bsearch": bsearch, "bsearch-algorithm": balgo};
 

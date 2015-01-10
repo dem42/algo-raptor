@@ -12,43 +12,13 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     /*******************************/
     console.debug("downloaded fft");
 
-
-    _my.AlgorithmUtils.insertIntoHeaderList("#" + algorithmTabId, algorithmName, "fft");
-    
-    var row0 = d3.select("#algoContainer")
-    	.append("div").attr("class", "tab-pane").attr("id", algorithmTabId)
-        .append("div").attr("class", "container-fluid")
-    	.append("div").attr("class", "row")
-    var leftPanel = row0.append("div").attr("class", "col-md-5")
-    var controlsPanel = leftPanel.append("div").attr("class", "row controls")
-    	.append("div").attr("class", "col-md-12")
-    	.append("div").attr("class", "panel panel-default");
-    controlsPanel.append("div").attr("class", "panel-heading").text("Controls:");
-
-    var leftPanelBody = controlsPanel.append("div").attr("class", "panel-body");
-    var ops = leftPanelBody.append("div").attr("class", "options");
-    _my.AlgorithmUtils.insertDefaultControls(ops, algorithmTabId);
-    _my.AlgorithmUtils.insertCustomControls(ops, algorithmTabId, algorithmName, "Select which algorithm you would like to see visualized:");
-    var radios = ops.append("div").attr("class", "buttons")
+    var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName, "fft", [5, 7], "Select which algorithm you would like to see visualized:");
+    var radios = layout.ops.append("div").attr("class", "buttons")
 	.append("div").attr("class", "btn-group-sm").attr("role", "group");
-
-    radios.append("button").attr("id", "fft-trans-btn").attr("class", "btn btn-default fft-radio-button active").attr("type", "button")
-	.text("FFT Transform Algorithm");
-    radios.append("button").attr("id", "fft-mult-btn").attr("class", "btn btn-default fft-radio-button").attr("type", "button")
-	.text("Polynomial Multiplication with FFT");
-    
-    var visPanel = leftPanel.append("div").attr("class", "row")
-    	.append("div").attr("class", "col-md-12")
-    	.append("div").attr("class", "panel panel-default");
-    visPanel.append("div").attr("class", "panel-heading").text("Algorithm Visualization");
-    visPanel.append("div").attr("class", "panel-body graphics");
-
-    var codePanel = row0.append("div").attr("class", "col-md-7")
-    	.append("div").attr("class", "panel panel-default");
-    codePanel.append("div").attr("class", "panel-heading").text("Code");
-    codePanel.append("div").attr("class", "panel-body code");
-
-    
+    radios.append("button").attr("id", "fft-trans-btn").attr("class", "btn btn-default fft-radio-button active")
+	.attr("type", "button").text("FFT Transform Algorithm");
+    radios.append("button").attr("id", "fft-mult-btn").attr("class", "btn btn-default fft-radio-button")
+	.attr("type", "button").text("Polynomial Multiplication with FFT");
     
     /*******************************/
     /*      Complex number type    */
@@ -81,8 +51,8 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    }
 	    return val + "i";
 	}
-	var ri = Math.round(this.imaginary, -2);
-	var rr = Math.round(this.real, -2);
+	var ri = Math.round10(this.imaginary, -2);
+	var rr = Math.round10(this.real, -2);
 	if (ri == 0) {
 	    return "" + rr;
 	}
@@ -185,7 +155,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     	    res[i] = Complex.mult(p[i], q[i]);
     	}
     	FFT_transform(res, 0, nearest2Pow, [], Complex);
-    	// rearrange roots of unity
+    	// rearrange coefficients after the inverse fft transform
     	for (var i=1; i < nearest2Pow / 2; i++) {
     	    var temp = res[i];
     	    res[i] = res[nearest2Pow - i];
@@ -202,15 +172,19 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
      *********************/
     var margin = { left: 10, top: 30, right: 10, bottom: 100};
     var width = 900;
-    var svg_elem = d3.select("#" + algorithmTabId + " .graphics").append("svg")
+    var svg_fft_elem = d3.select("#" + algorithmTabId + " .graphics").append("svg")
 	.attr("width",  width + "px")
 	.attr("height", "1050px")
-    var fft_group = svg_elem.append("g")
-	.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 	.style("display", "inline");
-    var multiply_group = svg_elem.append("g")
+    var fft_group = svg_fft_elem.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+    var svg_multiply_elem = d3.select("#" + algorithmTabId + " .graphics").append("svg")
+	.attr("width",  1.42*width + "px")
+	.attr("height", "1050px")
 	.style("display", "none");
+    var multiply_group = svg_multiply_elem.append("g")
+	.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
     /**********************
      ** Wire up the Algos *
@@ -232,7 +206,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	var group = fft_group.append("g").attr("id", group_name). attr("transform", "translate(" + left_margin + ", " + top_margin + ")");
 	var data = [];
 	for (var i=1;i<=node_num;i++) {
-	    data.push({id: i, label: 0});    
+	    data.push({id: i, label: 0, node_width: node_size});    
 	};
 	var lbl_cnt = 2;
 	function preorder_label(node) {
@@ -280,7 +254,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	for(var i=0; i < poly.length; i++) {
 	    elems.push({"val" : "" + poly[i], "key": i});
 	}
-	var textFields = elem_to_draw_into
+	var textField = elem_to_draw_into
 	    .selectAll(".fft-coef-text-" + invisible)
 	    .data([1]) // we just want this text field to be added once no mater how many times this function is called
 	    .enter()
@@ -288,8 +262,8 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    .attr("class", "fft-poly fft-coef-text-" + invisible)
 	    .attr("font-size", "30")
 	    .attr("dy", (invisible === true) ? "0em" : "-1em")
-	    .attr("text-anchor", "middle")
-	    .selectAll("tspan")
+	    .attr("text-anchor", "middle");
+	textField.selectAll("tspan")
 	    .data(elems)
 	    .enter()
 	    .append("tspan")
@@ -301,7 +275,18 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    .text(",");
 
 	if (invert === true) {
-	    elem_to_draw_into.selectAll("text").attr("transform", "scale(1,-1)");
+	    textField.attr("transform", "scale(1,-1)");
+	}
+	var max_width = 6 * elem_to_draw_into.datum().node_width;
+	var text_width = elem_to_draw_into.select(".fft-coef-text-" + invisible).node().getComputedTextLength();
+	var cut_num = Math.round(text_width / max_width);
+	//console.log(max_width, text_width, cut_num, "cut this");
+	if (text_width > max_width) {
+	    var cut_offset = Math.round(elems.length / cut_num);
+	    for (var cn = cut_offset; cn  < elems.length; cn+=cut_offset) {
+		var sel_val = textField.select(".fft-coef-" + cn);
+		sel_val.attr("x", 0).attr("dy", "1.4em");
+	    }
 	}
     }
 
@@ -312,14 +297,14 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    if (sin_zeroes === true && Complex.equals(poly[i], Complex.ZERO)) { 
 		continue;
 	    }
-	    elems.push({"value": poly[i], "real_sign" : Math.sign(poly[i].real), "key": i, "has_img" : (Math.round(poly[i].imaginary, -2) != 0), "f_non_z" : f_non_zero});
+	    elems.push({"value": poly[i], "real_sign" : Math.sign(poly[i].real), "key": i, "has_img" : (Math.round10(poly[i].imaginary, -2) != 0), "f_non_z" : f_non_zero});
 	    f_non_zero = false;
 	}
 	function signString(elem) {
 	    return (elem.real_sign > 0 || elem.has_img) ? (elem.f_non_z ? "" : " + ") : (elem.f_non_z ? "-" : " - ");
 	}
 	function wrapComplex(elem) {
-	    return elem.has_img ? "(" + elem.value + ")" : "" + Math.abs(Math.round(elem.value.real, -2));
+	    return elem.has_img ? "(" + elem.value + ")" : "" + Math.abs(Math.round10(elem.value.real, -2));
 	}
 	var text = elem_to_draw_into.append("text")
 	    .attr("text-anchor", "middle")
@@ -457,7 +442,6 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 
     /********* here we wire the callbacks ************/
     var ev_calls = [];
-    var calc_calls = [];
     var recursion_depth = 0;
     var current_id = 1;
     var tree_x_offset = 310;
@@ -465,6 +449,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     var tree2_y_offset = 1660;
 
     ev_calls[0] = function(poly, start, N) {
+	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	recursion_depth++;
 	if (recursion_depth == 1) {
 	    current_id = 1;
@@ -481,30 +466,32 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    current_id++;
 	    var top_down_tree = d3.select("#fft-poly-tree");
 	    var elem_to_draw_into = top_down_tree.select("#fft-node-num" + current_id);
-	    var transition = _my.vislib.animateGrowingArrow(top_down_tree, top_down_tree.selectAll(".fft-link-to" + current_id), 1000, 0, false, 0.7);
+	    var transition = _my.vislib.animateGrowingArrow(top_down_tree, top_down_tree.selectAll(".fft-link-to" + current_id), animation_duration, 0, false, 0.7);
 	    transition.each("end", function() {
 		drawCoefs(poly.slice(start, start + N), elem_to_draw_into, false);
 	    });
 	    drawLayerLabel(fft_group, N, recursion_depth, 2.5, elem_to_draw_into.datum().y + tree1_y_offset);
 	}
-	return 1000;
+	return animation_duration;
     };
     ev_calls[10] = function(poly, start, N) {
+	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	var top_down_tree = d3.select("#fft-poly-tree");
-	var transition = _my.vislib.animateGrowingArrow(top_down_tree, top_down_tree.selectAll(".fft-link-to" + 1), 1000, 0, false, 0.7);
+	var transition = _my.vislib.animateGrowingArrow(top_down_tree, top_down_tree.selectAll(".fft-link-to" + 1), animation_duration, 0, false, 0.7);
 	var elem_to_draw_into = top_down_tree.select("#fft-node-num" + current_id);
 	transition.each("end", function() {
 	    drawPoly(poly.slice(start, start + N), elem_to_draw_into, false);
 	});
 	drawLayerLabel(fft_group, N, recursion_depth, 2.5, elem_to_draw_into.datum().y + tree1_y_offset);
-	return 1000;
+	return animation_duration;
     }
     ev_calls[13] = { "pre" : function(poly, start, N) {
+	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	if (recursion_depth == 1) {
 	    current_id++;
 	    var top_down_tree = d3.select("#fft-poly-tree");
 	    var elem_to_draw_into = top_down_tree.select("#fft-node-num" + current_id);
-	    var transition = _my.vislib.animateGrowingArrow(top_down_tree, top_down_tree.selectAll(".fft-link-to" + current_id), 1000, 0, false, 0.7);
+	    var transition = _my.vislib.animateGrowingArrow(top_down_tree, top_down_tree.selectAll(".fft-link-to" + current_id), animation_duration, 0, false, 0.7);
 	    transition.each("end", function() {
 		drawCoefs(poly.slice(start, start + N), elem_to_draw_into, false);
 		d3.select(this).transition().each("end", function() {
@@ -518,9 +505,10 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    var elem_to_draw_into = top_down_tree.select("#fft-node-num" + current_id);
 	    drawCoefs(poly.slice(start, start + N), elem_to_draw_into, true);
 	}
-	return 1200;
+	return 1.2 * animation_duration;
     }};
     ev_calls[15] = function(poly, start, i, x, half_N) {
+	var animation_duration = (4/5) * this.AlgorithmContext.getBaselineAnimationSpeed();
 	var top_down_tree = d3.select("#fft-poly-tree");
 	var elem_to_draw_into = top_down_tree.select("#fft-node-num" + current_id)
 	var visible_coefs = elem_to_draw_into.select(".fft-coef-text-false");
@@ -532,10 +520,11 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	setTimeout(function() {
 	    ci.classed("fft-coefs-highlight", false)
 	    cf.classed("fft-coefs-highlight", false)
-	}, 400);
-	return 400;
+	}, animation_duration);
+	return animation_duration;
     };
     ev_calls[16] = function(poly, start, i, x, half_N, N) {
+	var animation_duration = (4/5) * this.AlgorithmContext.getBaselineAnimationSpeed();
 	var top_down_tree = d3.select("#fft-poly-tree");
 	var elem_to_draw_into = top_down_tree.select("#fft-node-num" + current_id);
 	var visible_coefs = elem_to_draw_into.select(".fft-coef-text-false");
@@ -548,36 +537,39 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	setTimeout(function() {
 	    ci.classed("fft-coefs-highlight", false)
 	    cf.classed("fft-coefs-highlight", false)
-	}, 400);
-	return 400;
+	}, animation_duration);
+	return animation_duration;
     };
     ev_calls[22] = function(poly, start, N) {
+	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	var lvl = Math.log2(N);
 	var subtree_nodenum = (1 << (lvl + 1)) - 2;
 	var our_id = current_id - subtree_nodenum;
 	var down_top_tree = d3.select("#fft-poly-tree-upside-down");
 	var elem_to_draw_into = down_top_tree.select("#fft-node-num" + our_id);
 
-	var transition = _my.vislib.animateGrowingArrows(down_top_tree, down_top_tree.selectAll(".fft-link-to" + our_id), 1000, 0, false, 0.7);
+	var transition = _my.vislib.animateGrowingArrows(down_top_tree, down_top_tree.selectAll(".fft-link-to" + our_id), animation_duration, 0, false, 0.7);
 	transition.each("end", function() {
 	    drawCoefs(poly.slice(start, start + N), elem_to_draw_into, false)
 	    drawCoefs(poly.slice(start, start + N), elem_to_draw_into, true);
 	    elem_to_draw_into.selectAll("text").attr("transform", "scale(1,-1)");
 	});
-	return 1200;
+	return 1.2 * animation_duration;
     };
     ev_calls[23] = { "pre" : function(N) {
+	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	var lvl = Math.log2(N);
 	var down_top_tree = d3.select("#fft-poly-tree-upside-down");
 	var elem_to_draw_into = getElemToDrawInto("#fft-poly-tree-upside-down", current_id, N);
 	var y_pos = elem_to_draw_into.datum().y;
-	rootsOfUnityCircle(down_top_tree, N, 80, 1000, "fft-circle-lvl" + lvl, 450, y_pos, true);
+	rootsOfUnityCircle(down_top_tree, N, 80, animation_duration, "fft-circle-lvl" + lvl, 450, y_pos, true);
 	/*    transition.each("end", function() {
 		d3.select("#fft-circle-lvl" + lvl).remove();
 	    });*/
-	return 1100;
+	return 1.1 * animation_duration;
     }};
     ev_calls[26] = function(poly, unity, k, start, N, half_N, helper_arr) {
+	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	var lvl = Math.log2(N);
 	var elem_to_draw_into = getElemToDrawInto("#fft-poly-tree-upside-down", current_id, N);
 	var visible_coefs = elem_to_draw_into.select(".fft-coef-text-false");
@@ -589,7 +581,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	var ci1 = visible_coefs.select(".fft-coef-" + (k)).classed("fft-coefs-highlight", true)
 	var ci2 = visible_coefs.select(".fft-coef-" + (k + half_N)).classed("fft-coefs-highlight", true)
 	var cf = invisible_coefs.select(".fft-coef-" + (k)).classed("fft-coefs-highlight", true)
-	var drawing = drawArrowFromCircle(elem_to_draw_into, lvl, k);
+	var drawing = drawArrowFromCircle(elem_to_draw_into, lvl, k, animation_duration);
 	setTimeout(function() {
 	    ci1.classed("fft-coefs-highlight", false)
 	    ci2.classed("fft-coefs-highlight", false)
@@ -597,10 +589,11 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    cf.text("" + helper_arr[k] + ",");
 	    drawing.circle.remove();
 	    drawing.path.remove();
-	}, 2000);
-	return 2000;
+	}, 2 * animation_duration);
+	return 2 * animation_duration;
     };
     ev_calls[27] = function(poly, unity, k, start, N, half_N, helper_arr) {
+	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	var lvl = Math.log2(N);
 	var elem_to_draw_into = getElemToDrawInto("#fft-poly-tree-upside-down", current_id, N);
 	var visible_coefs = elem_to_draw_into.select(".fft-coef-text-false");
@@ -612,7 +605,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	var ci1 = visible_coefs.select(".fft-coef-" + (k)).classed("fft-coefs-highlight", true)
 	var ci2 = visible_coefs.select(".fft-coef-" + (k + half_N)).classed("fft-coefs-highlight", true)
 	var cf = invisible_coefs.select(".fft-coef-" + (k + half_N)).classed("fft-coefs-highlight", true)
-	var drawing = drawArrowFromCircle(elem_to_draw_into, lvl, k + half_N);
+	var drawing = drawArrowFromCircle(elem_to_draw_into, lvl, k + half_N, animation_duration);
 	setTimeout(function() {
 	    ci1.classed("fft-coefs-highlight", false)
 	    ci2.classed("fft-coefs-highlight", false)
@@ -620,32 +613,33 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    cf.text("" + helper_arr[k + half_N] + comma);
 	    drawing.circle.remove();
 	    drawing.path.remove();
-	}, 2000);
-	return 2000;
+	}, 2 * animation_duration);
+	return 2 * animation_duration;
     };
     ev_calls[32] = ev_calls[2] = { 
 	"pre": function() { 
 	    recursion_depth--;
 	}
     };
-    var ev = new _my.Algorithm(FFT_transform, ev_calls, "eval-code", {default_animation_duration : 10}, function() {
+    var fft_algo_context = _my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj);
+    var ev = new _my.Algorithm(FFT_transform, ev_calls, "eval-code", fft_algo_context, function() {
 	_my.AlgorithmUtils.resetControls(algorithmTabId);
     }); 
-    var calc = new _my.Algorithm(Complex.calc_unity, calc_calls, "calc-code", {default_animation_duration : 10}); 
+    var calc = new _my.Algorithm(Complex.calc_unity, [], "calc-code", fft_algo_context); 
     var fft_call = [];
 
-    function drawArrowFromCircle(elem_to_draw_into, lvl, k) {
+    function drawArrowFromCircle(elem_to_draw_into, lvl, k, animation_duration) {
 	var target_bound_rect = elem_to_draw_into.datum();
 	var root_unity = fft_group.select("#fft-circle-lvl" + lvl + " #fft-root-of-unity" + k)
 	var text_root_traned = fft_group.select("#fft-circle-lvl" + lvl + " .fft-root-of-unity-path-to-" + k).node().getPointAtLength(0);
-	var text_root_unity_bound = {x:450 + text_root_traned.x,y: elem_to_draw_into.datum().y + text_root_traned.y};
+	var text_root_unity_bound = {x:450 + text_root_traned.x,y: elem_to_draw_into.datum().y - text_root_traned.y};
 	var highlight_circ = root_unity.insert("circle", "circle").attr("class", "fft-highlight-circle").attr("r", "40");
 
 	var arc = d3.svg.diagonal()
 	    .target(function() { return {"x": target_bound_rect.x, "y": target_bound_rect.y}; })
 	    .source(function() { return {"x": text_root_unity_bound.x, "y": text_root_unity_bound.y}; });
 	var path = fft_group.select("#fft-poly-tree-upside-down").append("path").style({"fill": "none", "stroke": "black"}).attr("d", arc(1));
-	_my.vislib.animatePath(path, 1000, 0, false, 0.85);
+	_my.vislib.animatePath(path, animation_duration, 0, false, 0.85);
 	return {path: path, circle: highlight_circ};
     }
     function digLen(val) {
@@ -681,10 +675,12 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 
     function prepareMultiplyLayout(N, node_size, fft_group, group_name, left_margin, top_margin) {
 	var node_num = 2*N - 1;
+	var node_width_coef = 1.57;
 	var last_level = Math.floor(Math.log2(N)) + 2;
 	var group = fft_group.append("g").attr("id", group_name). attr("transform", "translate(" + left_margin + ", " + top_margin + ")");
 	var data = [{v:0, children:[1]}, {v:1, children:[2]}, {v:2, children:[3,6]}, {v:3, children:[4]},
 		   {v:4, children: [5]}, {v:5, children:[]}, {v:6, children: [7]}, {v:7, children: [8]}, {v:8, children: []}];
+	data.forEach(function(d) { d.node_width = node_width_coef * node_size; });
 
 	var tree = d3.layout.tree()
 	    .children(function(d) {
@@ -694,7 +690,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 		}
 		return children;
 	    })
-	    .nodeSize([node_size, 4*node_size])
+	    .nodeSize([node_width_coef*node_size, 4*node_size])
 	    .separation(function(a, b) {
 		return (a.parent == b.parent ? ((a.depth == last_level) ? 1.5 : 8) : 2);
 	    })
@@ -716,21 +712,24 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    .attr("transform", function(d) { return "translate(" + d.x + " " + d.y + ")";})
 	node_gs.append("circle").attr("class", "fft-node-circle").attr("r", node_size / 2);
     }// end of prepareMultiplyLayout
-    function animateNodeMultDrawing(node_id, draw_function, polynom, third_argument_bool_value) {
+    function animateNodeMultDrawing(node_id, draw_function, polynom, third_argument_bool_value, algo_ctx) {
+	var animation_duration = 2 * algo_ctx.getBaselineAnimationSpeed();
     	var mult_tree = d3.select("#multiply-poly-tree");
 	var nodea = mult_tree.select("#fft-node-num" + node_id);
-	var transition = _my.vislib.animateGrowingArrows(mult_tree, mult_tree.selectAll(".fft-link-to" + node_id), 1000, 0, false, 0.7);
+	var transition = _my.vislib.animateGrowingArrows(mult_tree, mult_tree.selectAll(".fft-link-to" + node_id), animation_duration, 0, false, 0.7);
 	transition.each("end", function() {
 	    draw_function.call(null, polynom, nodea, third_argument_bool_value, true); // in non-strict mode if this==null it's replaced by global
 	});
-	return 1000;
+	return animation_duration;
     }
 
-    tree_mult_offset_x = 410;
-    tree_mult_offset_y = 1080;
+    var tree_mult_offset_x = 600;
+    var tree_mult_offset_y = 1080;
+    var mult_node_size = 50;
     var fft_calls = [];
     fft_calls[2] = function(p, q, N, nearest2Pow) {
-	prepareMultiplyLayout(nearest2Pow, 50, multiply_group, "multiply-poly-tree", 0, 0);
+	multiply_group.select("#multiply-poly-tree").remove();
+	prepareMultiplyLayout(nearest2Pow, mult_node_size, multiply_group, "multiply-poly-tree", 0, 0);
 	var mult_tree = d3.select("#multiply-poly-tree");
 	mult_tree.attr("transform", "translate(" + tree_mult_offset_x + ", " + tree_mult_offset_y +") scale(-1,1) rotate(180)");
 	var nodea = mult_tree.select("#fft-node-num5");
@@ -739,23 +738,24 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	drawPoly(q, nodeb, true, true);
     }
     fft_calls[6] = function(p) {
-	return animateNodeMultDrawing(4, drawPoly, p, false);
+	return animateNodeMultDrawing(4, drawPoly, p, false, this.AlgorithmContext);
     };
     fft_calls[9] = function(q) {
-	return animateNodeMultDrawing(7, drawPoly, q, false);
+	return animateNodeMultDrawing(7, drawPoly, q, false, this.AlgorithmContext);
     };
     fft_calls[10] = function(p) {
-	return animateNodeMultDrawing(3, drawCoefs, p, false);
+	return animateNodeMultDrawing(3, drawCoefs, p, false, this.AlgorithmContext);
     };
     fft_calls[11] = function(q) {
-	return animateNodeMultDrawing(6, drawCoefs, q, false);
+	return animateNodeMultDrawing(6, drawCoefs, q, false, this.AlgorithmContext);
     };
     fft_calls[13] = {"pre" : function(nearest2Pow) {
 	var empty_pol = new Array(nearest2Pow);
 	empty_pol.fill(0);
-	return animateNodeMultDrawing(2, drawCoefs, empty_pol, true);
+	return animateNodeMultDrawing(2, drawCoefs, empty_pol, true, this.AlgorithmContext);
     }};
-    fft_calls[14] = function(res, p, q, i) {
+    fft_calls[14] = function(res, p, q, i, nearest2Pow) {
+	var animation_duration = (4/5) * this.AlgorithmContext.getBaselineAnimationSpeed();
 	var mult_tree = d3.select("#multiply-poly-tree");
 	var elem_to_draw_from1 = mult_tree.select("#fft-node-num3")
 	var elem_to_draw_from2 = mult_tree.select("#fft-node-num6")
@@ -763,7 +763,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	var visible_coefs1 = elem_to_draw_from1.select(".fft-coef-text-false");
 	var visible_coefs2 = elem_to_draw_from2.select(".fft-coef-text-false");
 	var invisible_coefs = elem_to_draw_into.select(".fft-coef-text-true");
-	invisible_coefs.select(".fft-coef-" + i).text("" + res[i] + ",").style("visibility", "visible");
+	invisible_coefs.select(".fft-coef-" + i).text("" + res[i] + (i!=nearest2Pow-1 ? "," : "")).style("visibility", "visible");
 
 	var ci1 = visible_coefs1.select(".fft-coef-" + i).classed("fft-coefs-highlight", true)
 	var ci2 = visible_coefs2.select(".fft-coef-" + i).classed("fft-coefs-highlight", true)
@@ -772,18 +772,49 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    ci1.classed("fft-coefs-highlight", false)
 	    ci2.classed("fft-coefs-highlight", false)
 	    cf.classed("fft-coefs-highlight", false)
-	}, 400);
-	return 400;
+	}, animation_duration);
+	return animation_duration;
     };
     fft_calls[16] = function(res) {
-	return animateNodeMultDrawing(1, drawCoefs, res, false);
+	return animateNodeMultDrawing(1, drawCoefs, res, false, this.AlgorithmContext);
+    };
+    fft_calls[21] = function(res, i, nearest2Pow, temp) {
+	var animation_duration = (4/5) * this.AlgorithmContext.getBaselineAnimationSpeed();
+	var mult_tree = d3.select("#multiply-poly-tree");
+	var elem_to_draw_into = mult_tree.select("#fft-node-num1")
+	var ci1 = elem_to_draw_into.select(".fft-coef-" + i).classed("fft-coefs-highlight", true);
+	var ci2 = elem_to_draw_into.select(".fft-coef-" + (nearest2Pow - i)).classed("fft-coefs-highlight-green", true);
+	setTimeout(function() {
+	    ci1.text("" + res[i] + ",");
+	    ci1.classed("fft-coefs-highlight", false).classed("fft-coefs-highlight-green", true)
+	    ci2.text("" + res[nearest2Pow - i] + (i != 0 ? "," : ""));
+	    ci2.classed("fft-coefs-highlight-green", false).classed("fft-coefs-highlight", true)
+	    setTimeout(function() {
+		ci1.classed("fft-coefs-highlight-green", false)
+		ci2.classed("fft-coefs-highlight", false)
+	    }, animation_duration);
+	}, animation_duration);
+	return 2*animation_duration;
+    };
+    fft_calls[24] = function(res, i, nearest2Pow) {
+	var animation_duration = (1/5) * this.AlgorithmContext.getBaselineAnimationSpeed();
+	var idx = (i == 0) ? 0 : (i < nearest2Pow / 2) ? nearest2Pow - i : i;
+	var mult_tree = d3.select("#multiply-poly-tree");
+	var elem_to_draw_into = mult_tree.select("#fft-node-num1")
+	var ci1 = elem_to_draw_into.select(".fft-coef-" + idx)
+	    .text("" + Math.round10(res[i].real, -2) + (i != nearest2Pow-1 ? "," : "")).classed("fft-coefs-highlight", true);
+	setTimeout(function() {
+	    ci1.classed("fft-coefs-highlight", false)
+	}, animation_duration);
+	return animation_duration;
     };
     fft_calls[26] = { "pre": function(res) {
-	return animateNodeMultDrawing(0, drawPoly, res, true);
+	return animateNodeMultDrawing(0, drawPoly, res, true, this.AlgorithmContext);
     }};
-    var fft = new _my.Algorithm(FFT_multiply, fft_calls, "fft-code", {default_animation_duration : 200}, function() {
+    var mult_algo_ctx = _my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj);
+    var fft = new _my.Algorithm(FFT_multiply, fft_calls, "fft-code", mult_algo_ctx, function() {
 	_my.AlgorithmUtils.resetControls(algorithmTabId);
-    }); 
+    });
 
     // we need a kickoff function that will start the multiply algorithm
     function kickoff_fft_multiply(executionFunction) {
@@ -801,40 +832,9 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	console.log("After fft multiply", "" + result);
 	executionFunction();
     };
-
-    d3.select("#" + algorithmTabId + " .code")
-    	.append("div")
-    	.attr("class", "fft-code")
-	.style("display", "none")
-        .append("div")
-    	.attr("class", "function-code-holder")
-    	.append("pre")
-    	.attr("class", "prettyprint lang-js linenums:1")
-    	.append("code")
-    	.attr("class", "language-js")
-    	.text(fft.toString());
-
-    d3.select("#" + algorithmTabId + " .code")
-    	.append("div")
-    	.attr("class", "calc-code")
-        .append("div")
-    	.attr("class", "function-code-holder")
-    	.append("pre")
-    	.attr("class", "prettyprint lang-js linenums:1")
-    	.append("code")
-    	.attr("class", "language-js")
-    	.text(calc.toString());
-
-    d3.select("#" + algorithmTabId + " .code")
-    	.append("div")
-    	.attr("class", "eval-code")
-        .append("div")
-    	.attr("class", "function-code-holder")
-    	.append("pre")
-    	.attr("class", "prettyprint lang-js linenums:1")
-    	.append("code")
-    	.attr("class", "language-js")
-    	.text(ev.toString());
+    _my.AlgorithmUtils.appendCode(algorithmTabId, "calc-code", calc);
+    _my.AlgorithmUtils.appendCode(algorithmTabId, "eval-code", ev);
+    _my.AlgorithmUtils.appendCode(algorithmTabId, "fft-code", fft).style("display", "none");
 
     $(".fft-radio-button").click(function() {
 	$(this).addClass("active").siblings().removeClass("active");
@@ -844,8 +844,8 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	$(".eval-code").css("display", "none");
 	$(".calc-code").css("display", "none");
 	$(".fft-code").css("display", "inline");
-	fft_group.style("display", "none");
-	multiply_group.style("display", "inline");
+	svg_fft_elem.style("display", "none");
+	svg_multiply_elem.style("display", "inline");
 	//we attach the kickoff_fft_multiply to the default controls
 	_my.AlgorithmUtils.attachAlgoToControls(fft, algorithmTabId, kickoff_fft_multiply);
 
@@ -857,8 +857,8 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	$(".eval-code").css("display", "inline");
 	$(".calc-code").css("display", "inline");
 	$(".fft-code").css("display", "none");
-	fft_group.style("display", "inline");
-	multiply_group.style("display", "none");
+	svg_fft_elem.style("display", "inline");
+	svg_multiply_elem.style("display", "none");
 	//we attach the kickoff_fft_multiply to the default controls
 	_my.AlgorithmUtils.attachAlgoToControls(ev, algorithmTabId, kickoff_fft_trans);
     });

@@ -94,9 +94,9 @@ li.highlighted-row {
 
 /* control panel css3 animation */
 .a-btn{
-    background: linear-gradient(top, #80a9da 0%, #6f97c5 100%);
-    background: -webkit-linear-gradient(top, #80a9da 0%, #6f97c5 100%);
-    background: -moz-linear-gradient(top, #80a9da 0%, #6f97c5 100%);
+    background: linear-gradient(to bottom, #5BC0DE 0%, #2AABD2 100%);
+    background: -webkit-linear-gradient(to bottom, #5BC0DE 0%, #2AABD2 100%);
+    background: -moz-linear-gradient(to bottom, #5BC0DE 0%, #2AABD2 100%);
     padding-right: 55px;
     height: 49px;
     display: inline-block;
@@ -213,4 +213,15 @@ li.highlighted-row {
 }
 .a-btn.disabled-btn .a-btn-icon {
     opacity: 0.5;
+}
+
+svg.gauge {
+    float: left;
+}
+
+.speed-controls-buttons-div {
+    float: left;
+}
+.speed-controls-buttons-div > p {
+    margin: 0px 0px 1px 0px;
 }

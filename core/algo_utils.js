@@ -33,12 +33,14 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
     }
 
     AlgorithmUtils.insertCustomControls = function(controlsDiv, algorithmId, algorithmName, comments) {
-	controlsDiv.append("div").attr("class", "custom-controls-header").text(algorithmName + " Controls:");
+	var customControlsHolder = controlsDiv.append("div").attr("class", "custom-controls-holder");
+	customControlsHolder.append("div").attr("class", "custom-controls-header").text(algorithmName + " Controls:");
 
 	if (comments !== undefined) {
-	    var exRadioDiv = controlsDiv.append("div").attr("class", "custom-controls-comments-section");
-	    exRadioDiv.append("p").attr("class", "controls-info-text").text(comments);
+	    customControlsHolder.append("div").attr("class", "custom-controls-comments-section")
+		.append("p").attr("class", "controls-info-text").text(comments);
 	}
+	return customControlsHolder;
     }
 
     // create and populate a section for standard algorithm controls
@@ -50,11 +52,31 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 	}
 
 	controlsDiv.append("div").attr("class", "controls-header").text("General Controls:");
-	var defaultControls = controlsDiv.append("div").attr("class", "default-controls");
-	var exRadioDiv = defaultControls.append("div").attr("class", "execution-type-radios");
+	var defaultControls = controlsDiv.append("table").attr("class", "default-controls table").append("tr");
+	var exRadioDiv = defaultControls.append("td")
+	    .style("vertical-align", "top")
+	    .append("div").attr("class", "execution-type-radios");
 	exRadioDiv.append("p").attr("class", "controls-info-text").text("Choose how to execute the algorithm:");
 	appendButton(exRadioDiv, "play-btn", algorithmId, "Start the algorithm in continuous mode (the algorithm will run on its own)");
 	appendButton(exRadioDiv, "next-btn", algorithmId, "Take the next step in the algorithm in step-by-step mode (you have to click for the algorithm to keep going)");
+	var speedDialCell = defaultControls.append("td").attr("id", algorithmId + "speed-dial-div");
+	speedDialCell.append("p").attr("class", "controls-info-text").text("Adjust the speed at which to run the algorithm:");
+//	speedDialCell.append("div")
+	var gaugeObj = _my.vislib.addSpeedGauge("#" + algorithmId + "speed-dial-div", 0.6);
+	var buttonsDiv = speedDialCell.append("div").attr("class", "speed-controls-buttons-div");
+	buttonsDiv.append("p").append("button").attr("class", "btn btn-info btn-sm")
+	    .on("click", function() {
+		var current = gaugeObj.getValue();
+		gaugeObj.update(current+1);
+	    })
+	    .append("span").attr("class", "glyphicon glyphicon-plus");
+	buttonsDiv.append("p").append("button").attr("class", "btn btn-info btn-sm")
+	    .on("click", function() {
+		var current = gaugeObj.getValue();
+		gaugeObj.update(current-1);
+	    }).append("span").attr("class", "glyphicon glyphicon-minus");
+
+	return {"speedGauge" : gaugeObj};
     }
 
     AlgorithmUtils.resetControls = function(algorithmId) {
@@ -133,16 +155,16 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
     }
 
     // for adding a new frame for a recursive algorithm
-    AlgorithmUtils.visualizeNewStackFrame = function(codeContainerId) {
-	var duration = 1000;
-	var delay = 500;
+    AlgorithmUtils.visualizeNewStackFrame = function(codeContainerId, algorithmCtx) {
+	var duration = 2 * algorithmCtx.getBaselineAnimationSpeed();
+	var delay = algorithmCtx.getBaselineAnimationSpeed();
 	var selector = "." + codeContainerId + " div:last-of-type";
 	var height = $(selector).height();
 	var frow_height = $(selector + " li:nth-child(1)").height();
 	var clone = $(selector).clone();
 	var ds = d3.select(selector);
 	ds.style({"overflow": "hidden", "margin-bottom": "5px"}).attr("data-oldheight", height + "px");
-	ds.transition().duration(duration).style("height", frow_height + "px");
+	ds.style("height", frow_height + "px");
 	setTimeout(function() {
 	    clone.insertAfter(selector);
 	    AlgorithmUtils.clearComments(codeContainerId);
@@ -151,16 +173,10 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 	return duration + delay;
     }
 
-    //remove dynamic comments (values of variables appended with // during execution of the algorithm)
-    AlgorithmUtils.clearComments = function(codeContainerId) {
-	var selector = "." + codeContainerId + " div:last-of-type";
-	d3.select(selector).selectAll("span.com.dynamic").remove();
-    }
-
-    //remove an old stack frame and expand the previous one
-    AlgorithmUtils.popStackFrame = function(codeContainerId) {
-	var duration = 1000;
-	var delay = 500;
+   //remove an old stack frame and expand the previous one
+    AlgorithmUtils.popStackFrame = function(codeContainerId, algorithmCtx) {
+	var duration = 2 * algorithmCtx.getBaselineAnimationSpeed();
+	var delay = algorithmCtx.getBaselineAnimationSpeed();
 	var selector = "." + codeContainerId + " div:last-of-type";
 	d3.select(selector).remove();
 	var ds = d3.select(selector);
@@ -170,6 +186,12 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 	return duration + delay;
     }
 
+    //remove dynamic comments (values of variables appended with // during execution of the algorithm)
+    AlgorithmUtils.clearComments = function(codeContainerId) {
+	var selector = "." + codeContainerId + " div:last-of-type";
+	d3.select(selector).selectAll("span.com.dynamic").remove();
+    }
+ 
     //comupte a viewBox to scale svg contents properly on smaller screen sizes
     AlgorithmUtils.calcViewBox = function(parentId, width, height) {
 	var parentWidth = $(parentId).width() * 1.0;
@@ -225,6 +247,67 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 	};
     }
 
+    AlgorithmUtils.createAlgorithmContext = function(controlsObj) {
+	if (controlsObj === undefined) {
+	    return {
+		getBaselineAnimationSpeed : function() { return 0; }
+	    };
+	}
+	return { 
+	    getBaselineAnimationSpeed : function() {
+		return controlsObj.speedGauge.getSpeed();
+	    }
+	};
+    };
+
+    AlgorithmUtils.setupLayout = function(algorithmTabId, algorithmName, algorithmPriorityCode, columnWidths, comments) {
+	var layout = {};
+	
+	AlgorithmUtils.insertIntoHeaderList("#" + algorithmTabId, algorithmName, algorithmPriorityCode);
+	
+	layout.row0 = d3.select("#algoContainer")
+    	    .append("div").attr("class", "tab-pane").attr("id", algorithmTabId)
+            .append("div").attr("class", "container-fluid")
+    	    .append("div").attr("class", "row")
+	layout.leftPanel = layout.row0.append("div").attr("class", "col-md-" + columnWidths[0])
+	layout.controlsPanel = layout.leftPanel.append("div").attr("class", "row controls")
+    	    .append("div").attr("class", "col-md-12")
+    	    .append("div").attr("class", "panel panel-default");
+	layout.controlsPanel.append("div").attr("class", "panel-heading").text("Controls:");
+
+	layout.leftPanelBody = layout.controlsPanel.append("div").attr("class", "panel-body");
+	layout.ops = layout.leftPanelBody.append("div").attr("class", "options");
+	layout.defaultControlsObj = AlgorithmUtils.insertDefaultControls(layout.ops, algorithmTabId);
+	layout.customControlsLayout = AlgorithmUtils.insertCustomControls(layout.ops, algorithmTabId, algorithmName, comments);
+	
+	layout.visPanel = layout.leftPanel.append("div").attr("class", "row")
+    	    .append("div").attr("class", "col-md-12")
+    	    .append("div").attr("class", "panel panel-default");
+	layout.visPanel.append("div").attr("class", "panel-heading").text("Algorithm Visualization");
+	layout.visPanel.append("div").attr("class", "panel-body graphics");
+
+	layout.codePanel = layout.row0.append("div").attr("class", "col-md-" + columnWidths[1])
+    	    .append("div").attr("class", "panel panel-default");
+	layout.codePanel.append("div").attr("class", "panel-heading").text("Code");
+	layout.codePanel.append("div").attr("class", "panel-body code");
+
+
+	return layout;
+    };
+
+    AlgorithmUtils.appendCode = function(algorithmTabId, codeContainerId, algo) {
+	var code_holder = d3.select("#" + algorithmTabId + " .code")
+	    .append("div")
+	    .attr("class", codeContainerId)
+	code_holder.append("div")
+	    .attr("class", "function-code-holder")
+	    .append("pre")
+            .attr("class", "prettyprint lang-js linenums:1")
+	    .append("code")
+            .attr("class", "language-js")
+            .text(algo);
+	return code_holder;
+    };
     //return the augmented module
     _my.AlgorithmUtils = AlgorithmUtils;
     return _my;
