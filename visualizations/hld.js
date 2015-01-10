@@ -12,14 +12,6 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
     /*******************************/
     console.debug("downloaded hld");
     var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName, "a-hld", [5, 7]);
-    layout.customControlsLayout.append("button")
-	.attr("class", "btn btn-default btn-sm")
-	.attr("title", "Permute the tree input data. (You want to do this .. Trust me!")
-        .on("click", function() {
-	    d3.select("#hld-tree-group").remove();
-	    initialize(createRandomTree(TREE_SIZE));
-	})
-	.text("Shuffle Data");
     /*********************/
     /*** HLD functions ***/
     /*********************/
@@ -193,10 +185,18 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
 	nodes.isLeafNode = function(val) { return this[val].children.length == 0; };
 	return nodes;
     }
-
     var tree = createRandomTree(TREE_SIZE);
     initialize(tree);
+    layout.customControlsLayout.append("button")
+	.attr("class", "btn btn-default btn-sm")
+	.attr("title", "Permute the tree input data. (You want to do this .. Trust me!")
+        .on("click", function() {
+	    d3.select("#hld-tree-group").remove();
+	    tree = initialize(createRandomTree(TREE_SIZE));
+	})
+	.text("Shuffle Data");
 
+    
     _my.AlgorithmUtils.attachAlgoToControls(ss_algo, algorithmTabId, function(play_callback){
 	ss_algo.run(tree, 0);
 	chains = {chainLengths: undefined, 
