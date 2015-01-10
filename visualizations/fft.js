@@ -660,15 +660,13 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     function kickoff_fft_trans(executionFunction) {
 	console.log("Before fft transform", "" + poly_ev);
 	cleanup();
-	var sharedEv = function(poly, len, start, helper_arr, Complex) {
-	    return ev.runWithSharedAnimationQueue(fft, poly, start, len, helper_arr, Complex);
-	}
 	var sharedCalc = function(idx, N, Complex) {
 	    return calc.runWithSharedAnimationQueue(ev, idx, N, Complex);
 	}
-	Complex.calc_unity = sharedCalc;
+	var ComplexClone = _my.AlgorithmUtils.clone(Complex);
+	ComplexClone.calc_unity = sharedCalc;
 	var p = poly_ev.slice();
-	var result = ev.startAnimation(p, 0, p.length, [], Complex);
+	var result = ev.startAnimation(p, 0, p.length, [], ComplexClone);
 	console.log("After fft transform", "" + p);
 	executionFunction();
     };
