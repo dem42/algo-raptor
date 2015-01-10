@@ -1,0 +1,12 @@
+.hld-link {
+    fill: none;
+    stroke: #000;
+    stroke-width: 1.5px;
+}
+
+.hld-circle {
+    cursor: move;
+    fill: #ccc;
+    stroke: #333;
+    stroke-width: 1.5px;
+}

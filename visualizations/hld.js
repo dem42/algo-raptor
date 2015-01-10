@@ -59,15 +59,84 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
 	    }
 	}
     }
+    /**********************/
+    /** Visualizations  ***/
+    /**********************/
+    var hld_callbacks = [];
+    var ss_callbacks = [];
+    var margin = { left: 10, top: 30, right: 10, bottom: 100};
+    var svg = d3.select("#" + algorithmTabId + " .graphics").append("svg")
+	.attr("width",  "900px")
+	.attr("height", "1050px")
+	.append("g")
+	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    function createNodes(tree) {
+	var nodes = [];
+	for (var i = 0; i <= tree.size; i++) {
+	    nodes.push(tree[i]);
+	}
+	return nodes;
+    }
+    function createLinks(tree) {
+	var links = [];
+	for (var i = 0; i < tree.size; i++) {
+	    var ch = tree[i].children;
+	    for (var j = 0; j < ch.length; j++) {
+		links.push({source: tree[i], 
+			    target: tree[ch[j]]});
+	    }
+	}
+	return links;
+    }
+    function initialize(tree) {
+	var nodes = createNodes(tree);
+	var links = createLinks(tree);
+	var force = d3.layout.force()
+	    .size([600, 600])
+	    .nodes(nodes)
+	    .links(links)
+	    .charge(-600)
+	    .linkDistance(200)
+	    .start();
+
+	var diag = d3.svg.diagonal();
+	var flinks = svg.selectAll("hld-link")
+	    .data(links)
+	    .enter()
+	   .append("line")
+	    .attr("class", "hld-link")
+	    .attr("id", function(d) { return "hld-link-from-" + d.source.idx + "-to-" + d.target.idx; });
+
+	var fnodes = svg.selectAll("hld-circle")
+	    .data(nodes)
+	    .enter()
+	   .append("circle")
+	    .attr("class", "hld-circle")
+	    .attr("id", function(d) { return "hld-node-" + d.idx; })
+	    .attr("r", 20)
+	    .call(force.drag())
+
+	force.on("tick", function() {
+	    fnodes
+		.attr("cx", function(d) { return d.x; })
+		.attr("cy", function(d) { return d.y; })
+	    
+	    flinks
+		.attr("x1", function(d) { return d.source.x; })
+		.attr("y1", function(d) { return d.source.y; })
+		.attr("x2", function(d) { return d.target.x; })
+		.attr("y2", function(d) { return d.target.y; })
+	});
+    }
+    ss_callbacks[0] = function(tree) {
+    }
 
     /******************/
     /** Wiring code ***/
     /******************/
-    var hld_callbacks = [];
     var hld_context = _my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj);
     var hld_algo = new _my.Algorithm(heavyLightDecomposition, hld_callbacks, "hld-code", hld_context);
-
-    var ss_callbacks = [];
     var ss_context = _my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj);
     var ss_algo = new _my.Algorithm(computeSubtreeSize, ss_callbacks, "ss-code", ss_context);
 
@@ -88,6 +157,7 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
     tree.isLeafNode = function(val) { return this[val].children.length == 0; };
 
     _my.AlgorithmUtils.attachAlgoToControls(ss_algo, algorithmTabId, function(){
+	initialize(tree);
 	ss_algo.run(tree, 0);
 	chains = {chainLengths: undefined, 
 		  chainHeads: undefined, 
