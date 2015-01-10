@@ -25,8 +25,10 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
     /*********************/
     function computeSubtreeSize(tree, current_node) {
 	tree[current_node].subTreeSize = 1;
-	for (var idx = 0; idx < tree[current_node].children.length; idx++) {
-	    tree[current_node].subTreeSize += computeSubtreeSize(tree, tree[current_node].children[idx]);
+	var children = tree[current_node].children;
+	for (var idx = 0; idx < children.length; idx++) {
+	    var sub_result = computeSubtreeSize(tree, children[idx]);
+	    tree[current_node].subTreeSize += sub_result;
 	}
 	return tree[current_node].subTreeSize;
     }
@@ -37,11 +39,9 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
 	chains.chainIdx[current_node] = current_chain;
 	chains.chainPos[current_node] = chains.chainLengths[current_chain];
 	chains.chainLengths[current_chain]++;
-	
 	if (tree.isLeafNode(current_node)) {
 	    return;
 	}
-
 	var maxSubTreeSize = -1;
 	var specialChild = -1;
 	var children = tree[current_node].children;
@@ -52,7 +52,6 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
 	    }
 	}
 	heavyLightDecomposition(tree, specialChild, current_chain, chains);
-
 	for (var idx = 0; idx < children.length; idx++) {
 	    if (children[idx] != specialChild) {
 		var new_chain_num = ++chains.numChains;
@@ -90,12 +89,13 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
 	}
 	return links;
     }
+    var radius = 20;
     function initialize(tree) {
 	var tree_group = svg.append("g").attr("id", "hld-tree-group");
 	var nodes = createNodes(tree);
 	var links = createLinks(tree);
 	var force = d3.layout.force()
-	    .size([600, 600])
+	    .size([800, 700])
 	    .nodes(nodes)
 	    .links(links)
 	    .charge(-600)
@@ -119,10 +119,10 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
 	    .call(force.drag())
 	fnodes.append("circle")
 	     .attr("class", "hld-circle")
-	     .attr("r", 20)
+	     .attr("r", radius)
 
 	tree_group.select("#hld-node-" + 0).append("text").attr("class", "hld-root-id")
-	    .attr("dx", "-1em").text("Root");
+	    .attr("text-anchor", "middle").text("Root");
 
 	// this function is called on tick events inside the force graph and it's how we simulate node movement
 	force.on("tick", function() {
@@ -138,8 +138,20 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
 		.attr("y2", function(d) { return d.target.y; })
 	});
     }
-    ss_callbacks[0] = function(tree) {
-    }
+    ss_callbacks[1] = function(tree, current_node) {
+	svg.select("#hld-node-" + current_node).append("text").attr("class", "hld-size-label")
+	    .attr("dx", -radius).attr("dy", -radius).attr("text-anchor", "middle").text(tree[current_node].subTreeSize);
+    };
+    ss_callbacks[4] = function(tree, current_node, idx, sub_result) {
+	var id = tree[current_node].children[idx];
+	svg.select("#hld-link-from-" + current_node + "-to-" + id).classed("hld-link-highlighted", true);
+	svg.select("#hld-node-" + current_node + " .hld-size-label").text(tree[current_node].subTreeSize + " + " + sub_result);
+	return this.AlgorithmContext.getBaselineAnimationSpeed();
+    };
+    ss_callbacks[5] = function(tree, current_node, idx) {
+	svg.select("#hld-node-" + current_node + " .hld-size-label").text(tree[current_node].subTreeSize);	
+    };
+
 
     /******************/
     /** Wiring code ***/
@@ -153,7 +165,8 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
     _my.AlgorithmUtils.appendCode(algorithmTabId, "hld-code", hld_algo);
 
     // the randomness here isn't good i think .. certain shapes are very improbable whereas
-    // all shapes should have the same probablitity
+    // all shapes should have the same probablitity (maybe it's okay .. the prob of a every labelled shape is 
+    // the same isn't it? at every stage the prob of picking the number we picked is the same 
     function createRandomTree(N) {
 	var nodes = {};
 	for (var i = 0; i < N; i++) {
@@ -182,7 +195,7 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
     // tree.size = 8;
     // tree.isLeafNode = function(val) { return this[val].children.length == 0; };
 
-    _my.AlgorithmUtils.attachAlgoToControls(ss_algo, algorithmTabId, function(){
+    _my.AlgorithmUtils.attachAlgoToControls(ss_algo, algorithmTabId, function(play_callback){
 	ss_algo.run(tree, 0);
 	chains = {chainLengths: undefined, 
 		  chainHeads: undefined, 
@@ -199,6 +212,7 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
 	chains.chainIdx.fill(undefined);
 	hld_algo.runWithSharedAnimationQueue(ss_algo, tree, 0, 0, chains);
 	console.log(tree, chains);
+	play_callback();
     });
 
     //return {"hld": heavyLightDecomposition, "hld-algo": hld_algo};

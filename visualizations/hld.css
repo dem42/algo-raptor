@@ -4,6 +4,12 @@
     stroke-width: 1.5px;
 }
 
+.hld-link-highlighted {
+    fill: none;
+    stroke: #00f;
+    stroke-width: 2px;
+}
+
 .hld-circle {
     cursor: move;
     fill: #ccc;
@@ -12,8 +18,19 @@
 }
 
 .hld-root-id {
+    cursor: move;
+    pointer-events: none;
     fill: #f00;
     stroke: #f00;
+    font-size: small;
+    font-family: monospace;
+}
+
+.hld-size-label {
+    cursor: move;
+    pointer-events: none;
+    fill: #00f;
+    stroke: #00f;
     font-size: small;
     font-family: monospace;
 }
