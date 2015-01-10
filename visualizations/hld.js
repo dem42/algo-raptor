@@ -127,10 +127,7 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
 	// this function is called on tick events inside the force graph and it's how we simulate node movement
 	force.on("tick", function() {
 	    fnodes
-		// .attr("cx", function(d) { return d.x; })
-		// .attr("cy", function(d) { return d.y; })
-	    .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")";})
-	    
+		.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")";})
 	    flinks
 		.attr("x1", function(d) { return d.source.x; })
 		.attr("y1", function(d) { return d.source.y; })
@@ -138,6 +135,7 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
 		.attr("y2", function(d) { return d.target.y; })
 	});
     }
+    // compute subtree size callbacks -> show small number of subtree size and colorful edges that are done
     ss_callbacks[1] = function(tree, current_node) {
 	svg.select("#hld-node-" + current_node).append("text").attr("class", "hld-size-label")
 	    .attr("dx", -radius).attr("dy", -radius).attr("text-anchor", "middle").text(tree[current_node].subTreeSize);
@@ -152,14 +150,29 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
 	svg.select("#hld-node-" + current_node + " .hld-size-label").text(tree[current_node].subTreeSize);	
     };
 
+    // hld callbacks colors for chains and special child animation 
+    var chain_colors = d3.scale.category10();
+    hld_callbacks[4] = function(tree, current_chain, current_node, chains) {
+	var parent = tree[current_node].parent_idx;
+	svg.select("#hld-node-" + current_node + " circle")
+	    .style({"stroke": chain_colors(current_chain),
+		   "stroke-width": "5"});
+	if (parent !== undefined) {
+	    svg.select("#hld-link-from-" + parent + "-to-" + current_node).classed("hld-link-highlighted", false)
+		.style({"stroke": chain_colors(current_chain),
+		       "stroke-width": "3px"});
+	}
+    };
 
     /******************/
     /** Wiring code ***/
     /******************/
-    var hld_context = _my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj);
-    var hld_algo = new _my.Algorithm(heavyLightDecomposition, hld_callbacks, "hld-code", hld_context);
-    var ss_context = _my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj);
-    var ss_algo = new _my.Algorithm(computeSubtreeSize, ss_callbacks, "ss-code", ss_context);
+    var remover = function() {
+	_my.AlgorithmUtils.resetControls(algorithmTabId);
+    }
+    var context = _my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj);
+    var hld_algo = new _my.Algorithm(heavyLightDecomposition, hld_callbacks, "hld-code", context, remover);
+    var ss_algo = new _my.Algorithm(computeSubtreeSize, ss_callbacks, "ss-code", context, remover);
 
     _my.AlgorithmUtils.appendCode(algorithmTabId, "ss-code", ss_algo);
     _my.AlgorithmUtils.appendCode(algorithmTabId, "hld-code", hld_algo);
@@ -170,10 +183,10 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
     function createRandomTree(N) {
 	var nodes = {};
 	for (var i = 0; i < N; i++) {
-	    nodes[i] = {idx: i, children: []};
+	    nodes[i] = {idx: i, children: [], parent_idx: undefined};
 	    if (i > 0) {
-		var parent = Math.floor(Math.random() * (i - 1));
-		nodes[parent].children.push(i);
+		nodes[i].parent_idx = Math.floor(Math.random() * (i - 1));
+		nodes[nodes[i].parent_idx].children.push(i);
 	    }
 	}
 	nodes.size = N - 1;
@@ -183,17 +196,6 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
 
     var tree = createRandomTree(TREE_SIZE);
     initialize(tree);
-    // tree[0] = {idx: 0, children: [1, 3, 5]};
-    // tree[1] = {idx: 1, children: [2, 4]};
-    // tree[2] = {idx: 2, children: []};
-    // tree[3] = {idx: 3, children: []};
-    // tree[4] = {idx: 4, children: [6]};
-    // tree[5] = {idx: 5, children: [7]};
-    // tree[6] = {idx: 6, children: [8]};
-    // tree[7] = {idx: 7, children: []};
-    // tree[8] = {idx: 8, children: []};
-    // tree.size = 8;
-    // tree.isLeafNode = function(val) { return this[val].children.length == 0; };
 
     _my.AlgorithmUtils.attachAlgoToControls(ss_algo, algorithmTabId, function(play_callback){
 	ss_algo.run(tree, 0);
