@@ -12,8 +12,9 @@
 }
 
 .q-rec-depth-label {
-    stroke: magenta;
-    fill: magenta;
+    fill: black;
+    stroke: none;
+    text-decoration: underline;
     font-size:120%;
 }
 
@@ -24,7 +25,7 @@
 
 #qsort-pivot > text {
     pointer-events: none;
-    stroke: red;
+    stroke: none;
     fill: red;
     text-anchor: middle; 
     font-size: 120%;
