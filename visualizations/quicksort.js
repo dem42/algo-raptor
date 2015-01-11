@@ -92,8 +92,8 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	    .data(data)
 	    .enter()
 	    .append("radialGradient")
-	    .attr("class", "gradients")
-	    .attr("id", function(d, i) { return "gradient-" + i; })
+	    .attr("class", "qsort-gradients")
+	    .attr("id", function(d, i) { return "qsort-gradient-" + i; })
 	    .attr("fx", "50%")
 	    .attr("fy", "50%")
 	    .attr("r", "70%")
@@ -101,7 +101,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	    .attr("offset", "25%")
 	    .attr("stop-color", "white");
 
-	svg.selectAll(".gradients")
+	svg.selectAll(".qsort-gradients")
     	    .append("stop")
 	    .attr("offset", "75%")
 	    .attr("stop-color", randomColor);
@@ -117,7 +117,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	    .append("circle")
 	    .attr("id", function(d, i) { return "q-circle-" + i; })
 	    .attr("class", "quicksort-circle")
-	    .attr("fill", function(d, i) { return "url(#gradient-" + i +")";})
+	    .attr("fill", function(d, i) { return "url(#qsort-gradient-" + i +")";})
 	    .attr("r", function(d) {
 		return computeWidth(d.val);
 	    });
@@ -125,8 +125,6 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	    .append("text")
 	    .attr("class", "quicksort-text")
 	    .style("font-size", function(d) { return ((computeWidth(d.val) / mini_width) * 100) + "%"; })
-	    .attr("dx", function(d) { return ((d.val > 9 ? 2 : 1)*-0.30) + "em"; })
-	    .attr("dy", function(d) { return "0.22em"; })
 	    .text(function(d) { return d.val; });
     }
     // now call the initialization
@@ -136,19 +134,31 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
     /**  Setup algorithms ****/
     /*************************/
     var q_callbacks = [];
+    var recursion_depth = -1; // this is used by the callbacks to determine the depth of the recursion
     q_callbacks[0] = function(data, left, right) {
 	var animationDuration = this.AlgorithmContext.getBaselineAnimationSpeed();
-	d3.selectAll("text.left-text").remove();
-	d3.selectAll("text.right-text").remove();
+        recursion_depth++; // a new stack frame has been added so we increase the recursion depth
+	d3.selectAll("text.q-left-text").remove();
+	d3.selectAll("text.q-right-text").remove();
 	if (left == 0 && right == data.length - 1) {
 	    return animationDuration; // we don't want to move the entire array down, only subarrays
+	}
+	var layer_y = (2.5 * maxi_width) * recursion_depth;
+	var depth_label_id = "q-rec-label-depth-" + recursion_depth;
+	if (svg.select("#" + depth_label_id).size() == 0) {
+	    svg.insert("text", "#qsort-circle-gradient-defs")
+		.attr("x", 20)
+		.attr("y", layer_y)
+		.attr("class", "q-rec-depth-label")
+		.attr("id", depth_label_id)
+		.text("Recursion Depth = " + recursion_depth + ":");
 	}
 	for (var i=left; i<=right; i++) {
 	    var gi = d3.select("#q-g-" + data[i].old_idx);
 	    var dat = gi.datum();
 	    gi.transition()
 		.duration(animationDuration)
-		.attr("transform", "translate(" + dat.x_off + ", " + (dat.y_off + 2.5*maxi_width) + ")");
+		.attr("transform", "translate(" + dat.x_off + ", " + (dat.y_off + 2.5 * maxi_width) + ")");
 	    dat.y_off = 2.5 * maxi_width + dat.y_off;
 	}
 
@@ -160,14 +170,15 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	var g = d3.select("#q-g-" + pi)
 	var radius = g.select(".quicksort-circle").attr("r");
 
-	g.append("rect")
-	    .attr("id", "pivot-rect")
-	    .attr("fill", "none")
-	    .attr("stroke", "red")
+	var pivot = g.append("g").attr("id", "qsort-pivot");
+	pivot.append("rect")
 	    .attr("width", 2*radius)
 	    .attr("height", 2*radius)
 	    .attr("x", -radius)
 	    .attr("y", -radius);
+	pivot.append("text")
+	    .text("Pivot")
+	    .attr("dy", -(1.1)*radius);
 	return this.AlgorithmContext.getBaselineAnimationSpeed();
     }
     // left animation
@@ -180,10 +191,10 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	var radius = g.select("circle").attr("r");
 	d3.selectAll("g.left")
 	    .classed("left", false)
-	    .select("text.left-text")
+	    .select("text.q-left-text")
 	    .remove();
 	g.append("text")
-	    .attr("class", "left-text")
+	    .attr("class", "q-left-text")
 	    .attr("dx", -radius)
 	    .attr("dy", -radius)
 	    .text("Left");
@@ -203,11 +214,11 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	var radius = g.select("circle").attr("r");
 	d3.selectAll("g.right")
 	    .classed("right", false)
-	    .select("text.right-text")
+	    .select("text.q-right-text")
 	    .remove();
 
 	g.append("text")
-	    .attr("class", "right-text")
+	    .attr("class", "q-right-text")
 	    .attr("dx", radius)
 	    .attr("dy", radius)
 	    .text("Right");
@@ -219,7 +230,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
     }
     // end of while cleanup
     q_callbacks[22] = function() {
-	svg.selectAll("#pivot-rect").remove();
+	svg.selectAll("#qsort-pivot").remove();
 	return 0.5 * this.AlgorithmContext.getBaselineAnimationSpeed();
     };
 
@@ -237,6 +248,8 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 		.attr("transform", "translate(" + dat.x_off + ", " + (dat.y_off - 2.5*maxi_width) + ")");
 	    dat.y_off = dat.y_off - 2.5 * maxi_width;
 	}
+	svg.select("#q-rec-label-depth-" + recursion_depth).remove();
+	recursion_depth--; // these are return statements so we want to decrease the recursion depth
 	return animationDuration;
     }
     // we are going to do the animation inside swap and return the length of that
@@ -277,6 +290,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
     var algo_context = _my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj);
     var qual_algo = new _my.Algorithm(quicksort, q_callbacks, "quicksort-code", algo_context, function() {
 	_my.AlgorithmUtils.resetControls(algorithmTabId);
+	recursion_depth = -1;
     });
 
     var swap_callbacks = [];

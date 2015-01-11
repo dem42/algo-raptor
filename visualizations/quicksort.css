@@ -1,3 +1,31 @@
 .quicksort-text {
     pointer-events: none;
+    text-anchor: middle;
+    dominant-baseline: middle;
+}
+
+.q-right-text {
+    text-anchor: start;
+}
+.q-left-text {
+    text-anchor: end;
+}
+
+.q-rec-depth-label {
+    stroke: magenta;
+    fill: magenta;
+    font-size:120%;
+}
+
+#qsort-pivot > rect {
+    fill: none;
+    stroke: red;
+}
+
+#qsort-pivot > text {
+    pointer-events: none;
+    stroke: red;
+    fill: red;
+    text-anchor: middle; 
+    font-size: 120%;
 }
