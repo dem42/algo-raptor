@@ -23,4 +23,4 @@ Download `vagrant` and `virtual box` and run
     
 This will start the `node.js` server in a virtual machine.
 
-After running these commands the algoviz website will be accessible on `http://localhost:8989`
+After running these commands the runalgo website will be accessible on `http://localhost:8989`
