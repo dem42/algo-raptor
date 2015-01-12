@@ -28,7 +28,15 @@
     <div class="container-fluid">
       <!-- Brand and toggle get grouped for better mobile display -->
       <div class="navbar-header">
-	<a class="navbar-brand" href="#home-tab" role="tab" data-toggle="tab" title="Algorithm visualizations in d3.js"><span class="text-danger"><span class="glyphicon glyphicon-star"></span>Algoviz</span></a>
+	<!-- this button will show our collapsed menu on small screen sizes -> the contents describe the icon look -->
+	<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+	  <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+	</button>
+
+	<a class="navbar-brand" href="#home-tab" role="tab" data-toggle="tab" title="Algorithm visualizations in d3.js"><span class="text-danger"><span class="glyphicon glyphicon-star"></span>RunAlgo</span></a>
       </div>
 
       <!-- Collect the nav links, forms, and other content for toggling -->
@@ -40,7 +48,8 @@
 	</ul>
       </div><!-- /.navbar-collapse -->
 
-      <a href="https://github.com/dem42/algoviz" target="_blank"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"></a>
+      <!-- uses the bootstrap responsive utilities to hide itself on small devices -->
+      <a href="https://github.com/dem42/algoviz" target="_blank" class="hidden-sm hidden-xs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"></a>
     </div><!-- /.container-fluid -->
   </nav>
 
@@ -49,7 +58,7 @@
     <div class="tab-pane active" id="home-tab">
       <div class="jumbotron">
 	<div class="container">
-	  <h1> Welcome to Algoviz!</h1>
+	  <h1> Welcome to RunAlgo!</h1>
 	  <p>This site presents visualizations of famous algorithms to help us better understand how these clever beasts actually work.</p>
 	  <p>Visualizations can be accessed through links in the navigation toolbar. Each visualization is accompanied with the source code of the algorithm, implemented in Javascript. </p>
 	  <p>Feel free to explore the algorithms, start the visualizations and observe the effects of the executed code in real time.</p>

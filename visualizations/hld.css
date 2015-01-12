@@ -21,7 +21,7 @@
     cursor: move;
     pointer-events: none;
     fill: #f00;
-    stroke: #f00;
+    stroke: none;
     font-size: small;
     font-family: monospace;
 }
