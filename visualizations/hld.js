@@ -197,8 +197,17 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
 	})
 	.text("Shuffle Data");
 
+    function cleanup() {
+	console.log("running cleanup");
+	var links = d3.selectAll(".hld-link");
+	links.classed("hld-link-highlighted", false);
+	links.attr("style", null);
+	d3.selectAll(".hld-size-label").remove();
+	d3.selectAll(".hld-circle").attr("style", null);
+    }
     
     _my.AlgorithmUtils.attachAlgoToControls(ss_algo, algorithmTabId, function(play_callback){
+	cleanup();
 	ss_algo.run(tree, 0);
 	chains = {chainLengths: undefined, 
 		  chainHeads: undefined, 
