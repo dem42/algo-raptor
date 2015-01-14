@@ -178,17 +178,17 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	/* The function that starts the simulation.
 	 * It creates a dialog and the dialog starts the execution
 	 */
-	bootbox.dialog({
+	var dialog = bootbox.dialog({
 	    title:"Start binary search", 
 	    message: '<span>Enter a value to search for:</span>' + 
-		'<input id="find" type="text" class="input-box" maxlength="2" />',
+		'<input id="bs-find" type="text" class="input-box" maxlength="2" />',
 	    buttons: {
 		success: {
 		    label: "Start",
 		    className: "btn-success",
 		    callback: function() {
 			console.log("hello");
-			var lo = 0, hi = N, m, tf = document.getElementById("find").value;
+			var lo = 0, hi = N, m, tf = document.getElementById("bs-find").value;
 			console.log(data, tf);
 			d3.selectAll(".forms .input-box").each(function(v, i, a) {
 			    data[i] = { val: this.value};
@@ -206,6 +206,10 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 		}
 	    }
 	});
+	// this is a jquery object and therefore the .on function can be used
+	// to attach multiple handlers .. they will be called in order of addition
+	// unless one of them call e.stopImmediatePropagation
+	dialog.on("shown.bs.modal", function() { $("#bs-find").focus(); })
     });
     _my.AlgorithmUtils.appendCode(algorithmTabId, "bs-code", balgo);
     
