@@ -31,7 +31,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     var svg = d3.select("#" + algorithmTabId + " .graphics").append("svg")
 	.attr("width", width)
 	.attr("height", 0);
-    var svgg = null; //current svg group
+    var svgg = undefined; //current svg group
     var cumulative_height = 0; //this is how we know by how much to translate latter groups vertically
 
     function bsearch(data, key) {
@@ -60,6 +60,10 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
      * it initializes the data
      */
     cbs[0] = function(data) { 
+	if (svgg !== undefined) {
+	    svgg.remove();
+	    svgg = undefined;
+	}
 	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	svgg = svg.append("g")
 	    .attr("transform", "translate(" + margin.left + "," + (margin.top + cumulative_height) +  ")");
@@ -76,6 +80,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	    .data(data)
 	    .enter().append("g")
 	    .attr("class", "gs")
+	    .attr("id", function(d, i) { return "bs-item-" + i; })
 	    .attr("transform", function(d, i) { return "translate(" + 2*w*d.old_i + "," + Y + ")";});
 	/*add rectangles and text into the groups*/  
 	gs.append("rect")
@@ -103,8 +108,8 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
      * it draws the data
      */
     cbs[2] = function(data) { 
-	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
-
+	var animation_duration = 4 * this.AlgorithmContext.getBaselineAnimationSpeed();
+	var move_up_animation_duration = (1/5) * this.AlgorithmContext.getBaselineAnimationSpeed();
 	/* the gs have an old_i which is their old order .. we move the gs to where they are
 	 * in the old order
 	 */
@@ -115,12 +120,22 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	    map_of_new_pos[data[i].old_i] = i;
 	}
 
+	var single_iterm_anim_duration = animation_duration / data.length;
+	for (var i=0; i<data.length; i++) {
+	    svg.select("#bs-item-" + data[i].old_i).transition()
+		.delay(i*single_iterm_anim_duration)
+		.duration(single_iterm_anim_duration)
+		.attr("transform", function(d) {
+		    return "translate(" + (2*w*i) + "," + (2.5*Y) + ")";
+		});
+	}
+
 	/*interpolating works with transforms too .. so cool -> move to new spot*/
-	gs.transition().duration(animation_duration).attr("transform", function(d, i) {
-	    return "translate(" + 2*w*map_of_new_pos[i] + "," + Y + ")";
+	gs.transition().delay(animation_duration).duration(move_up_animation_duration).attr("transform", function(d, i) {
+	    return "translate(" + (2*w*map_of_new_pos[i]) + "," + Y + ")";
 	});
 	
-	return animation_duration;
+	return animation_duration + move_up_animation_duration;
     };
     /*callback called inside every iteration
      * updates the arrow pointer
