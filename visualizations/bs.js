@@ -19,7 +19,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     /*******************************/
     /*      Setup the svg stuff    */
     /*******************************/
-    var margin = { left: 10, top: 10, right: 10, bottom: 10},
+    var margin = { left: 20, top: 45, right: 10, bottom: 10},
     height = 200,
     width = 600,
     w = 20,
@@ -32,7 +32,6 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	.attr("width", width)
 	.attr("height", 0);
     var svgg = undefined; //current svg group
-    var cumulative_height = 0; //this is how we know by how much to translate latter groups vertically
 
     function bsearch(data, key) {
 	//data must be sorted before we can binary search
@@ -49,7 +48,8 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 		high = mid;
 	    }
 	}
-	if (low == high && data[low].val == key) {
+	mid = low;
+	if (mid == high && data[mid].val == key) {
 	    console.log("found");
 	} else {
 	    console.log("not found");
@@ -59,16 +59,19 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     /* callback called right after entering the function
      * it initializes the data
      */
-    cbs[0] = function(data) { 
+    cbs[0] = function(data, key) { 
 	if (svgg !== undefined) {
 	    svgg.remove();
 	    svgg = undefined;
 	}
 	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	svgg = svg.append("g")
-	    .attr("transform", "translate(" + margin.left + "," + (margin.top + cumulative_height) +  ")");
-	cumulative_height += height;
-	var viewBox = _my.AlgorithmUtils.calcViewBox("#" + algorithmTabId + " .graphics", width, cumulative_height);
+	    .attr("transform", "translate(" + margin.left + "," + margin.top +  ")");
+	svgg.append("text").attr("id", "bs-what-to-find-lbl")
+	    .attr("dy", -25)
+	    .attr("dx", -10)
+	    .text("Searching for: ").append("tspan").text(key);
+	var viewBox = _my.AlgorithmUtils.calcViewBox("#" + algorithmTabId + " .graphics", width, height);
 	svg.attr("width", viewBox.width)
 	    .attr("height", viewBox.height)
 	    .attr("viewBox", viewBox.string)
@@ -84,12 +87,12 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	    .attr("transform", function(d, i) { return "translate(" + 2*w*d.old_i + "," + Y + ")";});
 	/*add rectangles and text into the groups*/  
 	gs.append("rect")
+	    .attr("x", -w/2)
 	    .attr("width", w)
 	    .attr("height", h)
 	    .attr("class", "svg-input-box");
 	gs.append("text")
 	    .attr("class", "bs-text")
-	    .attr("dx", function(d) { if(d.val.length == 2) return 2; else return 5;})
 	    .attr("dy", 15)
 	    .text(function(d) { return d.val; });
 
@@ -131,25 +134,27 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	}
 
 	/*interpolating works with transforms too .. so cool -> move to new spot*/
-	gs.transition().delay(animation_duration).duration(move_up_animation_duration).attr("transform", function(d, i) {
-	    return "translate(" + (2*w*map_of_new_pos[i]) + "," + Y + ")";
-	});
+	gs.attr("id", function(d, i) { return "bs-item-" + map_of_new_pos[i]; })
+	    .transition().delay(animation_duration).duration(move_up_animation_duration)
+	    .attr("transform", function(d, i) {
+		return "translate(" + (2*w*map_of_new_pos[i]) + "," + Y + ")";
+	    });
 	
 	return animation_duration + move_up_animation_duration;
     };
     /*callback called inside every iteration
      * updates the arrow pointer
      */
-    cbs[8] = function(mid) { 
+    cbs[8] = cbs[15] = function(mid) { 
 	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
-	arrow.style("visibility","visible").transition().duration(animation_duration).attr("x",2*w*mid-3);
+	arrow.style("visibility","visible").transition().duration(animation_duration).attr("x",2*w*mid-3-w/2);
 	return animation_duration;
     };
     /*callback called after a match was found
      */
-    cbs[16] = function(low) { 
+    cbs[17] = function(low) { 
 	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
-	arrow.style("visibility","visible").transition().duration(animation_duration).attr("x",2*w*low-3);
+	arrow.style("visibility","visible").transition().duration(animation_duration).attr("x",2*w*low-3-w/2);
 	svgg.append("text")
 	    .attr("dy", "100px")
 	    .attr("class", "not-found-label")
@@ -158,7 +163,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     };
     /*callback called if a match was NOT found
      */
-    cbs[18] = function() { 
+    cbs[19] = function() { 
 	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	svgg.append("text")
 	    .attr("dy", "100px")
