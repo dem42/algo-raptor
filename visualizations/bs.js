@@ -27,6 +27,9 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     N = 15,
     Y = 50;
     var cbs = {};
+    // used to store new position, this var is here because we cannot store it on data since the callbacks
+    // receive their own copy of data and any changes they make won't be preserved
+    var map_of_new_pos = {}; 
     var arrow = false;
     var svg = d3.select("#" + algorithmTabId + " .graphics").append("svg")
 	.attr("width", width)
@@ -59,7 +62,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     /* callback called right after entering the function
      * it initializes the data
      */
-    cbs[0] = function(data, key) { 
+    cbs[0] = function(data, key) {
 	if (svgg !== undefined) {
 	    svgg.remove();
 	    svgg = undefined;
@@ -79,10 +82,10 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	/* the gs have an old_i which is their old order .. we move the gs to where they are
 	 * in the old order
 	 */
-	var gs = svgg.selectAll(".gs")
+	var gs = svgg.selectAll(".bs-gs")
 	    .data(data)
 	    .enter().append("g")
-	    .attr("class", "gs")
+	    .attr("class", "bs-gs")
 	    .attr("id", function(d, i) { return "bs-item-" + i; })
 	    .attr("transform", function(d, i) { return "translate(" + 2*w*d.old_i + "," + Y + ")";});
 	/*add rectangles and text into the groups*/  
@@ -116,9 +119,8 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	/* the gs have an old_i which is their old order .. we move the gs to where they are
 	 * in the old order
 	 */
-	var gs = svgg.selectAll(".gs");
-
-	var map_of_new_pos = {};
+	var gs = svgg.selectAll(".bs-gs");
+	map_of_new_pos = {};
 	for (var i=0;i < data.length; i++) {
 	    map_of_new_pos[data[i].old_i] = i;
 	}
@@ -150,6 +152,18 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	arrow.style("visibility","visible").transition().duration(animation_duration).attr("x",2*w*mid-3-w/2);
 	return animation_duration;
     };
+    cbs[10] = function(low) {
+	var animation_duration = this.AlgorithmContext.getBaselineAnimationSpeed();
+	svgg.selectAll(".bs-gs").filter(function(d, i) { return map_of_new_pos[d.old_i] < low;})
+	    .transition(animation_duration).style("opacity", 0);
+	return animation_duration;
+    }
+    cbs[12] = function(high) {
+	var animation_duration = this.AlgorithmContext.getBaselineAnimationSpeed();
+	svgg.selectAll(".bs-gs").filter(function(d, i) { return map_of_new_pos[d.old_i] > high;})
+	    .transition(animation_duration).style("opacity", 0);
+	return animation_duration;
+    }
     /*callback called after a match was found
      */
     cbs[17] = function(low) { 
@@ -207,9 +221,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 		    label: "Start",
 		    className: "btn-success",
 		    callback: function() {
-			console.log("hello");
 			var lo = 0, hi = N, m, tf = document.getElementById("bs-find").value;
-			console.log(data, tf);
 			d3.selectAll(".forms .input-box").each(function(v, i, a) {
 			    data[i] = { val: this.value};
 			});
