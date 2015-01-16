@@ -217,6 +217,12 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	    message: '<span>Enter a value to search for:</span>' + 
 		'<input id="bs-find" type="text" class="input-box" maxlength="2" />',
 	    buttons: {
+		cancel: {
+		    label: "Cancel",
+		    className: "btn-primary",
+		    callback: function() {
+		    }
+		},
 		success: {
 		    label: "Start",
 		    className: "btn-success",
@@ -228,12 +234,6 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 			data.forEach(function (v,i) { v.old_i = i; });
 			balgo.startAnimation(data,tf,lo,hi,m);
 			executionFunction();
-		    }
-		},
-		cancel: {
-		    label: "Cancel",
-		    className: "btn-primary",
-		    callback: function() {
 		    }
 		}
 	    }
