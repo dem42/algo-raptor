@@ -15,7 +15,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     console.debug("downloaded bs", _my);
 
     var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName, "search-1-binary", [6, 6], "Algorithm input data may be modified below:");
-    layout.customControlsLayout.append("div").attr("class", "forms");
+    layout.customControlsLayout.append("div").attr("class", "bs-forms");
     /*******************************/
     /*      Setup the svg stuff    */
     /*******************************/
@@ -190,7 +190,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     var data = new Array(N);
 
     /*setup the DOM elements*/
-    var forms = d3.select(".forms").selectAll("input[type='text']")
+    var forms = d3.select(".bs-forms").selectAll("input[type='text']")
 	.data(data)
 	.enter().append("input")
 	.attr("type","text")
@@ -198,7 +198,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	.attr("maxlength", 2);
 
     /*populate the inputs*/
-    var inputs = document.querySelectorAll("input[type='text']");
+    var inputs = document.querySelectorAll(".bs-forms > input[type='text']");
     for(var j=inputs.length-1;j >= 0;j--)
     {
 	inputs[j].value = Math.floor(Math.random()*99);
@@ -228,7 +228,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 		    className: "btn-success",
 		    callback: function() {
 			var lo = 0, hi = N, m, tf = document.getElementById("bs-find").value;
-			d3.selectAll(".forms .input-box").each(function(v, i, a) {
+			d3.selectAll(".bs-forms .input-box").each(function(v, i, a) {
 			    data[i] = { val: this.value};
 			});
 			data.forEach(function (v,i) { v.old_i = i; });

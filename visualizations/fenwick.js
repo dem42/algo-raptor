@@ -8,8 +8,40 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 
     var algorithmTabId = "fenwick-tab";
     var algorithmName = "Fenwick tree";
+    var data = new Array(14);
 
-    /*********************/
+    /*******************************/
+    /*      Setup the panels       */
+    /*******************************/
+    console.debug("downloaded fenwick");
+
+    var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName, "fenwick", [7, 5], "You may modify the input array here:");
+    var float_container = layout.customControlsLayout.append("div").attr("class", "fen-float-container")
+    var fen_labels = float_container.append("div").attr("class", "fen-labels");
+    var fen_forms = float_container.append("div").attr("class", "fen-forms");
+    
+    fen_labels.append("span").text("index:").attr("class", "fen-table-lbl");
+    var labels = d3.select(".fen-labels").selectAll("fen-label")
+	.data(data)
+	.enter().append("span")
+	.attr("class","fen-label")
+	.text(function(d, i) { return i; });
+
+    fen_forms.append("span").text("value:").attr("class", "fen-table-lbl");
+    var forms = d3.select(".fen-forms").selectAll("input[type='text']")
+	.data(data)
+	.enter().append("input")
+	.attr("type","text")
+	.attr("class","fen-input-box")
+	.attr("maxlength", 2);
+
+    /*populate the inputs*/
+    var inputs = document.querySelectorAll(".fen-forms > input[type='text']");
+    for(var j=inputs.length-1;j >= 0;j--)
+    {
+	inputs[j].value = 0;
+    }
+/*********************/
     /*** fenwick functions ***/
     /*********************/
     function read(idx, data) {
@@ -29,13 +61,9 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	}
     }
 
-    /*******************************/
-    /*      Setup the panels       */
-    /*******************************/
-    console.debug("downloaded fenwick");
-
-    var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName, "fenwick", [7, 5]);
-
+    /*****************************/
+    /*** svg setup and wiring ***/
+    /*****************************/
 
     var fenwick_read_algo = new _my.Algorithm(read, {}, "fen-read-code", 
 						_my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj),
