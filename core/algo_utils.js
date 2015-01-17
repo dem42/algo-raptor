@@ -91,42 +91,57 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
     // if you have some dialog that needs to query for input before the algorithm is started pass it as kickoffCallback
     // the argument passed as kickoffCallback must be either undefined or a function that accepts another function as
     // an argument. The function passed to kickoffCallback should be executed in kickoffCallback as the last step
-    AlgorithmUtils.attachAlgoToControls = function(algorithm, algorithmId, kickoffCallback) {
-	var play_function = function() {
-	    if (!algorithm.runningInContMode) {
-		d3.select("#" + "play-btn-of-" + algorithmId + " span span").attr("class", "pause-btn");
-		d3.select("#" + "play-btn-of-" + algorithmId + " span").attr("title", "Pause the algorithm");
-		d3.select("#" + "next-btn-of-" + algorithmId).classed("disabled-btn", true);
-		d3.select("#" + "next-btn-of-" + algorithmId).classed("enabled-btn", false);
-     		algorithm.runStack();
-	    }
-	    else {
-		algorithm.runningInContMode = false; //stopping
-		AlgorithmUtils.resetControls(algorithmId);
-	    }
-	};
-	var next_function = function() {
-	    if (!algorithm.runningInContMode) {
-     		algorithm.executeNextRowInStepMode();
-	    }
+    AlgorithmUtils.createAlgoAttacher = function() {
+	var res = {};
+	res.play_maker = function(algorithm, algorithmId) {
+	    return function() {
+		if (!algorithm.runningInContMode) {
+		    d3.select("#" + "play-btn-of-" + algorithmId + " span span").attr("class", "pause-btn");
+		    d3.select("#" + "play-btn-of-" + algorithmId + " span").attr("title", "Pause the algorithm");
+		    d3.select("#" + "next-btn-of-" + algorithmId).classed("disabled-btn", true);
+		    d3.select("#" + "next-btn-of-" + algorithmId).classed("enabled-btn", false);
+     		    algorithm.runStack();
+		}
+		else {
+		    algorithm.runningInContMode = false; //stopping
+		    AlgorithmUtils.resetControls(algorithmId);
+		}
+	    };
 	};
 
-	d3.select("#" + "play-btn-of-" + algorithmId).on("click", function() {
-	    if (!algorithm.isRunning() && kickoffCallback != undefined) {
-		kickoffCallback(play_function);
-	    }
-	    else {
-		play_function();
-	    }
-	});
-	d3.select("#" + "next-btn-of-" + algorithmId).on("click", function() {
-	    if (!algorithm.isRunning() && kickoffCallback != undefined) {
-		kickoffCallback(next_function);
-	    }
-	    else {
-		next_function();
-	    }
-	});
+	res.next_maker = function(algorithm, algorithmId) {
+	    return function() {
+		if (!algorithm.runningInContMode) {
+     		    algorithm.executeNextRowInStepMode();
+		}
+	    };
+	};
+
+	// allows us to reattach the controls as we like
+	res.attach = function(algorithm, algorithmId, kickoffCallback) {
+	    d3.select("#" + "play-btn-of-" + algorithmId).on("click", function() {
+		if (!algorithm.isRunning() && kickoffCallback != undefined) {
+		    kickoffCallback(res.play_maker(algorithm, algorithmId));
+		}
+		else {
+		    (res.play_maker(algorithm, algorithmId))();
+		}
+	    });
+	    d3.select("#" + "next-btn-of-" + algorithmId).on("click", function() {
+		if (!algorithm.isRunning() && kickoffCallback != undefined) {
+		    kickoffCallback(res.next_maker(algorithm, algorithmId));
+		}
+		else {
+		    (res.next_maker(algorithm, algorithmId))();
+		}
+	    });
+	};
+	return res;
+    }
+
+    AlgorithmUtils.attachAlgoToControls = function(algorithm, algorithmId, kickoffCallback) {
+	var attacher = AlgorithmUtils.createAlgoAttacher();
+	attacher.attach(algorithm, algorithmId, kickoffCallback);
     }
 
     // create an item for the algorithm in the list of all available algorithms 

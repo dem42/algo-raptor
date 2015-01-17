@@ -29,6 +29,7 @@
     width: 1.5em;
     padding-left: 2px;
     border-left: steelBlue 1px solid;
+    font-weight: bold;
 }
 
 .fen-table-lbl {

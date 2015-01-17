@@ -194,7 +194,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	.data(data)
 	.enter().append("input")
 	.attr("type","text")
-	.attr("class","input-box")
+	.attr("class","bs-input-box")
 	.attr("maxlength", 2);
 
     /*populate the inputs*/
@@ -215,7 +215,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	var dialog = bootbox.dialog({
 	    title:"Start binary search", 
 	    message: '<span>Enter a value to search for:</span>' + 
-		'<input id="bs-find" type="text" class="input-box" maxlength="2" />',
+		'<input id="bs-find" type="text" class="bs-input-box" maxlength="2" />',
 	    buttons: {
 		cancel: {
 		    label: "Cancel",
@@ -228,7 +228,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 		    className: "btn-success",
 		    callback: function() {
 			var lo = 0, hi = N, m, tf = document.getElementById("bs-find").value;
-			d3.selectAll(".bs-forms .input-box").each(function(v, i, a) {
+			d3.selectAll(".bs-forms .bs-input-box").each(function(v, i, a) {
 			    data[i] = { val: this.value};
 			});
 			data.forEach(function (v,i) { v.old_i = i; });

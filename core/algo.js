@@ -446,7 +446,6 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     AnimationFrame.prototype.isReturnRow = function() {
 	return this.returnRows[this.rowNumber];
     }
-    
     _my.Algorithm = Algorithm;
     return _my;
 })(ALGORITHM_MODULE, $, d3);

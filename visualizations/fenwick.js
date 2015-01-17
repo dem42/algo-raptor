@@ -25,7 +25,7 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	.data(data)
 	.enter().append("span")
 	.attr("class","fen-label")
-	.text(function(d, i) { return i; });
+	.text(function(d, i) { return i+1; });
 
     fen_forms.append("span").text("value:").attr("class", "fen-table-lbl");
     var forms = d3.select(".fen-forms").selectAll("input[type='text']")
@@ -41,9 +41,16 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     {
 	inputs[j].value = 0;
     }
-/*********************/
+    /*********************/
     /*** fenwick functions ***/
     /*********************/
+    function sumBetween(start, end, data, read) {
+	var sum_to_end = read(end, data);
+	var sum_upto_start = read(start - 1, data);
+	var sum = sum_to_end - sum_upto_start;
+	return sum;
+    }
+
     function read(idx, data) {
 	var result = 0;
 	for (var i = idx; i > 0;) {
@@ -65,6 +72,10 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     /*** svg setup and wiring ***/
     /*****************************/
 
+    var fenwick_sum = new _my.Algorithm(sumBetween, {}, "fen-sum-code", 
+						_my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj),
+						function() { _my.AlgorithmUtils.resetControls(algorithmTabId); });
+
     var fenwick_read_algo = new _my.Algorithm(read, {}, "fen-read-code", 
 						_my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj),
 						function() { _my.AlgorithmUtils.resetControls(algorithmTabId); });
@@ -72,6 +83,26 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 						_my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj),
 						function() { _my.AlgorithmUtils.resetControls(algorithmTabId); });
 
+
+    
+    _my.AlgorithmUtils.attachAlgoToControls(fenwick_read_algo, algorithmTabId, function kickOff(executionFunction) {
+	/* The function that starts the simulation.
+	 * It creates a dialog and the dialog starts the execution
+	 */
+	var dialog = bootbox.dialog({
+	    title:"Fenwick interaction", 
+	    message: '<span>To start the visualization, in the "Fenwick Controls " section either click on two indices or change a value</span>',
+	    buttons: {
+		success: {
+		    label: "Ok",
+		    className: "btn-primary",
+		    callback: function() {
+		    }
+		}
+	    }
+	});
+    });
+    _my.AlgorithmUtils.appendCode(algorithmTabId, "fen-sum-code", fenwick_sum);
     _my.AlgorithmUtils.appendCode(algorithmTabId, "fen-read-code", fenwick_read_algo);
     _my.AlgorithmUtils.appendCode(algorithmTabId, "fen-update-code", fenwick_update_algo);
 
