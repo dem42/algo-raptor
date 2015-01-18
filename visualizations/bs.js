@@ -26,7 +26,8 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     h = 20,
     N = 15,
     Y = 50;
-    var cbs = {};
+    var cbs = [];
+    var prep_calls = [];
     // used to store new position, this var is here because we cannot store it on data since the callbacks
     // receive their own copy of data and any changes they make won't be preserved
     var map_of_new_pos = {}; 
@@ -36,10 +37,13 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	.attr("height", 0);
     var svgg = undefined; //current svg group
 
-    function bsearch(data, key) {
+    function preprocess(data, key, bsearch) {
 	//data must be sorted before we can binary search
 	data.sort(function(a,b) { return a.val - b.val;});
+	return bsearch(data, key);
+    }
 
+    function bsearch(data, key) {
 	var high = data.length-1;
 	var low = 0;
 	var mid = 0;
@@ -62,7 +66,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     /* callback called right after entering the function
      * it initializes the data
      */
-    cbs[0] = function(data, key) {
+    prep_calls[0] = function(data, key) {
 	if (svgg !== undefined) {
 	    svgg.remove();
 	    svgg = undefined;
@@ -70,10 +74,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	svgg = svg.append("g")
 	    .attr("transform", "translate(" + margin.left + "," + margin.top +  ")");
-	svgg.append("text").attr("id", "bs-what-to-find-lbl")
-	    .attr("dy", -25)
-	    .attr("dx", -10)
-	    .text("Searching for: ").append("tspan").text(key);
+
 	var viewBox = _my.AlgorithmUtils.calcViewBox("#" + algorithmTabId + " .graphics", width, height);
 	svg.attr("width", viewBox.width)
 	    .attr("height", viewBox.height)
@@ -108,14 +109,20 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	    .attr("height",30)
 	    .attr("xlink:href", "assets/arrow2.png");
 
+	svgg.append("text").attr("class", "bs-big-red-warning").attr("dx", -10)
+	    .text("We can only binary search a ")
+	.append("tspan").attr("class", "bs-warning-bold-tspan").text("sorted")
+	.append("tspan").attr("class", "bs-warning-normal-tspan").text(" array. Thus, we must sort.");
+
 	return animation_duration;
     };
     /* callback called after the array has been sorted
      * it draws the data
      */
-    cbs[2] = function(data) { 
+    prep_calls[2] = function(data, key) { 
 	var animation_duration = 4 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	var move_up_animation_duration = (1/5) * this.AlgorithmContext.getBaselineAnimationSpeed();
+
 	/* the gs have an old_i which is their old order .. we move the gs to where they are
 	 * in the old order
 	 */
@@ -147,18 +154,25 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     /*callback called inside every iteration
      * updates the arrow pointer
      */
-    cbs[8] = cbs[15] = function(mid) { 
+    cbs[0] = function(key) {
+	svgg.select(".bs-big-red-warning").remove();
+	svgg.append("text").attr("id", "bs-what-to-find-lbl")
+	    .attr("dy", -25)
+	    .attr("dx", -10)
+	    .text("Searching for: ").append("tspan").text(key);
+    }
+    cbs[5] = cbs[12] = function(mid) { 
 	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	arrow.style("visibility","visible").transition().duration(animation_duration).attr("x",2*w*mid-3-w/2);
 	return animation_duration;
     };
-    cbs[10] = function(low) {
+    cbs[8] = function(low) {
 	var animation_duration = this.AlgorithmContext.getBaselineAnimationSpeed();
 	svgg.selectAll(".bs-gs").filter(function(d, i) { return map_of_new_pos[d.old_i] < low;})
 	    .transition(animation_duration).style("opacity", 0);
 	return animation_duration;
     }
-    cbs[12] = function(high) {
+    cbs[9] = function(high) {
 	var animation_duration = this.AlgorithmContext.getBaselineAnimationSpeed();
 	svgg.selectAll(".bs-gs").filter(function(d, i) { return map_of_new_pos[d.old_i] > high;})
 	    .transition(animation_duration).style("opacity", 0);
@@ -166,21 +180,23 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     }
     /*callback called after a match was found
      */
-    cbs[17] = function(low) { 
+    cbs[14] = function(low) { 
 	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	arrow.style("visibility","visible").transition().duration(animation_duration).attr("x",2*w*low-3-w/2);
 	svgg.append("text")
-	    .attr("dy", "100px")
+	    .attr("dy", -25)
+	    .attr("dx", 140)
 	    .attr("class", "not-found-label")
 	    .transition().duration(animation_duration).text("Found!");
 	return animation_duration;
     };
     /*callback called if a match was NOT found
      */
-    cbs[19] = function() { 
+    cbs[16] = function() { 
 	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	svgg.append("text")
-	    .attr("dy", "100px")
+	    .attr("dy", -25)
+	    .attr("dx", 140)
 	    .attr("class", "not-found-label")
 	    .transition().duration(animation_duration).text("Not Found!");
 	return animation_duration;
@@ -206,9 +222,12 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 
 
     /* create an Algorithm instance wired with callbacks */
+    var prep_algo = new _my.Algorithm(preprocess, prep_calls, "prep-code", _my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj),
+				  function() { _my.AlgorithmUtils.resetControls(algorithmTabId); });
+
     var balgo = new _my.Algorithm(bsearch, cbs, "bs-code", _my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj),
 				  function() { _my.AlgorithmUtils.resetControls(algorithmTabId); });
-    _my.AlgorithmUtils.attachAlgoToControls(balgo, algorithmTabId, function kickOff(executionFunction) {
+    _my.AlgorithmUtils.attachAlgoToControls(prep_algo, algorithmTabId, function kickOff(executionFunction) {
 	/* The function that starts the simulation.
 	 * It creates a dialog and the dialog starts the execution
 	 */
@@ -232,7 +251,10 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 			    data[i] = { val: this.value};
 			});
 			data.forEach(function (v,i) { v.old_i = i; });
-			balgo.startAnimation(data,tf,lo,hi,m);
+			var bs_wrapped = function(data, tf) {
+			    return balgo.runWithSharedAnimationQueue(prep_algo, data, tf);
+			}
+			prep_algo.startAnimation(data, tf, bs_wrapped);
 			executionFunction();
 		    }
 		}
@@ -243,6 +265,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	// unless one of them call e.stopImmediatePropagation
 	dialog.on("shown.bs.modal", function() { $("#bs-find").focus(); })
     });
+    _my.AlgorithmUtils.appendCode(algorithmTabId, "prep-code", prep_algo).style("display", "none");
     _my.AlgorithmUtils.appendCode(algorithmTabId, "bs-code", balgo);
     
     return {"bsearch": bsearch, "bsearch-algorithm": balgo};

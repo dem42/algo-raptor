@@ -25,3 +25,16 @@
     font-weight: bold;
     font-size: 110%;
 }
+
+.bs-big-red-warning {
+    fill: red;
+    font-size: 130%;
+}
+
+.bs-warning-bold-tspan {
+    font-weight: bold;
+}
+
+.bs-warning-normal-tspan {
+    font-weight: normal;
+}
