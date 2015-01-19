@@ -166,7 +166,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	arrow.style("visibility","visible").transition().duration(animation_duration).attr("x",2*w*mid-3-w/2);
 	return animation_duration;
     };
-    cbs[8] = function(low) {
+    cbs[7] = function(low) {
 	var animation_duration = this.AlgorithmContext.getBaselineAnimationSpeed();
 	svgg.selectAll(".bs-gs").filter(function(d, i) { return map_of_new_pos[d.old_i] < low;})
 	    .transition(animation_duration).style("opacity", 0);
