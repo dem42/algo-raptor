@@ -313,8 +313,6 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 	layout.codePanel.append("div").attr("class", "panel-heading").append("h5").attr("class", "panel-title")
 	    .text("Code");
 	layout.codePanel.append("div").attr("class", "panel-body code");
-
-
 	return layout;
     };
 

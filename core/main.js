@@ -27,7 +27,6 @@ $(function (ALGORITHM_MODULE) {
     (function ( $ ) {
 	$.fn.stickyTabs = function() {
 	    var context = this;
-	    console.log(context);
 	    // Show the tab corresponding with the hash in the URL, or the first tab.
 	    var showTabFromHash = function() {
 		var hash = window.location.hash;
@@ -38,6 +37,8 @@ $(function (ALGORITHM_MODULE) {
 	    showTabFromHash(context)
 	    // Set the correct tab when a user uses their back/forward button
 	    window.addEventListener('hashchange', showTabFromHash, false);
+	    // Change the URL when tabs are clicked
+
 	    return this;
 	};
     }( jQuery ));
@@ -54,9 +55,16 @@ $(function (ALGORITHM_MODULE) {
 	    $('a[data-toggle="tab"]').off('shown.bs.tab');
 	    // attach a callback on shown tab to adjust svg sizes dynamically
 	    // this is needed to make sure our visualizations fit onto smaller screens
-	    $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
-		resizingSvg(e);
-		window.location.hash = $(this).attr("href");
+	    $('a[data-toggle="tab"]').on('shown.bs.tab', resizingSvg);
+	    // again we need to turn off previous click handlers so that we don't end up with too many
+	    $('a', "#algoTabs").off("click");
+	    $('a', "#algoTabs").on('click', function(e) {
+		// modify the history and the url
+		// although the firefox back button does look quite strange after this
+		//history.pushState(null, null, this.href);
+		// alternative solution
+		window.location.href = $(this).attr("href"); 
+		window.scrollBy(0, -window.pageYOffset);
 	    });
 	}
     });
