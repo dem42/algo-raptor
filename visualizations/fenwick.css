@@ -46,3 +46,22 @@
 .fen-float-container {
     width: 400px;
 }
+
+.fen-node > rect {
+    stroke: steelBlue;
+    fill: white;
+    width: 20px;
+    margin: 10px;
+    text-align: center;
+}
+
+.fen-link {
+    fill: none;
+    stroke: #000;
+    stroke-width: 1.5px;
+}
+
+.fen-node-lbl {
+    pointer-events: none;
+    text-anchor: middle;
+}

@@ -12,6 +12,7 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
     /*******************************/
     console.debug("downloaded hld");
     var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName, "a-hld", [5, 7]);
+    layout.introductionParagraph.text("This algorithm is all about preparing non balanced trees to get O(log(n)) algorithms.")
     /*********************/
     /*** HLD functions ***/
     /*********************/

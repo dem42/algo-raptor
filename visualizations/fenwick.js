@@ -80,6 +80,64 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     /*****************************/
     /*** svg setup and wiring ***/
     /*****************************/
+    var sum_callbacks = [];
+    var read_callbacks = [];
+    var update_callbacks = [];
+    var svg = function init() {
+	var margin = { left: 10, top: 50, right: 10, bottom: 100};
+	var svg = d3.select("#" + algorithmTabId + " .graphics").append("svg")
+	.attr("width",  "900px")
+	.attr("height", "1050px")
+	.append("g")
+	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+	var highest2Pow = 1 << Math.ceil(Math.log2(N));
+
+	var cluster = d3.layout.cluster()
+	    .children(function(node) {
+		var lsb = (node.val & -node.val);
+		console.log("calling get children for", node.val, "lsb=", lsb);
+
+		node.children = [];
+		var s = node.val - lsb;
+		for (var i = lsb >> 1; i > 0; i = i >> 1) {
+		    console.log("looping for", node.val, "i=", i);
+		    s += i;
+		    node.children.push({val: s});
+		}
+		return node.children;
+	    })
+	    .size([800, 600]);
+
+	var nodes = cluster.nodes({val: highest2Pow});
+	var links = cluster.links(nodes);
+
+	svg.selectAll("fen-link")
+	    .data(links)
+	    .enter()
+	    .append("path").attr("class", "fen-link")
+	    .attr("d", d3.svg.diagonal());
+
+	var radius = 60;
+	var fen_nodes = svg.selectAll("fen-node")
+	    .data(nodes)
+	    .enter()
+	    .append("g")
+	    .attr("class", "fen-node")
+	    .attr("id", function(d) { return "fen-node-" + d.val; })
+	    .attr("transform", function(d) { return "translate(" + d.x + ", " + d.y + ")"; });
+	fen_nodes.append("rect")
+	    .attr("x", -radius/2)
+	    .attr("y", -radius/2)
+	    .attr("width", radius)
+	    .attr("height", radius);
+	fen_nodes.append("text")
+	    .attr("class", "fen-node-lbl")
+	    .text(function(d) { return d.val; });
+    }();
+
+
+
 
     function cleanup() {
 	d3.selectAll(".fen-label").classed("fen-label-highlighted", false);

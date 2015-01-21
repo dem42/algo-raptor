@@ -94,7 +94,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	    .attr("x", -w/2)
 	    .attr("width", w)
 	    .attr("height", h)
-	    .attr("class", "svg-input-box");
+	    .attr("class", "bs-svg-input-box");
 	gs.append("text")
 	    .attr("class", "bs-text")
 	    .attr("dy", 15)

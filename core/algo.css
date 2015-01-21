@@ -12,14 +12,6 @@
     display: inline;
 }
 
-.svg-input-box {
-    stroke: steelBlue;
-    fill: none;
-    width: 20px;
-    margin: 10px;
-    text-align: center;
-}
-
 .controls {
     /*
     border: solid black 1px;
