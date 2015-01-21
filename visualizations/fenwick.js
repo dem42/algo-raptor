@@ -80,18 +80,27 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     /*****************************/
     /*** svg setup and wiring ***/
     /*****************************/
+    var log2N = Math.ceil(Math.log2(N));
+    function bitPattern(num) {
+	var res = [];
+	for (var i = 0; i <= log2N; i++) {
+	    res.push(num % 2);
+	    num = num >> 1;
+	}
+	return res.reverse().join("");
+    }
     var sum_callbacks = [];
     var read_callbacks = [];
     var update_callbacks = [];
     var svg = function init() {
-	var margin = { left: 10, top: 50, right: 10, bottom: 100};
+	var margin = { left: 10, top: 70, right: 10, bottom: 100};
 	var svg = d3.select("#" + algorithmTabId + " .graphics").append("svg")
 	.attr("width",  "900px")
 	.attr("height", "1050px")
 	.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-	var highest2Pow = 1 << Math.ceil(Math.log2(N));
+	var highest2Pow = 1 << log2N;
 
 	var cluster = d3.layout.cluster()
 	    .children(function(node) {
@@ -118,7 +127,7 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	    .append("path").attr("class", "fen-link")
 	    .attr("d", d3.svg.diagonal());
 
-	var radius = 60;
+	var radius = 80;
 	var fen_nodes = svg.selectAll("fen-node")
 	    .data(nodes)
 	    .enter()
@@ -133,11 +142,22 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	    .attr("height", radius);
 	fen_nodes.append("text")
 	    .attr("class", "fen-node-lbl")
-	    .text(function(d) { return d.val; });
+	    .attr("dy", -radius/3)
+	    .append("tspan")
+	    .text(function(d) { return "Index: " + d.val; });
+	fen_nodes.append("text")
+	    .attr("class", "fen-node-lbl")
+	    .text(function(d) { return "(" + bitPattern(d.val) + ")" ; });
+	fen_nodes.append("text")
+	    .attr("class", "fen-node-lbl")
+	    .attr("dy", +radius/3)
+	    .text(function(d) { return "Sum: " + (tree[d.val] || 0); });
+	fen_nodes.append("line")
+	    .attr("x1",-radius/2)
+	    .attr("x2",radius/2)
+	    .attr("y1",radius/6)
+	    .attr("y2",radius/6);
     }();
-
-
-
 
     function cleanup() {
 	d3.selectAll(".fen-label").classed("fen-label-highlighted", false);

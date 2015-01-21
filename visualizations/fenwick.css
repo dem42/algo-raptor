@@ -55,6 +55,12 @@
     text-align: center;
 }
 
+.fen-node > line {
+    stroke: steelBlue;
+    fill: none;
+    stroke-width: 1.5px;
+}
+
 .fen-link {
     fill: none;
     stroke: #000;
@@ -64,4 +70,5 @@
 .fen-node-lbl {
     pointer-events: none;
     text-anchor: middle;
+    dominant-baseline: middle;
 }
