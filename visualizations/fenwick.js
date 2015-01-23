@@ -105,18 +105,16 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	var cluster = d3.layout.cluster()
 	    .children(function(node) {
 		var lsb = (node.val & -node.val);
-		console.log("calling get children for", node.val, "lsb=", lsb);
 
 		node.children = [];
 		var s = node.val - lsb;
 		for (var i = lsb >> 1; i > 0; i = i >> 1) {
-		    console.log("looping for", node.val, "i=", i);
 		    s += i;
 		    node.children.push({val: s});
 		}
 		return node.children;
 	    })
-	    .size([800, 600]);
+	    .size([660, 460]);
 
 	var nodes = cluster.nodes({val: highest2Pow});
 	var links = cluster.links(nodes);
@@ -159,11 +157,12 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	    .attr("y1",radius/6)
 	    .attr("y2",radius/6);
 
-	result = {svg: svg, fen_nodes: nodes};
+	var arrow_holder = svg.insert("g", "g");
+
+	result = {svg: svg, fen_nodes: nodes, arrow_holder: arrow_holder};
 	return result;
     }();
     var svg = svg_data.svg;
-    console.log(svg_data.fen_nodes);
 
     function highlighting(idx) {
 	svg.select("#fen-node-" + idx + " > rect").classed("fen-rect-highlighted", true);
@@ -171,11 +170,10 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     function arrowAnimate(old_idx, i) {
 	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	if (i == 0 || old_idx == 0) return this.AlgorithmContext.getBaselineAnimationSpeed(); 
-	console.log("animate called with", old_idx, i);
 	var arrow_gen = _my.vislib.interpolatableDiagonal("linear");
 	var data = {"source": svg.select("#fen-node-" + old_idx).datum(), "target" : svg.select("#fen-node-" + i).datum()}
 	var path = svg.insert("path", "g").attr("class", "fen-arrow").attr("d", arrow_gen(data));
-	var arrow = _my.vislib.animateGrowingArrow(svg, path, animation_duration, 0, false, 0.5).arrow;
+	var arrow = _my.vislib.animateGrowingArrow(svg_data.arrow_holder, path, animation_duration, 0, false, 0.5).arrow;
 	arrow.attr("class", "fen-arrow-head");
 	setTimeout(function() {
 	    highlighting(i);
@@ -236,7 +234,6 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 		play_function();
 	    }
 	    else {
-		console.log("fenwick clicked", clicked);
 		d3.select(this).classed("fen-label-highlighted", true);
 	    }
 	    clicked = (clicked + 1) % 2;
@@ -249,14 +246,12 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	$(".fen-input-box").on("input", function(d) {
 	    var value = $(this).val();
 	    var index = $(this).attr("data-fen-index");
-	    console.log("calling on input", value, index);
 	    if (!isNaN(+value)) {
 		var attacher = _my.AlgorithmUtils.createAlgoAttacher();
 		attacher.attach(fenwick_update_algo, algorithmTabId);
 		var play_function = attacher.play_maker(fenwick_update_algo, algorithmTabId);
 		fenwick_update_algo.run(+value, +index, tree);
 		play_function();
-		console.log(tree);
 	    }
 	});
     }

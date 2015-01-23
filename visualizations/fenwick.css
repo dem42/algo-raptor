@@ -82,3 +82,7 @@
     fill: none;
     stroke: red;
 }
+.fen-arrow-head {
+    fill: red;
+    stroke: red;
+}
