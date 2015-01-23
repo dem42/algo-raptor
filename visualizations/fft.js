@@ -466,7 +466,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    current_id++;
 	    var top_down_tree = d3.select("#fft-poly-tree");
 	    var elem_to_draw_into = top_down_tree.select("#fft-node-num" + current_id);
-	    var transition = _my.vislib.animateGrowingArrow(top_down_tree, top_down_tree.selectAll(".fft-link-to" + current_id), animation_duration, 0, false, 0.7);
+	    var transition = _my.vislib.animateGrowingArrow(top_down_tree, top_down_tree.selectAll(".fft-link-to" + current_id), animation_duration, 0, false, 0.7).transition;
 	    transition.each("end", function() {
 		drawCoefs(poly.slice(start, start + N), elem_to_draw_into, false);
 	    });
@@ -477,7 +477,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     ev_calls[10] = function(poly, start, N) {
 	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	var top_down_tree = d3.select("#fft-poly-tree");
-	var transition = _my.vislib.animateGrowingArrow(top_down_tree, top_down_tree.selectAll(".fft-link-to" + 1), animation_duration, 0, false, 0.7);
+	var transition = _my.vislib.animateGrowingArrow(top_down_tree, top_down_tree.selectAll(".fft-link-to" + 1), animation_duration, 0, false, 0.7).transition;
 	var elem_to_draw_into = top_down_tree.select("#fft-node-num" + current_id);
 	transition.each("end", function() {
 	    drawPoly(poly.slice(start, start + N), elem_to_draw_into, false);
@@ -491,7 +491,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    current_id++;
 	    var top_down_tree = d3.select("#fft-poly-tree");
 	    var elem_to_draw_into = top_down_tree.select("#fft-node-num" + current_id);
-	    var transition = _my.vislib.animateGrowingArrow(top_down_tree, top_down_tree.selectAll(".fft-link-to" + current_id), animation_duration, 0, false, 0.7);
+	    var transition = _my.vislib.animateGrowingArrow(top_down_tree, top_down_tree.selectAll(".fft-link-to" + current_id), animation_duration, 0, false, 0.7).transition;
 	    transition.each("end", function() {
 		drawCoefs(poly.slice(start, start + N), elem_to_draw_into, false);
 		d3.select(this).transition().each("end", function() {
@@ -548,7 +548,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	var down_top_tree = d3.select("#fft-poly-tree-upside-down");
 	var elem_to_draw_into = down_top_tree.select("#fft-node-num" + our_id);
 
-	var transition = _my.vislib.animateGrowingArrows(down_top_tree, down_top_tree.selectAll(".fft-link-to" + our_id), animation_duration, 0, false, 0.7);
+	var transition = _my.vislib.animateGrowingArrows(down_top_tree, down_top_tree.selectAll(".fft-link-to" + our_id), animation_duration, 0, false, 0.7).transition;
 	transition.each("end", function() {
 	    drawCoefs(poly.slice(start, start + N), elem_to_draw_into, false)
 	    drawCoefs(poly.slice(start, start + N), elem_to_draw_into, true);
@@ -714,7 +714,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	var animation_duration = 2 * algo_ctx.getBaselineAnimationSpeed();
     	var mult_tree = d3.select("#multiply-poly-tree");
 	var nodea = mult_tree.select("#fft-node-num" + node_id);
-	var transition = _my.vislib.animateGrowingArrows(mult_tree, mult_tree.selectAll(".fft-link-to" + node_id), animation_duration, 0, false, 0.7);
+	var transition = _my.vislib.animateGrowingArrows(mult_tree, mult_tree.selectAll(".fft-link-to" + node_id), animation_duration, 0, false, 0.7).transition;
 	transition.each("end", function() {
 	    draw_function.call(null, polynom, nodea, third_argument_bool_value, true); // in non-strict mode if this==null it's replaced by global
 	});

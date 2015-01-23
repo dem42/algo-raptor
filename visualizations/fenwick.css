@@ -78,3 +78,7 @@
     text-anchor: middle;
     dominant-baseline: middle;
 }
+.fen-arrow {
+    fill: none;
+    stroke: red;
+}

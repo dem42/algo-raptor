@@ -92,7 +92,7 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     var sum_callbacks = [];
     var read_callbacks = [];
     var update_callbacks = [];
-    var svg = function init() {
+    var svg_data = function init() {
 	var margin = { left: 10, top: 70, right: 10, bottom: 100};
 	var svg = d3.select("#" + algorithmTabId + " .graphics").append("svg")
 	.attr("width",  "900px")
@@ -159,12 +159,28 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	    .attr("y1",radius/6)
 	    .attr("y2",radius/6);
 
-	return svg;
+	result = {svg: svg, fen_nodes: nodes};
+	return result;
     }();
+    var svg = svg_data.svg;
+    console.log(svg_data.fen_nodes);
 
     function highlighting(idx) {
-	console.log("in highlighting");
 	svg.select("#fen-node-" + idx + " > rect").classed("fen-rect-highlighted", true);
+    }
+    function arrowAnimate(old_idx, i) {
+	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
+	if (i == 0 || old_idx == 0) return this.AlgorithmContext.getBaselineAnimationSpeed(); 
+	console.log("animate called with", old_idx, i);
+	var arrow_gen = _my.vislib.interpolatableDiagonal("linear");
+	var data = {"source": svg.select("#fen-node-" + old_idx).datum(), "target" : svg.select("#fen-node-" + i).datum()}
+	var path = svg.insert("path", "g").attr("class", "fen-arrow").attr("d", arrow_gen(data));
+	var arrow = _my.vislib.animateGrowingArrow(svg, path, animation_duration, 0, false, 0.5).arrow;
+	arrow.attr("class", "fen-arrow-head");
+	setTimeout(function() {
+	    highlighting(i);
+	}, animation_duration);
+	return animation_duration;
     }
     read_callbacks[0] = update_callbacks[0] = function(idx) {
 	svg.selectAll(".fen-rect-highlighted").classed("fen-rect-highlighted", false);
@@ -173,8 +189,17 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     read_callbacks[2] = update_callbacks[1] = function(i) {
 	highlighting(i);
     }
+    read_callbacks[5] = function(i, lowest_set_bit) {
+	return arrowAnimate.call(this, i + lowest_set_bit, i);
+    }
+
+    update_callbacks[4] = function(i, lowest_set_bit) {
+	return arrowAnimate.call(this, i - lowest_set_bit, i);
+    }
 
     function cleanup() {
+	d3.selectAll(".fen-arrow-head").remove();
+	d3.selectAll(".fen-arrow").remove();
 	d3.selectAll(".fen-label").classed("fen-label-highlighted", false);
 	svg.selectAll(".fen-rect-highlighted").classed("fen-rect-highlighted", false);
 	_my.AlgorithmUtils.resetControls(algorithmTabId);
