@@ -47,12 +47,18 @@
     width: 400px;
 }
 
-.fen-node > rect {
+.fen-rect {
     stroke: steelBlue;
     fill: white;
     width: 20px;
     margin: 10px;
     text-align: center;
+    -webkit-filter: drop-shadow( -5px -5px 5px #000 );
+    filter: drop-shadow( -5px -5px 5px #000 );
+}
+
+.fen-rect-highlighted {
+    stroke: red;
 }
 
 .fen-node > line {

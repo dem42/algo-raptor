@@ -136,6 +136,7 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	    .attr("id", function(d) { return "fen-node-" + d.val; })
 	    .attr("transform", function(d) { return "translate(" + d.x + ", " + d.y + ")"; });
 	fen_nodes.append("rect")
+	    .attr("class", "fen-rect")
 	    .attr("x", -radius/2)
 	    .attr("y", -radius/2)
 	    .attr("width", radius)
@@ -157,21 +158,36 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	    .attr("x2",radius/2)
 	    .attr("y1",radius/6)
 	    .attr("y2",radius/6);
+
+	return svg;
     }();
+
+    function highlighting(idx) {
+	console.log("in highlighting");
+	svg.select("#fen-node-" + idx + " > rect").classed("fen-rect-highlighted", true);
+    }
+    read_callbacks[0] = update_callbacks[0] = function(idx) {
+	svg.selectAll(".fen-rect-highlighted").classed("fen-rect-highlighted", false);
+	highlighting(idx);
+    }
+    read_callbacks[2] = update_callbacks[1] = function(i) {
+	highlighting(i);
+    }
 
     function cleanup() {
 	d3.selectAll(".fen-label").classed("fen-label-highlighted", false);
+	svg.selectAll(".fen-rect-highlighted").classed("fen-rect-highlighted", false);
 	_my.AlgorithmUtils.resetControls(algorithmTabId);
 	reinitButtons();
     }
-    var fenwick_sum = new _my.Algorithm(sumBetween, {}, "fen-sum-code", 
+    var fenwick_sum = new _my.Algorithm(sumBetween, sum_callbacks, "fen-sum-code", 
 						_my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj),
 						cleanup);
 
-    var fenwick_read_algo = new _my.Algorithm(read, {}, "fen-read-code", 
+    var fenwick_read_algo = new _my.Algorithm(read, read_callbacks, "fen-read-code", 
 						_my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj),
 						cleanup);
-    var fenwick_update_algo = new _my.Algorithm(update, {}, "fen-update-code", 
+    var fenwick_update_algo = new _my.Algorithm(update, update_callbacks, "fen-update-code", 
 						_my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj),
 						cleanup);
 
