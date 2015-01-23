@@ -145,10 +145,10 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	    .append("tspan")
 	    .text(function(d) { return "Index: " + d.val; });
 	fen_nodes.append("text")
-	    .attr("class", "fen-node-lbl")
+	    .attr("class", "fen-node-lbl fen-bit")
 	    .text(function(d) { return "(" + bitPattern(d.val) + ")" ; });
 	fen_nodes.append("text")
-	    .attr("class", "fen-node-lbl")
+	    .attr("class", "fen-node-lbl fen-sum")
 	    .attr("dy", +radius/3)
 	    .text(function(d) { return "Sum: " + (tree[d.val] || 0); });
 	fen_nodes.append("line")
@@ -181,6 +181,8 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	return animation_duration;
     }
     read_callbacks[0] = update_callbacks[0] = function(idx) {
+	d3.selectAll(".fen-arrow-head").remove();
+	d3.selectAll(".fen-arrow").remove();
 	svg.selectAll(".fen-rect-highlighted").classed("fen-rect-highlighted", false);
 	highlighting(idx);
     }
@@ -190,7 +192,9 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     read_callbacks[5] = function(i, lowest_set_bit) {
 	return arrowAnimate.call(this, i + lowest_set_bit, i);
     }
-
+    update_callbacks[2] = function(tree, i) {
+	svg.select("#fen-node-" + i).select(".fen-sum").text("Sum: " + (tree[i] || 0));
+    }
     update_callbacks[4] = function(i, lowest_set_bit) {
 	return arrowAnimate.call(this, i - lowest_set_bit, i);
     }

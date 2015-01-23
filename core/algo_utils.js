@@ -32,8 +32,8 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 	return cpy;
     }
 
-    AlgorithmUtils.insertCustomControls = function(controlsDiv, algorithmId, algorithmName, comments) {
-	var customControlsHolder = controlsDiv.append("div").attr("class", "custom-controls-holder");
+    AlgorithmUtils.insertCustomControls = function(layout, algorithmId, algorithmName, comments) {
+	var customControlsHolder = layout.visPanelContents.append("div").attr("class", "custom-controls-holder");
 	customControlsHolder.append("div").attr("class", "custom-controls-header").text(algorithmName + " Controls:");
 
 	if (comments !== undefined) {
@@ -44,8 +44,9 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
     }
 
     // create and populate a section for standard algorithm controls
-    AlgorithmUtils.insertDefaultControls = function(controlsDiv, algorithmId) {
+    AlgorithmUtils.insertDefaultControls = function(layout, algorithmId) {
 
+	var controlsDiv = layout.ops;
 	function appendButton(div, classname, algorithmName, tooltip) {
 	    var button = div.append("a").attr("href", "#").classed("a-btn enabled-btn", true).attr("id", classname + "-of-" + algorithmId);
 	    button.append("span").attr("class", "a-btn-icon").attr("title", tooltip).append("span").attr("class", classname);
@@ -295,8 +296,6 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 
 	layout.controlsPanelBody = layout.controlsPanel.append("div").attr("class", "panel-body");
 	layout.ops = layout.controlsPanelBody.append("div").attr("class", "options");
-	layout.defaultControlsObj = AlgorithmUtils.insertDefaultControls(layout.ops, algorithmTabId);
-	layout.customControlsLayout = AlgorithmUtils.insertCustomControls(layout.ops, algorithmTabId, algorithmName, comments);
 	
 
 	layout.row1 = layout.container.append("div").attr("class", "row");
@@ -307,7 +306,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
     	    .append("div").attr("class", "panel panel-default");
 	layout.visPanel.append("div").attr("class", "panel-heading").append("h6").attr("class", "panel-title")
 	    .text("Algorithm Visualization");
-	layout.visPanel.append("div").attr("class", "panel-body graphics");
+	layout.visPanelContents = layout.visPanel.append("div").attr("class", "panel-body graphics");
 	
 	
 	layout.codePanel = layout.row1.append("div").attr("class", "col-md-" + columnWidths[1])
@@ -315,6 +314,11 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 	layout.codePanel.append("div").attr("class", "panel-heading").append("h6").attr("class", "panel-title")
 	    .text("Code");
 	layout.codePanel.append("div").attr("class", "panel-body code");
+
+	// insert the controls objects
+	layout.defaultControlsObj = AlgorithmUtils.insertDefaultControls(layout, algorithmTabId);
+	layout.customControlsLayout = AlgorithmUtils.insertCustomControls(layout, algorithmTabId, algorithmName, comments);
+
 	return layout;
     };
 
