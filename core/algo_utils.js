@@ -275,6 +275,9 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 	};
     };
 
+    /**
+     * this creates the layout for the algorithm page
+     */
     AlgorithmUtils.setupLayout = function(algorithmTabId, algorithmName, algorithmPriorityCode, columnWidths, comments) {
 	var layout = {};
 	
@@ -283,33 +286,33 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
     	    .append("div").attr("class", "tab-pane").attr("id", algorithmTabId)
             .append("div").attr("class", "container-fluid");
 	layout.row0 = layout.container.append("div").attr("class", "row");
-	layout.introHeader = layout.row0.append("div").attr("class", "col-md-12");
-	layout.introHeader.append("div").attr("class", "page-header").append("h2").text(algorithmName);
+	layout.introHeader = layout.row0.append("div").attr("class", "col-md-8");
+	layout.introHeader.append("div").attr("class", "page-header").append("h4").text(algorithmName);
 	layout.introductionParagraph = layout.introHeader.append("p").text("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum");
 
-	layout.row1 = layout.container.append("div").attr("class", "row");
-	layout.leftPanel = layout.row1.append("div").attr("class", "col-md-" + columnWidths[0])
-	layout.controlsPanel = layout.leftPanel.append("div").attr("class", "row controls")
-    	    .append("div").attr("class", "col-md-12")
-    	    .append("div").attr("class", "panel panel-default");
-	layout.controlsPanel.append("div").attr("class", "panel-heading").append("h5").attr("class", "panel-title")
-	    .text("Controls");
+	layout.controlsPanel = layout.row0.append("div").attr("class", "col-md-4 controls")
+    	    .append("div").attr("class", "panel panel-default controls-affix").attr("data-spy", "affix");
 
-	layout.leftPanelBody = layout.controlsPanel.append("div").attr("class", "panel-body");
-	layout.ops = layout.leftPanelBody.append("div").attr("class", "options");
+	layout.controlsPanelBody = layout.controlsPanel.append("div").attr("class", "panel-body");
+	layout.ops = layout.controlsPanelBody.append("div").attr("class", "options");
 	layout.defaultControlsObj = AlgorithmUtils.insertDefaultControls(layout.ops, algorithmTabId);
 	layout.customControlsLayout = AlgorithmUtils.insertCustomControls(layout.ops, algorithmTabId, algorithmName, comments);
 	
+
+	layout.row1 = layout.container.append("div").attr("class", "row");
+	layout.leftPanel = layout.row1.append("div").attr("class", "col-md-" + columnWidths[0])
+
 	layout.visPanel = layout.leftPanel.append("div").attr("class", "row")
     	    .append("div").attr("class", "col-md-12")
     	    .append("div").attr("class", "panel panel-default");
-	layout.visPanel.append("div").attr("class", "panel-heading").append("h5").attr("class", "panel-title")
+	layout.visPanel.append("div").attr("class", "panel-heading").append("h6").attr("class", "panel-title")
 	    .text("Algorithm Visualization");
 	layout.visPanel.append("div").attr("class", "panel-body graphics");
-
+	
+	
 	layout.codePanel = layout.row1.append("div").attr("class", "col-md-" + columnWidths[1])
     	    .append("div").attr("class", "panel panel-default");
-	layout.codePanel.append("div").attr("class", "panel-heading").append("h5").attr("class", "panel-title")
+	layout.codePanel.append("div").attr("class", "panel-heading").append("h6").attr("class", "panel-title")
 	    .text("Code");
 	layout.codePanel.append("div").attr("class", "panel-body code");
 	return layout;
