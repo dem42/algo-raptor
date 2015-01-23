@@ -4,22 +4,20 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     if (_my == undefined) {
 	throw "Algorithm module is not defined!";
     }
-    var algorithmTabId = "fft-tab";
-    var algorithmName = "Fast Fourier Transform";
+    var algorithm1TabId = "fft-tab-tran";
+    var algorithm2TabId = "fft-tab-mult";
+    var algorithm1Name = "Fast Fourier Transform";
+    var algorithm2Name = "Fast Fourier Multiplication";
 
     /*******************************/
     /*      Setup the panels       */
     /*******************************/
     console.debug("downloaded fft");
 
-    var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName, "fft", [5, 7], "Select which algorithm you would like to see visualized:");
-    var radios = layout.ops.append("div").attr("class", "buttons")
-	.append("div").attr("class", "btn-group-sm").attr("role", "group");
-    radios.append("button").attr("id", "fft-trans-btn").attr("class", "btn btn-default fft-radio-button active")
-	.attr("type", "button").text("FFT Transform Algorithm");
-    radios.append("button").attr("id", "fft-mult-btn").attr("class", "btn btn-default fft-radio-button")
-	.attr("type", "button").text("Polynomial Multiplication with FFT");
-    
+    var layout_tran = _my.AlgorithmUtils.setupLayout(algorithm1TabId, algorithm1Name, {priority:"fft1-tran"}, [5, 7]);
+    layout_tran.customControlsLayout.style("display", "none");
+    var layout_mult = _my.AlgorithmUtils.setupLayout(algorithm2TabId, algorithm2Name,  {priority:"fft2-mult"}, [5, 7]);
+    layout_mult.customControlsLayout.style("display", "none");
     /*******************************/
     /*      Complex number type    */
     /*******************************/
@@ -172,14 +170,14 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
      *********************/
     var margin = { left: 10, top: 30, right: 10, bottom: 100};
     var width = 900;
-    var svg_fft_elem = d3.select("#" + algorithmTabId + " .graphics").append("svg")
+    var svg_fft_elem = d3.select("#" + algorithm1TabId + " .graphics").append("svg")
 	.attr("width",  width + "px")
 	.attr("height", "1050px")
 	.style("display", "inline");
     var fft_group = svg_fft_elem.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
-    var svg_multiply_elem = d3.select("#" + algorithmTabId + " .graphics").append("svg")
+    var svg_multiply_elem = d3.select("#" + algorithm2TabId + " .graphics").append("svg")
 	.attr("width",  1.42*width + "px")
 	.attr("height", "1050px")
 	.style("display", "none");
@@ -621,9 +619,9 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    recursion_depth--;
 	}
     };
-    var fft_algo_context = _my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj);
+    var fft_algo_context = _my.AlgorithmUtils.createAlgorithmContext(layout_tran.defaultControlsObj);
     var ev = new _my.Algorithm(FFT_transform, ev_calls, "eval-code", fft_algo_context, function() {
-	_my.AlgorithmUtils.resetControls(algorithmTabId);
+	_my.AlgorithmUtils.resetControls(algorithm1TabId);
     }); 
     var calc = new _my.Algorithm(Complex.calc_unity, [], "calc-code", fft_algo_context); 
     var fft_call = [];
@@ -809,9 +807,9 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     fft_calls[26] = { "pre": function(res) {
 	return animateNodeMultDrawing(0, drawPoly, res, true, this.AlgorithmContext);
     }};
-    var mult_algo_ctx = _my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj);
+    var mult_algo_ctx = _my.AlgorithmUtils.createAlgorithmContext(layout_mult.defaultControlsObj);
     var fft = new _my.Algorithm(FFT_multiply, fft_calls, "fft-code", mult_algo_ctx, function() {
-	_my.AlgorithmUtils.resetControls(algorithmTabId);
+	_my.AlgorithmUtils.resetControls(algorithm2TabId);
     });
 
     // we need a kickoff function that will start the multiply algorithm
@@ -830,36 +828,16 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	console.log("After fft multiply", "" + result);
 	executionFunction();
     };
-    _my.AlgorithmUtils.appendCode(algorithmTabId, "calc-code", calc);
-    _my.AlgorithmUtils.appendCode(algorithmTabId, "eval-code", ev);
-    _my.AlgorithmUtils.appendCode(algorithmTabId, "fft-code", fft).style("display", "none");
+    _my.AlgorithmUtils.appendCode(algorithm1TabId, "calc-code", calc);
+    _my.AlgorithmUtils.appendCode(algorithm1TabId, "eval-code", ev);
+    _my.AlgorithmUtils.appendCode(algorithm2TabId, "fft-code", fft);
 
     $(".fft-radio-button").click(function() {
 	$(this).addClass("active").siblings().removeClass("active");
     });
 
-    d3.select("#fft-mult-btn").on("click", function() {
-	$(".eval-code").css("display", "none");
-	$(".calc-code").css("display", "none");
-	$(".fft-code").css("display", "inline");
-	svg_fft_elem.style("display", "none");
-	svg_multiply_elem.style("display", "inline");
-	//we attach the kickoff_fft_multiply to the default controls
-	_my.AlgorithmUtils.attachAlgoToControls(fft, algorithmTabId, kickoff_fft_multiply);
-
-    });
-
-    // the default is the fft-transform algorithm so we attach it here
-    _my.AlgorithmUtils.attachAlgoToControls(ev, algorithmTabId, kickoff_fft_trans);
-    d3.select("#fft-trans-btn").on("click", function() {
-	$(".eval-code").css("display", "inline");
-	$(".calc-code").css("display", "inline");
-	$(".fft-code").css("display", "none");
-	svg_fft_elem.style("display", "inline");
-	svg_multiply_elem.style("display", "none");
-	//we attach the kickoff_fft_multiply to the default controls
-	_my.AlgorithmUtils.attachAlgoToControls(ev, algorithmTabId, kickoff_fft_trans);
-    });
+    _my.AlgorithmUtils.attachAlgoToControls(fft, algorithm2TabId, kickoff_fft_multiply);
+    _my.AlgorithmUtils.attachAlgoToControls(ev, algorithm1TabId, kickoff_fft_trans);
 
     return {FFT_multiply : FFT_multiply, Complex : Complex, FFT_transform : FFT_transform};
 })(ALGORITHM_MODULE, $, d3, bootbox);

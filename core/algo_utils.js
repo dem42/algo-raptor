@@ -146,25 +146,10 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
     }
 
     // create an item for the algorithm in the list of all available algorithms 
-    AlgorithmUtils.insertIntoHeaderList = function(tabId, headerText, listItemId) {
+    AlgorithmUtils.insertIntoHeaderList = function(tabId, headerText, menuConfig) {
 
-	var otherAlgos = [listItemId];
-	d3.selectAll("#algoTabs li a").each(function(d) { 
-	    if (d != undefined) {
-		otherAlgos.push(d);
-	    }
-	});
-	otherAlgos.sort();
-	var indexInAlgos = otherAlgos.indexOf(listItemId);
-	var listItem = null;
-	if (indexInAlgos == otherAlgos.length - 1) {
-	    listItem = d3.select("#algoTabs").append("li");	
-	}
-	else {
-	    listItem = d3.select("#algoTabs").insert("li", "#" + otherAlgos[indexInAlgos + 1]);
-	}
-
-	listItem.attr("id", listItemId);
+	var listItemId = menuConfig.priority;
+	var listItem = d3.select("#" + listItemId);
 	listItem.append("a").data([listItemId]).attr("href", tabId).attr("role", "tab").attr("data-toggle", "tab")
 	    .attr("data-tab-id", tabId)
 	    .text(headerText);
@@ -279,10 +264,10 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
     /**
      * this creates the layout for the algorithm page
      */
-    AlgorithmUtils.setupLayout = function(algorithmTabId, algorithmName, algorithmPriorityCode, columnWidths, comments) {
+    AlgorithmUtils.setupLayout = function(algorithmTabId, algorithmName, menuConfig, columnWidths, comments) {
 	var layout = {};
 	
-	AlgorithmUtils.insertIntoHeaderList("#" + algorithmTabId, algorithmName, algorithmPriorityCode);
+	AlgorithmUtils.insertIntoHeaderList("#" + algorithmTabId, algorithmName, menuConfig);
 	layout.container = d3.select("#algoContainer")
     	    .append("div").attr("class", "tab-pane").attr("id", algorithmTabId)
             .append("div").attr("class", "container-fluid");

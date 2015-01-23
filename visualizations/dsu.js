@@ -13,7 +13,7 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     /*******************************/
     console.log("downloaded dsu");
 
-    var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName, "graphs-1-dsu", [7, 5]);
+    var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName, {priority: "graphs-1-dsu"}, [7, 5]);
     layout.customControlsLayout.style("display", "none");
     
     /*******************************/

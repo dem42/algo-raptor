@@ -12,7 +12,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
     /*******************************/
     console.debug("downloaded quicksort");
 
-    var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName, "sorting-quick", [6, 6]);
+    var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName,  {priority:"sorting-quick"}, [6, 6]);
 
     /*******************************/
     /*      Define the functions   */

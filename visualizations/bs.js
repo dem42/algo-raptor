@@ -14,7 +14,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     /*******************************/
     console.debug("downloaded bs", _my);
 
-    var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName, "search-1-binary", [6, 6], "Algorithm input data may be modified below:");
+    var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName,  {priority:"search-1-binary"}, [6, 6], "Algorithm input data may be modified below:");
     layout.customControlsLayout.append("div").attr("class", "bs-forms");
     /*******************************/
     /*      Setup the svg stuff    */
