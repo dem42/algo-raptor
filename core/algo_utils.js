@@ -77,6 +77,18 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 		gaugeObj.update(current-1);
 	    }).append("span").attr("class", "glyphicon glyphicon-minus");
 
+	/*
+	var miniBtn = controlsDiv.append("button").attr("type","button")
+	miniBtn.append("span").attr("class", "sr-only");
+	miniBtn.append("span").attr("class", "icon-bar");
+	miniBtn.append("span").attr("class", "icon-bar");
+	miniBtn.append("span").attr("class", "icon-bar");
+	miniBtn.on("click", function(d) { 
+	    console.log("in mini btn click"); 
+	    controlsDiv.transition().duration(200).attr("width", 50);
+	});
+	*/
+
 	return {"speedGauge" : gaugeObj};
     }
 

@@ -8,7 +8,7 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 
     var algorithmTabId = "fenwick-tab";
     var algorithmName = "Fenwick tree";
-    var N = 14;
+    var N = 16;
     var tree = new Array(N + 1);
     var input_data = new Array(N);
     tree.fill(0);
@@ -24,10 +24,27 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     console.debug("downloaded fenwick");
 
     var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName,  {priority:"fenwick"}, [7, 5], "You may modify the input array here:");
-    var float_container = layout.customControlsLayout.append("div").attr("class", "fen-float-container")
+    var fen_container = layout.customControlsLayout.append("div").style("width", "100%");
+    var float_container = fen_container.append("div").attr("class", "fen-float-container pull-left")
     var fen_labels = float_container.append("div").attr("class", "fen-labels");
     var fen_forms = float_container.append("div").attr("class", "fen-forms");
-    
+    var fenIndexData = fen_container.append("div").attr("class", "fen-index-data pull-right");
+    var summaryField = fenIndexData.append("p");
+    summaryField.append("span").attr("class", "fen-dyn-lbl").text("");
+    summaryField.append("span").attr("class", "fen-dyn-val").text("");
+    var currentField = fenIndexData.append("p");
+    currentField.append("span").attr("class", "fen-dyn-lbl").text("index: ");
+    currentField.append("span").attr("class", "fen-dyn-val").text("");
+    var minusCurrentField = fenIndexData.append("p");
+    minusCurrentField.append("span").attr("class", "fen-dyn-lbl").text("-index: ");
+    minusCurrentField.append("span").attr("class", "fen-dyn-val").text("");
+    var andCurrentField = fenIndexData.append("p");
+    andCurrentField.append("span").attr("class", "fen-dyn-lbl").text("index & -index: ");
+    andCurrentField.append("span").attr("class", "fen-dyn-val").text("");
+    var nextField = fenIndexData.append("p");
+    nextField.append("span").attr("class", "fen-dyn-lbl").text("new index: ");
+    nextField.append("span").attr("class", "fen-dyn-val").text("");
+
     fen_labels.append("span").text("index:").attr("class", "fen-table-lbl");
     var labels = d3.select(".fen-labels").selectAll("fen-label")
 	.data(idxs)
@@ -83,9 +100,23 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     var log2N = Math.ceil(Math.log2(N));
     function bitPattern(num) {
 	var res = [];
-	for (var i = 0; i <= log2N; i++) {
-	    res.push(num % 2);
-	    num = num >> 1;
+	if (num > 0) {
+	    for (var i = 0; i <= log2N; i++) {
+		res.push(num % 2);
+		num = num >> 1;
+	    }
+	}
+	else {
+	    var carry = 1;
+	    var nabs = Math.abs(num);
+	    for (var i = 0; i <= log2N; i++) {
+		var e = 1 - num % 2;
+		res.push((e + carry)%2);
+		if (e + carry == 1) {
+		    carry = 0;
+		}
+		num = num >> 1;
+	    }
 	}
 	return res.reverse().join("");
     }
@@ -95,11 +126,13 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     var svg_data = function init() {
 	var margin = { left: 10, top: 70, right: 10, bottom: 100};
 	var svg = d3.select("#" + algorithmTabId + " .graphics").append("svg")
-	.attr("width",  "900px")
+	.attr("width",  "700px")
 	.attr("height", "1050px")
+	.style("float", "left")
 	.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+	svg.append("text").attr("class", "fen-text").text("Fenwick Tree:")
 	var highest2Pow = 1 << log2N;
 
 	var cluster = d3.layout.cluster()
@@ -169,33 +202,81 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     }
     function arrowAnimate(old_idx, i) {
 	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
-	if (i == 0 || old_idx == 0) return this.AlgorithmContext.getBaselineAnimationSpeed(); 
+	if (i == 0 || old_idx == 0 || i > N || old_idx > N) return this.AlgorithmContext.getBaselineAnimationSpeed(); 
 	var arrow_gen = _my.vislib.interpolatableDiagonal("linear");
 	var data = {"source": svg.select("#fen-node-" + old_idx).datum(), "target" : svg.select("#fen-node-" + i).datum()}
 	var path = svg.insert("path", "g").attr("class", "fen-arrow").attr("d", arrow_gen(data));
-	var arrow = _my.vislib.animateGrowingArrow(svg_data.arrow_holder, path, animation_duration, 0, false, 0.5).arrow;
+	var arrow = _my.vislib.animateGrowingArrow(svg_data.arrow_holder, path, animation_duration, 0, false, 1).arrow;
 	arrow.attr("class", "fen-arrow-head");
 	setTimeout(function() {
 	    highlighting(i);
 	}, animation_duration);
 	return animation_duration;
     }
-    read_callbacks[0] = update_callbacks[0] = function(idx) {
+    function commonStartup(idx) {
 	d3.selectAll(".fen-arrow-head").remove();
 	d3.selectAll(".fen-arrow").remove();
 	svg.selectAll(".fen-rect-highlighted").classed("fen-rect-highlighted", false);
 	highlighting(idx);
+    } 
+
+    function fadeIn(elem, duration) {
+	elem.transition().duration(duration).style("opacity", "1");
+	return elem;
+    }
+    function fadeOut(elem, duration) {
+	elem.transition().duration(duration).style("opacity", "0");
+	return elem;
+    }
+
+    read_callbacks[0] = function(idx) {
+	var animation_duration = this.AlgorithmContext.getBaselineAnimationSpeed();
+	commonStartup(idx);
+	fadeIn(summaryField, animation_duration).select("span:first-child").text("sum: ");
+	summaryField.select("span:last-child").text(0);
+	fadeIn(currentField, animation_duration).select("span:last-child").text(bitPattern(idx));
+	return animation_duration;
+    }
+    update_callbacks[0] = function(idx, value) {
+	var animation_duration = this.AlgorithmContext.getBaselineAnimationSpeed();
+	commonStartup(idx);
+	fadeIn(summaryField, animation_duration).select("span:first-child").text("increment: ");
+	summaryField.select("span:last-child").text(value);
+	fadeIn(currentField, animation_duration).select("span:last-child").text(bitPattern(idx));
+    }
+    update_callbacks[3] = function(i) {
+	var animation_duration = (1/2) * this.AlgorithmContext.getBaselineAnimationSpeed();
+	fadeIn(minusCurrentField, animation_duration).select("span:last-child").text(bitPattern(-i));
+	fadeIn(andCurrentField, 2 * animation_duration).select("span:last-child").text(bitPattern(i & -i));
+	return animation_duration * 2;
     }
     read_callbacks[2] = update_callbacks[1] = function(i) {
+	currentField.select("span:last-child").text(bitPattern(i));
 	highlighting(i);
     }
+    read_callbacks[4] = function(i) {
+	var animation_duration = (1/2) * this.AlgorithmContext.getBaselineAnimationSpeed();
+	fadeIn(minusCurrentField, animation_duration).select("span:last-child").text(bitPattern(-i));
+	fadeIn(andCurrentField, 2 * animation_duration).select("span:last-child").text(bitPattern(i & -i));
+	return animation_duration * 2;
+    }
     read_callbacks[5] = function(i, lowest_set_bit) {
+	var animation_duration = (1/2) * this.AlgorithmContext.getBaselineAnimationSpeed();
+	fadeIn(nextField, animation_duration).select("span:last-child").text(bitPattern(i));
 	return arrowAnimate.call(this, i + lowest_set_bit, i);
     }
     update_callbacks[2] = function(tree, i) {
-	svg.select("#fen-node-" + i).select(".fen-sum").text("Sum: " + (tree[i] || 0));
+	var animation_duration = this.AlgorithmContext.getBaselineAnimationSpeed();
+	var node = svg.select("#fen-node-" + i).select(".fen-sum");
+	node.classed("fen-text-highlight", true).text("Sum: " + (tree[i] || 0));
+	setTimeout(function() {
+	    node.classed("fen-text-highlight", false);
+	}, animation_duration);
+	return animation_duration;
     }
     update_callbacks[4] = function(i, lowest_set_bit) {
+	var animation_duration = (1/2) * this.AlgorithmContext.getBaselineAnimationSpeed();
+	fadeIn(nextField, animation_duration).select("span:last-child").text(bitPattern(i));
 	return arrowAnimate.call(this, i - lowest_set_bit, i);
     }
 

@@ -1,6 +1,7 @@
 .controls-affix {
     z-index: 10;
     opacity: 0.9;
+    padding-top: 30px;
 }
 
 .aviz-footer {
@@ -15,16 +16,6 @@
 
 .aviz-footer-list li {
     display: inline;
-}
-
-.controls {
-    /*
-    border: solid black 1px;
-    padding: 5px;
-    width: auto;
-    max-width: 700px;
-    font-weight: bold;
-    */
 }
 
 pre.prettyprint {

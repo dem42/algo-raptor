@@ -17,8 +17,9 @@ $(function (ALGORITHM_MODULE) {
 	$('a[data-toggle="tab"]').off('shown.bs.tab');
 	$('a[data-toggle="tab"]').on('shown.bs.tab', resizingSvg);
     }
-
-
+    $('#my-logo').on("click", function() {
+        $("#algoTabs a:first").tab("show");
+    });
     /**
      * jQuery Plugin: Sticky Tabs
      * License: Public Domain
@@ -38,7 +39,6 @@ $(function (ALGORITHM_MODULE) {
 	    // Set the correct tab when a user uses their back/forward button
 	    window.addEventListener('hashchange', showTabFromHash, false);
 	    // Change the URL when tabs are clicked
-
 	    return this;
 	};
     }( jQuery ));

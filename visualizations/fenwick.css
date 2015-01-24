@@ -86,3 +86,21 @@
     fill: red;
     stroke: red;
 }
+
+.fen-text {
+    fill: black;
+    stroke: none;
+    text-decoration: underline;
+    font-size:120%;
+}
+
+.fen-text-highlight {
+    fill: red;
+}
+
+.fen-dyn-lbl {
+    font-weight: bold;
+}
+.fen-index-data > p {
+    opacity: 0;
+}
