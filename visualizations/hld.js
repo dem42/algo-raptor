@@ -11,7 +11,8 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
     /*      Setup the panels       */
     /*******************************/
     console.debug("downloaded hld");
-    var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName, "a-hld", [5, 7]);
+    var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName,  {priority:"a-hld"}, [5, 7]);
+    layout.introductionParagraph.text("This algorithm is all about preparing non balanced trees to get O(log(n)) algorithms.")
     /*********************/
     /*** HLD functions ***/
     /*********************/
@@ -145,6 +146,9 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
     // hld callbacks colors for chains and special child animation 
     var chain_colors = d3.scale.category10();
     hld_callbacks[4] = function(tree, current_chain, current_node, chains) {
+	svg.selectAll(".hld-special-child-lbl").remove();
+	svg.selectAll(".hld-special-child-rect").remove();
+	svg.selectAll(".hld-new-chain-lbl").remove();
 	var parent = tree[current_node].parent_idx;
 	svg.select("#hld-node-" + current_node + " circle")
 	    .style({"stroke": chain_colors(current_chain),
@@ -154,6 +158,33 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
 		.style({"stroke": chain_colors(current_chain),
 		       "stroke-width": "3px"});
 	}
+    };
+    hld_callbacks[16] = function(tree, current_chain, specialChild) {
+	svg.selectAll(".hld-special-child-rect").remove();
+	svg.selectAll(".hld-special-child-lbl").remove();
+	var node = svg.select("#hld-node-" + specialChild);
+	node.append("rect")
+	    .attr("class", "hld-special-child-rect")
+	    .attr("width", 3*radius)
+	    .attr("height", 3*radius)
+	    .attr("x", -1.5*radius)
+	    .attr("y", -1.5*radius);
+	node.append("text")
+	    .attr("class", "hld-special-child-lbl")
+	    .attr("dy", -1.6*radius)
+	    .text("Special child candidate");
+
+    };
+    hld_callbacks[19] = {"pre" : function() {
+	svg.select(".hld-special-child-lbl").text("Special child winner!");
+    }};
+    hld_callbacks[22] = function(new_chain_num, children, idx) {
+	var animation_duration = 1.5 * this.AlgorithmContext.getBaselineAnimationSpeed();
+	var new_chain_lbl = svg.select("#hld-node-" + children[idx]).append("text")
+	    .attr("class", "hld-new-chain-lbl")
+	    .attr("dy", -1.6*radius)
+	    .text("Starting new chain!");
+	return animation_duration;
     };
 
     /******************/
@@ -188,7 +219,7 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
     var tree = createRandomTree(TREE_SIZE);
     initialize(tree);
     layout.customControlsLayout.append("button")
-	.attr("class", "btn btn-default btn-sm")
+	.attr("class", "btn btn-info btn-sm")
 	.attr("title", "Permute the tree input data. (You want to do this .. Trust me!")
         .on("click", function() {
 	    d3.select("#hld-tree-group").remove();
@@ -197,8 +228,17 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
 	})
 	.text("Shuffle Data");
 
-    
+    function cleanup() {
+	console.log("running cleanup");
+	var links = d3.selectAll(".hld-link");
+	links.classed("hld-link-highlighted", false);
+	links.attr("style", null);
+	d3.selectAll(".hld-size-label").remove();
+	d3.selectAll(".hld-circle").attr("style", null);
+    }
+
     _my.AlgorithmUtils.attachAlgoToControls(ss_algo, algorithmTabId, function(play_callback){
+	cleanup();
 	ss_algo.run(tree, 0);
 	chains = {chainLengths: undefined, 
 		  chainHeads: undefined, 

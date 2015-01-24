@@ -1,15 +1,48 @@
+.bs-svg-input-box {
+    stroke: steelBlue;
+    fill: none;
+    width: 20px;
+    margin: 10px;
+    text-align: center;
+}
+
 .not-found-label {
     fill: #f00;
 }
 
-.input-box {
+.bs-input-box {
     font-size: 1em; 
     border: steelBlue 1px solid;
-    width: 1.50em;
+    width: 1.45em;
     margin: 0.5em;
     text-align: center;
 }
 
 .bs-text {
     pointer-events: none;
+    text-anchor: middle;
+}
+
+#bs-what-to-find-lbl {
+    pointer-events: none;
+    fill: #000;
+    stroke: none;
+    text-decoration: underline;
+}
+#bs-what-to-find-lbl > tspan {
+    font-weight: bold;
+    font-size: 110%;
+}
+
+.bs-big-red-warning {
+    fill: red;
+    font-size: 130%;
+}
+
+.bs-warning-bold-tspan {
+    font-weight: bold;
+}
+
+.bs-warning-normal-tspan {
+    font-weight: normal;
 }

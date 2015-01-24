@@ -34,3 +34,24 @@
     font-size: small;
     font-family: monospace;
 }
+
+.hld-special-child-rect {
+    fill: none;
+    stroke: red;
+}
+
+.hld-special-child-lbl {
+    pointer-events: none;
+    stroke: none;
+    fill: red;
+    text-anchor: middle; 
+    font-size: medium;
+}
+
+.hld-new-chain-lbl {
+    pointer-events: none;
+    stroke: none;
+    fill: red;
+    text-anchor: middle; 
+    font-size: medium;
+}

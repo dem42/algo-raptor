@@ -12,7 +12,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
     /*******************************/
     console.debug("downloaded quicksort");
 
-    var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName, "sorting-quick", [6, 6]);
+    var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName,  {priority:"sorting-quick"}, [6, 6]);
 
     /*******************************/
     /*      Define the functions   */
@@ -140,6 +140,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
         recursion_depth++; // a new stack frame has been added so we increase the recursion depth
 	d3.selectAll("text.q-left-text").remove();
 	d3.selectAll("text.q-right-text").remove();
+	d3.selectAll("image.q-arrow").remove();
 	if (left == 0 && right == data.length - 1) {
 	    return animationDuration; // we don't want to move the entire array down, only subarrays
 	}
@@ -186,44 +187,44 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	if (new_left >= data.length) {
 	    return 0;
 	}
-	var new_left_i = data[new_left].old_idx;
-	var g = d3.select("#q-g-" + new_left_i);
-	var radius = g.select("circle").attr("r");
-	d3.selectAll("g.left")
-	    .classed("left", false)
-	    .select("text.q-left-text")
-	    .remove();
-	g.append("text")
-	    .attr("class", "q-left-text")
-	    .attr("dx", -radius)
-	    .attr("dy", -radius)
-	    .text("Left");
-	g.classed("left", true);
-	return this.AlgorithmContext.getBaselineAnimationSpeed();
-    };
-    q_callbacks[6] = q_callbacks[10] = q_callbacks[19] = function(data, new_left) {
-	return updateLeft.apply(this, arguments);
-    };
+	return updateArrow.call(this, data, new_left, "left", "q-left-text", "Left");
+    }
     //right animation
     function updateRight(data, new_right) {
 	if (new_right < 0) {
 	    return 0;
 	}
-	var new_right_i = data[new_right].old_idx;
-	var g = d3.select("#q-g-" + new_right_i);
+	return updateArrow.call(this, data, new_right, "right", "q-right-text", "Right");
+    }
+    function updateArrow(data, pos, class_name, text_class, text) {
+	if (pos >= data.length) {
+	    return 0;
+	}
+	var pos_i = data[pos].old_idx;
+	var g = d3.select("#q-g-" + pos_i);
 	var radius = g.select("circle").attr("r");
-	d3.selectAll("g.right")
-	    .classed("right", false)
-	    .select("text.q-right-text")
+	var gleft = d3.selectAll("g." + class_name)
+	    .classed(class_name, false)
+	gleft.select("image.q-arrow")
 	    .remove();
-
+	gleft.select("text." + text_class)
+	    .remove();
+	g.append("image")
+	    .attr("class", "q-arrow")
+	    .attr("y",-(maxi_width * 1.7))
+	    .attr("x",-15)
+	    .attr("width",30)
+	    .attr("height",30)
+	    .attr("xlink:href", "assets/arrow2.png")
+	    .attr("transform", "rotate(180)");
 	g.append("text")
-	    .attr("class", "q-right-text")
-	    .attr("dx", radius)
-	    .attr("dy", radius)
-	    .text("Right");
-	g.classed("right", true);
+	    .attr("class", text_class + " quicksort-text")
+	    .attr("dy", (maxi_width * 1.7) + 18).text(text)
+	g.classed(class_name, true);
 	return this.AlgorithmContext.getBaselineAnimationSpeed();
+    };
+    q_callbacks[6] = q_callbacks[10] = q_callbacks[19] = function(data, new_left) {
+	return updateLeft.apply(this, arguments);
     };
     q_callbacks[7] = q_callbacks[13] = q_callbacks[20] = function(data, new_right) {
 	return updateRight.apply(this, arguments);
@@ -287,6 +288,12 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	    return 0;
 	}
     };
+    q_callbacks[19] = function(data, new_left) {
+	updateLeft.call(this, data, new_left);
+    };
+    q_callbacks[20] = function(data, new_right) {
+	updateRight.call(this, data, new_right);
+    };
     var algo_context = _my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj);
     var qual_algo = new _my.Algorithm(quicksort, q_callbacks, "quicksort-code", algo_context, function() {
 	_my.AlgorithmUtils.resetControls(algorithmTabId);
@@ -320,7 +327,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	}
     };
     layout.customControlsLayout.append("button")
-	.attr("class", "btn btn-default btn-sm")
+	.attr("class", "btn btn-info btn-sm")
 	.attr("title", "Permute the quicksort input data. (The balls!)")
         .on("click", function() {
 	    sequence_to_sort.shuffle();

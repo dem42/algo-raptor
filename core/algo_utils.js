@@ -32,8 +32,8 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 	return cpy;
     }
 
-    AlgorithmUtils.insertCustomControls = function(controlsDiv, algorithmId, algorithmName, comments) {
-	var customControlsHolder = controlsDiv.append("div").attr("class", "custom-controls-holder");
+    AlgorithmUtils.insertCustomControls = function(layout, algorithmId, algorithmName, comments) {
+	var customControlsHolder = layout.visPanelContents.append("div").attr("class", "custom-controls-holder");
 	customControlsHolder.append("div").attr("class", "custom-controls-header").text(algorithmName + " Controls:");
 
 	if (comments !== undefined) {
@@ -44,8 +44,9 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
     }
 
     // create and populate a section for standard algorithm controls
-    AlgorithmUtils.insertDefaultControls = function(controlsDiv, algorithmId) {
+    AlgorithmUtils.insertDefaultControls = function(layout, algorithmId) {
 
+	var controlsDiv = layout.ops;
 	function appendButton(div, classname, algorithmName, tooltip) {
 	    var button = div.append("a").attr("href", "#").classed("a-btn enabled-btn", true).attr("id", classname + "-of-" + algorithmId);
 	    button.append("span").attr("class", "a-btn-icon").attr("title", tooltip).append("span").attr("class", classname);
@@ -76,6 +77,18 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 		gaugeObj.update(current-1);
 	    }).append("span").attr("class", "glyphicon glyphicon-minus");
 
+	/*
+	var miniBtn = controlsDiv.append("button").attr("type","button")
+	miniBtn.append("span").attr("class", "sr-only");
+	miniBtn.append("span").attr("class", "icon-bar");
+	miniBtn.append("span").attr("class", "icon-bar");
+	miniBtn.append("span").attr("class", "icon-bar");
+	miniBtn.on("click", function(d) { 
+	    console.log("in mini btn click"); 
+	    controlsDiv.transition().duration(200).attr("width", 50);
+	});
+	*/
+
 	return {"speedGauge" : gaugeObj};
     }
 
@@ -91,64 +104,64 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
     // if you have some dialog that needs to query for input before the algorithm is started pass it as kickoffCallback
     // the argument passed as kickoffCallback must be either undefined or a function that accepts another function as
     // an argument. The function passed to kickoffCallback should be executed in kickoffCallback as the last step
-    AlgorithmUtils.attachAlgoToControls = function(algorithm, algorithmId, kickoffCallback) {
-	var play_function = function() {
-	    if (!algorithm.runningInContMode) {
-		d3.select("#" + "play-btn-of-" + algorithmId + " span span").attr("class", "pause-btn");
-		d3.select("#" + "play-btn-of-" + algorithmId + " span").attr("title", "Pause the algorithm");
-		d3.select("#" + "next-btn-of-" + algorithmId).classed("disabled-btn", true);
-		d3.select("#" + "next-btn-of-" + algorithmId).classed("enabled-btn", false);
-     		algorithm.runStack();
-	    }
-	    else {
-		algorithm.runningInContMode = false; //stopping
-		AlgorithmUtils.resetControls(algorithmId);
-	    }
-	};
-	var next_function = function() {
-	    if (!algorithm.runningInContMode) {
-     		algorithm.executeNextRowInStepMode();
-	    }
+    AlgorithmUtils.createAlgoAttacher = function() {
+	var res = {};
+	res.play_maker = function(algorithm, algorithmId) {
+	    return function() {
+		if (!algorithm.runningInContMode) {
+		    d3.select("#" + "play-btn-of-" + algorithmId + " span span").attr("class", "pause-btn");
+		    d3.select("#" + "play-btn-of-" + algorithmId + " span").attr("title", "Pause the algorithm");
+		    d3.select("#" + "next-btn-of-" + algorithmId).classed("disabled-btn", true);
+		    d3.select("#" + "next-btn-of-" + algorithmId).classed("enabled-btn", false);
+     		    algorithm.runStack();
+		}
+		else {
+		    algorithm.runningInContMode = false; //stopping
+		    AlgorithmUtils.resetControls(algorithmId);
+		}
+	    };
 	};
 
-	d3.select("#" + "play-btn-of-" + algorithmId).on("click", function() {
-	    if (!algorithm.isRunning() && kickoffCallback != undefined) {
-		kickoffCallback(play_function);
-	    }
-	    else {
-		play_function();
-	    }
-	});
-	d3.select("#" + "next-btn-of-" + algorithmId).on("click", function() {
-	    if (!algorithm.isRunning() && kickoffCallback != undefined) {
-		kickoffCallback(next_function);
-	    }
-	    else {
-		next_function();
-	    }
-	});
+	res.next_maker = function(algorithm, algorithmId) {
+	    return function() {
+		if (!algorithm.runningInContMode) {
+     		    algorithm.executeNextRowInStepMode();
+		}
+	    };
+	};
+
+	// allows us to reattach the controls as we like
+	res.attach = function(algorithm, algorithmId, kickoffCallback) {
+	    d3.select("#" + "play-btn-of-" + algorithmId).on("click", function() {
+		if (!algorithm.isRunning() && kickoffCallback != undefined) {
+		    kickoffCallback(res.play_maker(algorithm, algorithmId));
+		}
+		else {
+		    (res.play_maker(algorithm, algorithmId))();
+		}
+	    });
+	    d3.select("#" + "next-btn-of-" + algorithmId).on("click", function() {
+		if (!algorithm.isRunning() && kickoffCallback != undefined) {
+		    kickoffCallback(res.next_maker(algorithm, algorithmId));
+		}
+		else {
+		    (res.next_maker(algorithm, algorithmId))();
+		}
+	    });
+	};
+	return res;
+    }
+
+    AlgorithmUtils.attachAlgoToControls = function(algorithm, algorithmId, kickoffCallback) {
+	var attacher = AlgorithmUtils.createAlgoAttacher();
+	attacher.attach(algorithm, algorithmId, kickoffCallback);
     }
 
     // create an item for the algorithm in the list of all available algorithms 
-    AlgorithmUtils.insertIntoHeaderList = function(tabId, headerText, listItemId) {
+    AlgorithmUtils.insertIntoHeaderList = function(tabId, headerText, menuConfig) {
 
-	var otherAlgos = [listItemId];
-	d3.selectAll("#algoTabs li a").each(function(d) { 
-	    if (d != undefined) {
-		otherAlgos.push(d);
-	    }
-	});
-	otherAlgos.sort();
-	var indexInAlgos = otherAlgos.indexOf(listItemId);
-	var listItem = null;
-	if (indexInAlgos == otherAlgos.length - 1) {
-	    listItem = d3.select("#algoTabs").append("li");	
-	}
-	else {
-	    listItem = d3.select("#algoTabs").insert("li", "#" + otherAlgos[indexInAlgos + 1]);
-	}
-
-	listItem.attr("id", listItemId);
+	var listItemId = menuConfig.priority;
+	var listItem = d3.select("#" + listItemId);
 	listItem.append("a").data([listItemId]).attr("href", tabId).attr("role", "tab").attr("data-toggle", "tab")
 	    .attr("data-tab-id", tabId)
 	    .text(headerText);
@@ -260,37 +273,48 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 	};
     };
 
-    AlgorithmUtils.setupLayout = function(algorithmTabId, algorithmName, algorithmPriorityCode, columnWidths, comments) {
+    /**
+     * this creates the layout for the algorithm page
+     */
+    AlgorithmUtils.setupLayout = function(algorithmTabId, algorithmName, menuConfig, columnWidths, comments) {
 	var layout = {};
 	
-	AlgorithmUtils.insertIntoHeaderList("#" + algorithmTabId, algorithmName, algorithmPriorityCode);
-	
-	layout.row0 = d3.select("#algoContainer")
+	AlgorithmUtils.insertIntoHeaderList("#" + algorithmTabId, algorithmName, menuConfig);
+	layout.container = d3.select("#algoContainer")
     	    .append("div").attr("class", "tab-pane").attr("id", algorithmTabId)
-            .append("div").attr("class", "container-fluid")
-    	    .append("div").attr("class", "row")
-	layout.leftPanel = layout.row0.append("div").attr("class", "col-md-" + columnWidths[0])
-	layout.controlsPanel = layout.leftPanel.append("div").attr("class", "row controls")
-    	    .append("div").attr("class", "col-md-12")
-    	    .append("div").attr("class", "panel panel-default");
-	layout.controlsPanel.append("div").attr("class", "panel-heading").text("Controls:");
+            .append("div").attr("class", "container-fluid");
+	layout.row0 = layout.container.append("div").attr("class", "row");
+	layout.introHeader = layout.row0.append("div").attr("class", "col-md-8");
+	layout.introHeader.append("div").attr("class", "page-header").append("h4").text(algorithmName);
+	layout.introductionParagraph = layout.introHeader.append("p").text("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum");
 
-	layout.leftPanelBody = layout.controlsPanel.append("div").attr("class", "panel-body");
-	layout.ops = layout.leftPanelBody.append("div").attr("class", "options");
-	layout.defaultControlsObj = AlgorithmUtils.insertDefaultControls(layout.ops, algorithmTabId);
-	layout.customControlsLayout = AlgorithmUtils.insertCustomControls(layout.ops, algorithmTabId, algorithmName, comments);
+	layout.controlsPanel = layout.row0.append("div").attr("class", "col-md-4 controls")
+    	    .append("div").attr("class", "panel panel-default controls-affix").attr("data-spy", "affix");
+
+	layout.controlsPanelBody = layout.controlsPanel.append("div").attr("class", "panel-body");
+	layout.ops = layout.controlsPanelBody.append("div").attr("class", "options");
 	
+
+	layout.row1 = layout.container.append("div").attr("class", "row");
+	layout.leftPanel = layout.row1.append("div").attr("class", "col-md-" + columnWidths[0])
+
 	layout.visPanel = layout.leftPanel.append("div").attr("class", "row")
     	    .append("div").attr("class", "col-md-12")
     	    .append("div").attr("class", "panel panel-default");
-	layout.visPanel.append("div").attr("class", "panel-heading").text("Algorithm Visualization");
-	layout.visPanel.append("div").attr("class", "panel-body graphics");
-
-	layout.codePanel = layout.row0.append("div").attr("class", "col-md-" + columnWidths[1])
+	layout.visPanel.append("div").attr("class", "panel-heading").append("h6").attr("class", "panel-title")
+	    .text("Algorithm Visualization");
+	layout.visPanelContents = layout.visPanel.append("div").attr("class", "panel-body graphics");
+	
+	
+	layout.codePanel = layout.row1.append("div").attr("class", "col-md-" + columnWidths[1])
     	    .append("div").attr("class", "panel panel-default");
-	layout.codePanel.append("div").attr("class", "panel-heading").text("Code");
+	layout.codePanel.append("div").attr("class", "panel-heading").append("h6").attr("class", "panel-title")
+	    .text("Code");
 	layout.codePanel.append("div").attr("class", "panel-body code");
 
+	// insert the controls objects
+	layout.defaultControlsObj = AlgorithmUtils.insertDefaultControls(layout, algorithmTabId);
+	layout.customControlsLayout = AlgorithmUtils.insertCustomControls(layout, algorithmTabId, algorithmName, comments);
 
 	return layout;
     };

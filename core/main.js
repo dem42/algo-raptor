@@ -12,11 +12,48 @@ $(function (ALGORITHM_MODULE) {
 	cache: false
     });
 
-    if (_my.RUNNING_IN_STATIC_MODE === true) {
-	prettyPrint.call({});
-	$('a[data-toggle="tab"]').off();
-	$('a[data-toggle="tab"]').on('shown.bs.tab', resizingSvg);
-    }
+    
+    prettyPrint.call({});
+    $('a[data-toggle="tab"]').off('shown.bs.tab');
+    $('a[data-toggle="tab"]').on('shown.bs.tab', resizingSvg);
+    $('a', "#algoTabs").off("click");
+    $('a', "#algoTabs").on('click', function(e) {
+	// modify the history and the url
+	// although the firefox back button does look quite strange after this
+	//history.pushState(null, null, this.href);
+	// alternative solution
+	window.location.href = $(this).attr("href"); 
+	window.scrollBy(0, -window.pageYOffset);
+    });
+
+    $('#my-logo').on("click", function() {
+        $("#algoTabs a:first").tab("show");
+    });
+    /**
+     * jQuery Plugin: Sticky Tabs
+     * License: Public Domain
+     * https://github.com/timabell/jquery.stickytabs/
+     */
+    (function ( $ ) {
+	$.fn.stickyTabs = function() {
+	    var context = this;
+	    // Show the tab corresponding with the hash in the URL, or the first tab.
+	    var showTabFromHash = function() {
+		var hash = window.location.hash;
+		var selector = hash ? 'a[href="' + hash + '"]' : 'li.active > a';
+		$(selector, context).tab('show');
+	    }
+	    // Set the correct tab when the page loads
+	    showTabFromHash(context)
+	    // Set the correct tab when a user uses their back/forward button
+	    window.addEventListener('hashchange', showTabFromHash, false);
+	    // Change the URL when tabs are clicked
+	    return this;
+	};
+    }( jQuery ));
+    $("#algoTabs").stickyTabs(); // activating sticky tabs
+    
+    /*
 
     var loadedVisualizations = {};
     var newAlgoAdded = false;
@@ -27,14 +64,25 @@ $(function (ALGORITHM_MODULE) {
 
 	    console.log("registering callback", newAlgoAdded);
 	    //first deregister old event listeners so that we don't have the same fnc attached many times
-	    $('a[data-toggle="tab"]').off();
+	    $('a[data-toggle="tab"]').off('shown.bs.tab');
 	    // attach a callback on shown tab to adjust svg sizes dynamically
 	    // this is needed to make sure our visualizations fit onto smaller screens
 	    $('a[data-toggle="tab"]').on('shown.bs.tab', resizingSvg);
+	    // again we need to turn off previous click handlers so that we don't end up with too many
+	    $('a', "#algoTabs").off("click");
+	    $('a', "#algoTabs").on('click', function(e) {
+		// modify the history and the url
+		// although the firefox back button does look quite strange after this
+		//history.pushState(null, null, this.href);
+		// alternative solution
+		window.location.href = $(this).attr("href"); 
+		window.scrollBy(0, -window.pageYOffset);
+	    });
 	}
     });
+    */
 
-
+    /*
     function updateVisualizations(data) {
         var N = data.length;
 	newAlgoAdded = false;
@@ -77,6 +125,7 @@ $(function (ALGORITHM_MODULE) {
 	    updater();
         }, 5000);
     }
+    */
 
     function resizingSvg(e) {
 	var tabz =  $(e.target).attr("data-tab-id");

@@ -61,7 +61,8 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    .attr("d", d3.svg.symbol().type("triangle-down")(10,1));
 
 	_my.vislib.animatePath(path, duration, delay, make_proportional, length_to_show_percentage);
-	return _my.vislib.animateMovingAlongAPath(arrow, path, duration, delay, make_proportional, length_to_show_percentage, true, -90);
+	var tran = _my.vislib.animateMovingAlongAPath(arrow, path, duration, delay, make_proportional, length_to_show_percentage, true, -90);
+	return {"arrow": arrow, "transition": tran};
     }
 
     /*** ice cold coolness!! takes a selection which should be translateable and animates it moving along a path
@@ -195,7 +196,11 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	});
 	var movable_selections = svg.selectAll(".fft-arrow.fft-arrows-generated-with" + uniq_id);
 	_my.vislib.animatePaths(paths, duration, delay, make_proportional, length_to_show_percentage);
-	return _my.vislib.animateMovingAlongPaths(movable_selections, paths, duration, delay, make_proportional, length_to_show_percentage, true, -90);
+	var transition = _my.vislib.animateMovingAlongPaths(movable_selections, paths, duration, delay, make_proportional, length_to_show_percentage, true, -90);
+	var result = {};
+	result.transition = transition;
+	result.arrows = arrows;
+	return result;
     }
 
     /*** ice cold coolness!! takes a selection which should be translateable and animates it moving along a path
