@@ -12,11 +12,20 @@ $(function (ALGORITHM_MODULE) {
 	cache: false
     });
 
-    if (_my.RUNNING_IN_STATIC_MODE === true) {
-	prettyPrint.call({});
-	$('a[data-toggle="tab"]').off('shown.bs.tab');
-	$('a[data-toggle="tab"]').on('shown.bs.tab', resizingSvg);
-    }
+    
+    prettyPrint.call({});
+    $('a[data-toggle="tab"]').off('shown.bs.tab');
+    $('a[data-toggle="tab"]').on('shown.bs.tab', resizingSvg);
+    $('a', "#algoTabs").off("click");
+    $('a', "#algoTabs").on('click', function(e) {
+	// modify the history and the url
+	// although the firefox back button does look quite strange after this
+	//history.pushState(null, null, this.href);
+	// alternative solution
+	window.location.href = $(this).attr("href"); 
+	window.scrollBy(0, -window.pageYOffset);
+    });
+
     $('#my-logo').on("click", function() {
         $("#algoTabs a:first").tab("show");
     });
@@ -42,6 +51,9 @@ $(function (ALGORITHM_MODULE) {
 	    return this;
 	};
     }( jQuery ));
+    $("#algoTabs").stickyTabs(); // activating sticky tabs
+    
+    /*
 
     var loadedVisualizations = {};
     var newAlgoAdded = false;
@@ -68,8 +80,9 @@ $(function (ALGORITHM_MODULE) {
 	    });
 	}
     });
-    $("#algoTabs").stickyTabs(); // activating sticky tabs
+    */
 
+    /*
     function updateVisualizations(data) {
         var N = data.length;
 	newAlgoAdded = false;
@@ -112,6 +125,7 @@ $(function (ALGORITHM_MODULE) {
 	    updater();
         }, 5000);
     }
+    */
 
     function resizingSvg(e) {
 	var tabz =  $(e.target).attr("data-tab-id");

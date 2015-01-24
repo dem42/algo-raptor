@@ -25,6 +25,13 @@
 
 	<link rel="stylesheet" href="core/algo.css" type="text/css">
 	<link rel="stylesheet" href="core/bootstrap_customization.css" type="text/css">
+
+	<link rel="stylesheet" href="visualizations/bs.css" type="text/css">
+	<link rel="stylesheet" href="visualizations/dsu.css" type="text/css">
+	<link rel="stylesheet" href="visualizations/quicksort.css" type="text/css">
+	<link rel="stylesheet" href="visualizations/fft.css" type="text/css">
+	<link rel="stylesheet" href="visualizations/hld.css" type="text/css">
+	<link rel="stylesheet" href="visualizations/fenwick.css" type="text/css">
       </head>
 <body style="padding-top: 30px">
   <nav class="navbar navbar-inverse navbar-embossed navbar-fixed-top" role="navigation">
@@ -39,7 +46,16 @@
           <span class="icon-bar"></span>
 	</button>
 
-	<a id="my-logo" class="navbar-brand" href="#home-tab" role="tab" data-toggle="tab" title="Algorithm visualizations in d3.js"><span class="text-danger"><span class="glyphicon glyphicon-star"></span>RunAlgo</span></a>
+	<a id="my-logo" class="navbar-brand" href="#home-tab" role="tab" data-toggle="tab" title="Algorithm visualizations in d3.js">
+	  <span style="position: relative; bottom:12px">
+	  <img alt="Brand" src="assets/raptor_small.png"></img>
+	  <span style="color:#e83b3b">AlgoRaptor</span>
+	  </span>
+	  <!--
+	  <span class="text-danger">
+	    <span class="glyphicon glyphicon-star"></span>RunAlgo</span>
+	  -->
+	</a>
       </div>
 
       <!-- Collect the nav links, forms, and other content for toggling -->
@@ -74,11 +90,24 @@
     <div class="tab-pane active" id="home-tab">
       <div class="jumbotron">
 	<div class="container">
-	  <h1> Welcome to RunAlgo!</h1>
-	  <p>This site presents visualizations of famous algorithms to help us better understand how these clever beasts actually work.</p>
-	  <p>Visualizations can be accessed through links in the navigation toolbar. Each visualization is accompanied with the source code of the algorithm, implemented in Javascript. </p>
-	  <p>Feel free to explore the algorithms, start the visualizations and observe the effects of the executed code in real time.</p>
-	  <p>Have fun!</p>
+	  <h1> Welcome to Algo Raptor</h1>
+	  <p> Snack on some tasty algorithm visualizations! </p>
+	  <ul>
+	    <li> "Clever girl!" - Robert Muldoon, Jurassic Park's game warden </li>
+	    <li> "Seeing is believing" - Farseer, Warcraft 3 hero </li>
+	  </ul>
+	</div>
+      </div>
+      <div class="container">
+	<div class="row">
+	  <div class="col-md-12">
+	    <div>
+	      <h2 class="page-header"> What is this place? </h2>
+	    <p class="lead">You find youserlf on the dreaded AlgoRaptor website. This site presents visualizations of famous algorithms to help us better understand how these clever beasts actually work.</p>
+	    <p class="lead">Visualizations can be accessed through links in the navigation toolbar. Each visualization is accompanied with the source code of the algorithm, implemented in Javascript. </p>
+	    <p class="lead">Feel free to explore the algorithms, start the visualizations and observe the effects of the executed code in real time.</p>
+	    <p class="lead">Have fun!</p>
+	  </div>
 	</div>
       </div>
       <footer role="contentinfo">
@@ -112,11 +141,13 @@
   <!-- bootstrap css script which contains all plugins -->
   <script src="libs/bootstrap.min.js"></script>
   <script src="libs/bootbox.min.js"></script>
+  <!-- algorithm visualization d3 scripts -->
+  <script src="visualizations/bs.js"></script>
+  <script src="visualizations/dsu.js"></script>
+  <script src="visualizations/quicksort.js"></script>
+  <script src="visualizations/fft.js"></script>
+  <script src="visualizations/hld.js"></script>
+  <script src="visualizations/fenwick.js"></script>
   <script src="core/main.js"></script>
-  <!-- algorithm visualization d3 scripts 
-       <script src="visualizations/bs.js"></script>
-       <script src="visualizations/dsu.js"></script>
-       <script src="visualizations/quicksort.js"></script>
-       -->
 </body>
 </html>

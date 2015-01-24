@@ -42,7 +42,9 @@ li.highlighted-row {
 
 .jumbotron {
     margin-top: -10px;
-    font-size: 1.26em;
+    font-size: 1em;
+    color: #f0f0f0;
+    background: linear-gradient(to bottom,  #222222 0%, #e83b3b 300%);
 }
 
 .controls-header {
