@@ -341,6 +341,9 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	})
 	.text("Shuffle Data");
 
+    _my.vislib.addRaptorHead("quicksort-code", 14, "hello world ashdh asjdhaj dhsa jdhs ad ja!");
+    
+
     return {"quicksort": quicksort, "quicksort-algorithm": qual_algo};
 
 })(ALGORITHM_MODULE, $, d3, bootbox);

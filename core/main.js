@@ -13,9 +13,11 @@ $(function (ALGORITHM_MODULE) {
     });
 
     
-    prettyPrint.call({});
     $('a[data-toggle="tab"]').off('shown.bs.tab');
-    $('a[data-toggle="tab"]').on('shown.bs.tab', resizingSvg);
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+	resizingSvg(e)
+	raptoringItUp(e);
+    });
     $('a', "#algoTabs").off("click");
     $('a', "#algoTabs").on('click', function(e) {
 	// modify the history and the url
@@ -127,6 +129,21 @@ $(function (ALGORITHM_MODULE) {
     }
     */
 
+    function raptoringItUp(e) {
+	var tabz =  $(e.target).attr("data-tab-id");
+	var tab = $(tabz);
+	if (tab.attr("data-raptored") == true) {
+	    return;
+	}
+	var callbacks = _my.AlgorithmUtils.getPrettyPrintCallbacks();
+	for (var i = 0; i < callbacks.length; i++) {
+	    callbacks[i]();
+	}
+	$(function () {
+	    $('[data-toggle="popover"]').popover()
+	});
+	$(tab).attr("data-raptored", true);
+    }
     function resizingSvg(e) {
 	var tabz =  $(e.target).attr("data-tab-id");
 	$(tabz + " svg").each(function() {

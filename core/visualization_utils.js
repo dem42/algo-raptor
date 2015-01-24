@@ -471,5 +471,23 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	return gaugeObj;
     };
 
+    // adding raptor heads using absolute positioning inside a relatively positioned code block
+    _my.vislib.addRaptorHead = function(algorithmCodeClass, lineNum, text) {
+	_my.AlgorithmUtils.attachPrettyPrintCallback(function() {
+	    var algorithmCodeHolder =  "." + algorithmCodeClass + " .function-code-holder";
+	    $(algorithmCodeHolder).css("position", "relative");
+	    var lineR = lineNum % 10;
+	    var lineQ = Math.floor(lineNum / 10);
+	    var dvObj = $(algorithmCodeHolder)[0];
+	    var lineObj = $(algorithmCodeHolder + " " + "li.L" + lineR)[lineQ]; 
+	    var raptor_top = lineObj.getBoundingClientRect().top - dvObj.getBoundingClientRect().top;
+	    var raptor_left = 0;
+	    console.log("selecting", dvObj.getBoundingClientRect(), lineObj.getBoundingClientRect());
+
+	    var img = $(algorithmCodeHolder).append("<img class='" + algorithmCodeClass + lineNum + "' src='assets/raptor24.png' style='position: absolute; z-index:10; top: " + 
+						raptor_top + "px; left: " + raptor_left + "px' data-toggle='popover' data-content='" + text + "' data-trigger='click'></img>");
+
+	});
+    }
     return _my;
 }(ALGORITHM_MODULE || {}, d3, $));

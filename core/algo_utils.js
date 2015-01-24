@@ -332,6 +332,15 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
             .text(algo);
 	return code_holder;
     };
+
+    var pretty_print_callbacks = [];
+    // attach any code you need to get executed after pretty print here
+    AlgorithmUtils.attachPrettyPrintCallback = function(callback) {
+	pretty_print_callbacks.push(callback);
+    }
+    AlgorithmUtils.getPrettyPrintCallbacks = function() {
+	return pretty_print_callbacks;
+    }
     //return the augmented module
     _my.AlgorithmUtils = AlgorithmUtils;
     return _my;

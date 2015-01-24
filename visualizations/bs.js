@@ -267,7 +267,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     });
     _my.AlgorithmUtils.appendCode(algorithmTabId, "prep-code", prep_algo).style("display", "none");
     _my.AlgorithmUtils.appendCode(algorithmTabId, "bs-code", balgo);
-    
+
     return {"bsearch": bsearch, "bsearch-algorithm": balgo};
 
 })(ALGORITHM_MODULE, $, d3, bootbox);

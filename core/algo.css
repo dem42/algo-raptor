@@ -37,7 +37,7 @@ pre.prettyprint {
 .prettyprint ol.linenums > li { list-style-type: decimal; }
 
 li.highlighted-row {
-    background: #FFFF7F;
+    background: #FFFF7F !important;
 }
 
 .jumbotron {
