@@ -8,16 +8,39 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     var algorithm2TabId = "fft-tab-mult";
     var algorithm1Name = "Fast Fourier Transform";
     var algorithm2Name = "Fast Fourier Multiplication";
-
+    console.debug("downloaded fft");
     /*******************************/
     /*      Setup the panels       */
     /*******************************/
-    console.debug("downloaded fft");
 
     var layout_tran = _my.AlgorithmUtils.setupLayout(algorithm1TabId, algorithm1Name, {priority:"fft1-tran"}, [5, 7]);
-    layout_tran.customControlsLayout.style("display", "none");
+    layout_tran.customControlsLayout.append("div").attr("class", "fft-trans-forms");
     var layout_mult = _my.AlgorithmUtils.setupLayout(algorithm2TabId, algorithm2Name,  {priority:"fft2-mult"}, [5, 7]);
-    layout_mult.customControlsLayout.style("display", "none");
+    var forms_holder = layout_mult.customControlsLayout.append("div");
+    forms_holder.append("div").attr("class", "fft-mult-forms-left pull-left");
+    forms_holder.append("div").attr("class", "fft-mult-forms-right pull-right");
+
+    /*function to create the input boxes for the polynomial .. you also have to read from them before kicking it off*/
+    function createInputBoxes(formClass, inputBoxClass, poly) {
+	var reversed_poly = [];
+	for (var j = poly.length-1; j >=0; j--) {
+	    reversed_poly.push(poly[j]);
+	}
+	var forms_spans = d3.select("." + formClass).selectAll("input[type='text']")
+	    .data(reversed_poly)
+	    .enter().append("span");
+	forms_spans.append("input")
+	    .attr("type","text")
+	    .attr("class",inputBoxClass)
+	    .attr("maxlength", 2)
+	    .attr("value", function(d) { return d; })
+	var labels = forms_spans.append("span")
+	    .text(function(d, i) { return i < poly.length-1 ? "x" : ""});
+	forms_spans.append("sup")
+	    .text(function(d, i) { return i < poly.length-1 ? "" + (poly.length-i-1) : ""});
+	forms_spans.append("span")
+	    .text(function(d, i) { return i < poly.length-1 ? " +" : ""});
+    }
     /*******************************/
     /*      Complex number type    */
     /*******************************/
@@ -98,7 +121,6 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	var coef = (2*Math.PI*idx) / N;
 	return Complex.create(Math.cos(coef), Math.sin(coef));
     };
-    
     /***********************
      **    Functions     ***
      **********************/
@@ -173,14 +195,12 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     var svg_fft_elem = d3.select("#" + algorithm1TabId + " .graphics").append("svg")
 	.attr("width",  width + "px")
 	.attr("height", "1050px")
-	.style("display", "inline");
     var fft_group = svg_fft_elem.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
     var svg_multiply_elem = d3.select("#" + algorithm2TabId + " .graphics").append("svg")
 	.attr("width",  1.42*width + "px")
 	.attr("height", "1050px")
-	.style("display", "none");
     var multiply_group = svg_multiply_elem.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
@@ -188,13 +208,22 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
      ** Wire up the Algos *
      **********************/
     var poly_ev = [Complex.create(-1,0), Complex.ZERO, Complex.create(-5,0)];
+    createInputBoxes("fft-trans-forms", "fft-input-box fft-trans-box", poly_ev);
     var poly_p = [Complex.create(11,0), Complex.ZERO, Complex.create(-3,0), Complex.create(2,0)];
+    createInputBoxes("fft-mult-forms-left", "fft-input-box fft-mult-box-left", poly_p);
     var poly_q = [Complex.create(-3,0), Complex.create(3.4, 0), Complex.create(-7, 0)];
+    createInputBoxes("fft-mult-forms-right", "fft-input-box fft-mult-box-right", poly_q);
+
+    function populate(poly, boxClass) {
+	d3.selectAll("." + boxClass).each(function(d, i) {
+	    var value = +this.value;
+	    poly[poly.length - i - 1] = value != 0 ? Complex.create(value,0) : Complex.ZERO;
+	});
+    }
 
     var elem_between = 2;
     var btw_elem = 10;
     var per_width = (width - 100) / (poly_p.length + poly_q.length + elem_between);
-
 
     /***** this function creates a tree layout that we can then write the polynomials to and move them around in*/
     function prepareLayoutForPolys(N, node_size, fft_group, group_name, left_margin, top_margin, inverted) {
@@ -656,6 +685,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     }
     // we need a kickoff function that will start the transform algorithm
     function kickoff_fft_trans(executionFunction) {
+	populate(poly_ev, "fft-trans-box");
 	console.log("Before fft transform", "" + poly_ev);
 	cleanup();
 	var sharedCalc = function(idx, N, Complex) {
@@ -814,6 +844,8 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 
     // we need a kickoff function that will start the multiply algorithm
     function kickoff_fft_multiply(executionFunction) {
+	populate(poly_p, "fft-mult-box-left");
+	populate(poly_q, "fft-mult-box-right");
 	console.log("Before fft multiply", "" + poly_p, "" + poly_q);
 	cleanup();
 	var sharedEv = function(poly, len, start, helper_arr, Complex) {

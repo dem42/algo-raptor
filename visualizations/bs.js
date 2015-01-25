@@ -211,15 +211,8 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	.enter().append("input")
 	.attr("type","text")
 	.attr("class","bs-input-box")
-	.attr("maxlength", 2);
-
-    /*populate the inputs*/
-    var inputs = document.querySelectorAll(".bs-forms > input[type='text']");
-    for(var j=inputs.length-1;j >= 0;j--)
-    {
-	inputs[j].value = Math.floor(Math.random()*99);
-    }
-
+	.attr("maxlength", 2)
+	.attr("value", function(d) { return Math.floor(Math.random()*99); });
 
     /* create an Algorithm instance wired with callbacks */
     var prep_algo = new _my.Algorithm(preprocess, prep_calls, "prep-code", _my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj),
