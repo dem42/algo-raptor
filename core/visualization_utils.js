@@ -483,6 +483,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	_my.AlgorithmUtils.attachPrettyPrintCallback(algorithmTabId, function() {
 	    var algorithmCodeHolder =  "." + algorithmCodeClass + " .function-code-holder";
 	    $(algorithmCodeHolder).css("position", "relative");
+	    $(algorithmCodeHolder + " ol").css("margin-left", "10px");
 	    var lineR = lineNum % 10;
 	    var lineQ = Math.floor(lineNum / 10);
 	    var dvObj = $(algorithmCodeHolder)[0];
