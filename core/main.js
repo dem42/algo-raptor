@@ -13,6 +13,17 @@ $(function (ALGORITHM_MODULE) {
     });
 
 
+    // close popovers when we click elsewhere
+    $('body').on('click', function (e) {
+	$('[data-toggle="popover"]').each(function () {
+            //the 'is' for buttons that trigger popups
+            //the 'has' for icons within a button that triggers a popup
+            if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+		$(this).popover('hide');
+            }
+	});
+    });
+
     // using ready for now because load doesn't get triggered 
     // when our internet drops and the twitter/git imgs don't get loaded
     var prettification_complete = false;
@@ -80,11 +91,9 @@ $(function (ALGORITHM_MODULE) {
 	}
 	var tab = $(tab_id);
 	if (tab.attr("data-raptored") == "true") {
-	    console.debug("already raptored", tab_id);
 	    return;
 	}
 	var callbacks = _my.AlgorithmUtils.getPrettyPrintCallbacks(tab_id);
-	console.debug("callbacks for", tab_id, "are", callbacks.length);
 	if (callbacks !== undefined) {
 	    for (var i = 0; i < callbacks.length; i++) {
 		callbacks[i]();

@@ -12,7 +12,7 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
     /*******************************/
     console.debug("downloaded hld");
     var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName,  {priority:"a-hld"}, [5, 7]);
-    layout.introductionParagraph.text("This algorithm is all about preparing non balanced trees to get O(log(n)) algorithms.")
+    layout.introductionParagraph.html("Balanced trees are great, right? But what if you end up with an unbalanced tree? We probably don't want to restructure our tree to balance it, if the parent child relationships are important. This is where heavy light decomposition steps in. This algorithm is all about getting <var>O(log n)</var> out of unbalanced trees. The idea is to build preferred paths by always picking the child node with the largest subtree size. We can then use these paths to quickly jump over a bunch of nodes without having to visit them. If we can make it so that from any leaf node we only have to traverse <var>log N</var> chains to get to the root then the tree is basically balanced.");
     /*********************/
     /*** HLD functions ***/
     /*********************/
@@ -60,7 +60,7 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
     var margin = { left: 10, top: 30, right: 10, bottom: 100};
     var svg = d3.select("#" + algorithmTabId + " .graphics").append("svg")
 	.attr("width",  "900px")
-	.attr("height", "1050px")
+	.attr("height", "636px")
 	.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -198,8 +198,10 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
     var ss_algo = new _my.Algorithm(computeSubtreeSize, ss_callbacks, "ss-code", context, remover);
 
     _my.AlgorithmUtils.appendCode(algorithmTabId, "ss-code", ss_algo);
+    _my.vislib.addRaptorHead(algorithmTabId, "ss-code", 0, "To be able to decompose our unbalanced tree we first need to compute the subtree sizes using this depth first search");
     _my.AlgorithmUtils.appendCode(algorithmTabId, "hld-code", hld_algo);
-
+    _my.vislib.addRaptorHead(algorithmTabId, "hld-code", 14, "To build a chain decomposition which guarantees <var>O(log N)</var> we always pick the largest subtree as the next node in the chain.");
+    _my.vislib.addRaptorHead(algorithmTabId, "hld-code", 23, "Since we picked the largest subtree for the main chain, the other subtrees now have a size of at most half the size of the current subtree. This means that everytime we start a new chain the subtree sizes halves! That's where the <var>log N</var> comes from.");
     // the randomness here isn't good i think .. certain shapes are very improbable whereas
     // all shapes should have the same probablitity (maybe it's okay .. the prob of a every labelled shape is 
     // the same isn't it? at every stage the prob of picking the number we picked is the same 

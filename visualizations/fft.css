@@ -1,13 +1,14 @@
 .fft-n-value {
     /*stroke-width: 0.5px;*/
-    stroke: #a94442;
+    stroke: none;
     fill: #a94442;
     font-family: freeserif, serif; /*"Lucida Console", Courier, monospace;*/
 }
 
 .fft-poly {
     /*stroke-width: 0.5px;*/
-    stroke: #333;
+    fill: #333;
+    stroke: none;
     font-family: freeserif, serif; /*"Lucida Console", Courier, monospace;*/
 }
 
@@ -23,7 +24,8 @@
 }
 .fft-coefs {
     /*stroke-width: 0.5px;*/
-    stroke: #333;
+    fill: #333;
+    stroke: none;
     font-family: freeserif, serif; /*"Lucida Console", Courier, monospace;*/
 }
 
@@ -63,7 +65,8 @@
 }
 
 .fft-text {
-    stroke: #333;
+    stroke: none;
+    fill: #333;
     font-family: sans-serif;
     pointer-events: none;
 }

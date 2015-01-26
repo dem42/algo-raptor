@@ -473,7 +473,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 
     function createRaptorPopupTemplate(text) {
 	var raptor_num = Math.floor(Math.random()*2) + 1;
-	var temp =  "<div class='clearfix'><img class='pull-left' style='width:40%; height:40%' src='../assets/raptor" + raptor_num + ".jpg'><p>" + text + "</p></div>"
+	var temp =  "<div class='clearfix'><img class='pull-left raptor-img' src='../assets/raptor_fade" + raptor_num + ".jpg'><p>" + text + "</p></div>"
 	console.log(temp);
 	return temp;
     }
@@ -483,7 +483,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	_my.AlgorithmUtils.attachPrettyPrintCallback(algorithmTabId, function() {
 	    var algorithmCodeHolder =  "." + algorithmCodeClass + " .function-code-holder";
 	    $(algorithmCodeHolder).css("position", "relative");
-	    $(algorithmCodeHolder + " ol").css("margin-left", "10px");
+	    $(algorithmCodeHolder + " ol").css("margin-left", "15px");
 	    var lineR = lineNum % 10;
 	    var lineQ = Math.floor(lineNum / 10);
 	    var dvObj = $(algorithmCodeHolder)[0];
@@ -492,8 +492,8 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    var raptor_left = 0;
 	    console.log("selecting", dvObj.getBoundingClientRect(), lineObj.getBoundingClientRect());
 
-	    var img = $(algorithmCodeHolder).append('<img class="' + algorithmCodeClass + lineNum + '" src="assets/raptor24.png" style="position: absolute; z-index:10; top: ' + 
-						raptor_top + 'px; left: ' + raptor_left + 'px" data-toggle="popover" data-trigger="click" data-placement="top" data-html="true" data-content="' + createRaptorPopupTemplate(text) +'"></img>');
+	    var img = $(algorithmCodeHolder).append('<img class="' + algorithmCodeClass + lineNum + '" src="assets/raptor24.png" style="position: absolute; margin-left: 2px; z-index:10; top: ' + 
+						raptor_top + 'px; left: ' + raptor_left + 'px" data-toggle="popover" data-trigger="click focus" data-placement="top" data-html="true" data-content="' + createRaptorPopupTemplate(text) +'"></img>');
 	});
     }
     return _my;
