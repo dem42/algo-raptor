@@ -16,7 +16,8 @@ $(function (ALGORITHM_MODULE) {
     // using ready for now because load doesn't get triggered 
     // when our internet drops and the twitter/git imgs don't get loaded
     var prettification_complete = false;
-    $("body").ready(function() {
+    $(function() {
+	console.debug("loaded");
 	prettyPrint();
 	prettification_complete = true;
 	var current_tab = window.location.hash;
@@ -74,7 +75,6 @@ $(function (ALGORITHM_MODULE) {
     }
 
     function raptoringItUp(tab_id) {
-	console.debug("raptoring", tab_id);
 	if (!prettification_complete) {
 	    return;
 	}
@@ -83,13 +83,14 @@ $(function (ALGORITHM_MODULE) {
 	    console.debug("already raptored", tab_id);
 	    return;
 	}
-	var callbacks = _my.AlgorithmUtils.getPrettyPrintCallbacks();
-	for (var i = 0; i < callbacks.length; i++) {
-	    callbacks[i]();
+	var callbacks = _my.AlgorithmUtils.getPrettyPrintCallbacks(tab_id);
+	console.debug("callbacks for", tab_id, "are", callbacks.length);
+	if (callbacks !== undefined) {
+	    for (var i = 0; i < callbacks.length; i++) {
+		callbacks[i]();
+	    }
 	}
-	$(function () {
-	    $('[data-toggle="popover"]').popover()
-	});
+	$('[data-toggle="popover"]').popover()
 	$(tab).attr("data-raptored", true);
     }
     function resizingSvg(e) {

@@ -333,13 +333,14 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 	return code_holder;
     };
 
-    var pretty_print_callbacks = [];
+    var pretty_print_callbacks = {};
     // attach any code you need to get executed after pretty print here
-    AlgorithmUtils.attachPrettyPrintCallback = function(callback) {
-	pretty_print_callbacks.push(callback);
+    AlgorithmUtils.attachPrettyPrintCallback = function(tab_id, callback) {
+	var tab_id_with_hash = "#" + tab_id; // we store them with hash since that's how we'll call them
+	(pretty_print_callbacks[tab_id_with_hash] = (pretty_print_callbacks[tab_id_with_hash] || [])).push(callback);
     }
-    AlgorithmUtils.getPrettyPrintCallbacks = function() {
-	return pretty_print_callbacks;
+    AlgorithmUtils.getPrettyPrintCallbacks = function(tab_id) {
+	return pretty_print_callbacks[tab_id];
     }
     //return the augmented module
     _my.AlgorithmUtils = AlgorithmUtils;

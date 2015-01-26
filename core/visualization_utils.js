@@ -471,9 +471,16 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	return gaugeObj;
     };
 
+    function createRaptorPopupTemplate(text) {
+	var raptor_num = Math.floor(Math.random()*2) + 1;
+	var temp =  "<div class='clearfix'><img class='pull-left' style='width:40%; height:40%' src='../assets/raptor" + raptor_num + ".jpg'><p>" + text + "</p></div>"
+	console.log(temp);
+	return temp;
+    }
+
     // adding raptor heads using absolute positioning inside a relatively positioned code block
-    _my.vislib.addRaptorHead = function(algorithmCodeClass, lineNum, text) {
-	_my.AlgorithmUtils.attachPrettyPrintCallback(function() {
+    _my.vislib.addRaptorHead = function(algorithmTabId, algorithmCodeClass, lineNum, text) {
+	_my.AlgorithmUtils.attachPrettyPrintCallback(algorithmTabId, function() {
 	    var algorithmCodeHolder =  "." + algorithmCodeClass + " .function-code-holder";
 	    $(algorithmCodeHolder).css("position", "relative");
 	    var lineR = lineNum % 10;
@@ -484,9 +491,8 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    var raptor_left = 0;
 	    console.log("selecting", dvObj.getBoundingClientRect(), lineObj.getBoundingClientRect());
 
-	    var img = $(algorithmCodeHolder).append("<img class='" + algorithmCodeClass + lineNum + "' src='assets/raptor24.png' style='position: absolute; z-index:10; top: " + 
-						raptor_top + "px; left: " + raptor_left + "px' data-toggle='popover' data-content='" + text + "' data-trigger='click'></img>");
-
+	    var img = $(algorithmCodeHolder).append('<img class="' + algorithmCodeClass + lineNum + '" src="assets/raptor24.png" style="position: absolute; z-index:10; top: ' + 
+						raptor_top + 'px; left: ' + raptor_left + 'px" data-toggle="popover" data-trigger="click" data-placement="top" data-html="true" data-content="' + createRaptorPopupTemplate(text) +'"></img>');
 	});
     }
     return _my;
