@@ -1,123 +1,129 @@
 <!DOCTYPE html>
-<html lang="en"
-      <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1"> <!-- for bootstrap to work on mobile -->
-	<!-- this script kicks off the code prettification with a "desert" skin -->
-	<!--<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=desert"></script>-->
-	<!--<script src="libs/prettify.js" type="text/javascript"></script>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- for bootstrap to work on mobile -->
+    <!-- this script kicks off the code prettification with a "desert" skin -->
+    <!--<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=desert"></script>-->
+    <!--<script src="libs/prettify.js" type="text/javascript"></script>
 	<link rel="stylesheet" href="libs/prettify.css" type="text/css">
 	-->
-	<script src="libs/d3.v3.min.js"></script>
+    <script src="libs/d3.v3.min.js"></script>
 
-	<!-- jquery .. consider trimming -->
-	<script src="libs/jquery-1.10.2.js"></script>
+    <!-- jquery .. consider trimming -->
+    <script src="libs/jquery-1.10.2.js"></script>
 
-	<!-- our algo code -->
-	<script src="core/algo_utils.js"></script>
-	<script src="core/visualization_utils.js"></script>
-	<script src="core/algo.js"></script>
-	<script src="core/text_typing.js"></script>
+    <!-- our algo code -->
+    <script src="core/algo_utils.js"></script>
+    <script src="core/visualization_utils.js"></script>
+    <script src="core/algo.js"></script>
+    <script src="core/text_typing.js"></script>
 
-	<!-- bootstrap css -->
-	<link rel="stylesheet" href="libs/bootstrap.min.css">
-	<link rel="stylesheet" href="libs/bootstrap-theme.min.css">
+    <!-- bootstrap css -->
+    <link rel="stylesheet" href="libs/bootstrap.min.css">
+    <link rel="stylesheet" href="libs/bootstrap-theme.min.css">
 
-	<link rel="stylesheet" href="core/algo.css" type="text/css">
-	<link rel="stylesheet" href="core/bootstrap_customization.css" type="text/css">
+    <link rel="stylesheet" href="core/algo.css" type="text/css">
+    <link rel="stylesheet" href="core/bootstrap_customization.css" type="text/css">
 
-	<link rel="stylesheet" href="visualizations/bs.css" type="text/css">
-	<link rel="stylesheet" href="visualizations/dsu.css" type="text/css">
-	<link rel="stylesheet" href="visualizations/quicksort.css" type="text/css">
-	<link rel="stylesheet" href="visualizations/fft.css" type="text/css">
-	<link rel="stylesheet" href="visualizations/hld.css" type="text/css">
-	<link rel="stylesheet" href="visualizations/fenwick.css" type="text/css">
-      </head>
-<body style="padding-top: 30px">
-  <nav class="navbar navbar-inverse navbar-embossed navbar-fixed-top" role="navigation">
-    <div class="container-fluid">
-      <!-- Brand and toggle get grouped for better mobile display -->
-      <div class="navbar-header">
-	<!-- this button will show our collapsed menu on small screen sizes -> the contents describe the icon look -->
-	<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-	  <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-	</button>
+    <link rel="stylesheet" href="visualizations/bs.css" type="text/css">
+    <link rel="stylesheet" href="visualizations/dsu.css" type="text/css">
+    <link rel="stylesheet" href="visualizations/quicksort.css" type="text/css">
+    <link rel="stylesheet" href="visualizations/fft.css" type="text/css">
+    <link rel="stylesheet" href="visualizations/hld.css" type="text/css">
+    <link rel="stylesheet" href="visualizations/fenwick.css" type="text/css">
+  </head>
+  <body style="padding-top: 30px">
+    <nav class="navbar navbar-inverse navbar-embossed navbar-fixed-top" role="navigation">
+      <div class="container-fluid">
+	<!-- Brand and toggle get grouped for better mobile display -->
+	<div class="navbar-header">
+	  <!-- this button will show our collapsed menu on small screen sizes -> the contents describe the icon look -->
+	  <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+	    <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+	  </button>
 
-	<a id="my-logo" class="navbar-brand" href="#home-tab" role="tab" data-toggle="tab" title="Algorithm visualizations in d3.js">
-	  <span style="position: relative; bottom:12px">
-	  <img alt="Brand" src="assets/raptor_small.png"></img>
-	  <span style="color:#e83b3b">AlgoRaptor</span>
-	  </span>
-	  <!--
-	  <span class="text-danger">
-	    <span class="glyphicon glyphicon-star"></span>Algo-Raptor</span>
-	  -->
-	</a>
-      </div>
-
-      <!-- Collect the nav links, forms, and other content for toggling -->
-      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-
-	<ul class="nav navbar-nav" role="tablist" id="algoTabs">
-	  <li class="active"><a href="#home-tab" role="tab" data-toggle="tab">About</a></li>
-	  <!-- filled dynamically through main.js -->
-	  <li id="a-hld"></li>
-	  <li id="fenwick"></li>
-	  <li id="fft" class="dropdown">
-	    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" 
-	       aria-expanded="false"> Fast Fourier <span class="caret"></span></a>
-	    <ul class="dropdown-menu inverse-dropdown" role="menu">
-	      <li id="fft1-tran"></li>
-	      <li id="fft2-mult"></li>
-	    </ul>
-	  </li>
-	  <li id="graphs-1-dsu"></li>
-	  <li id="search-1-binary"></li>
-	  <li id="sorting-quick"></li>
-	</ul>
-      </div><!-- /.navbar-collapse -->
-
-      <!-- uses the bootstrap responsive utilities to hide itself on small devices -->
-      <a href="https://github.com/dem42/algo-raptor" target="_blank" class="hidden-sm hidden-xs"><img style="position: absolute; top: 0; right: 0; border: 0; width=70%; height=70%" src="https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"></a>
-    </div><!-- /.container-fluid -->
-  </nav>
-
-
-  <div class="tab-content" id="algoContainer">
-    <div class="tab-pane active" id="home-tab">
-      <div class="jumbotron">
-	<div class="container">
-	  <h1>Algo Raptor</h1>
-	  <p> Snack on some tasty algorithm visualizations! </p>
-	  <ul>
-	    <li> "Clever girl!" - Robert Muldoon, Jurassic Park's game warden </li>
-	    <li> "Seeing is believing" - Farseer, Warcraft 3 hero </li>
-	  </ul>
+	  <a id="my-logo" class="navbar-brand" href="#home-tab" role="tab" data-toggle="tab" title="Algorithm visualizations in d3.js">
+	    <span style="position: relative; bottom:12px">
+	      <img alt="Brand" src="assets/raptor_small.png">
+	      <span style="color:#e83b3b">AlgoRaptor</span>
+	    </span>
+	    <!--
+		<span class="text-danger">
+		  <span class="glyphicon glyphicon-star"></span>Algo-Raptor</span>
+		-->
+	  </a>
 	</div>
-      </div>
-      <div class="container">
-	<div class="row">
-	  <div class="col-md-12">
-	    <div>
-	      <h2 class="page-header"> How to use? </h2>
-	    <p class="lead">Algorithm visualizations can be accessed through links in the navigation toolbar. Each visualization is accompanied with the source code of the algorithm, implemented in Javascript. </p>
-	    <p class="lead">Using the buttons in the <i>"General Controls"</i> section, you can start/stop the algorithm, adjust its speed or even step through the visualization line-by-line.</p>
-	    <p class="lead">The small raptor heads are clickable and when clicked expand to display additional comments and observations about what is going on.</p>
+
+	<!-- Collect the nav links, forms, and other content for toggling -->
+	<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+
+	  <ul class="nav navbar-nav" role="tablist" id="algoTabs">
+	    <li class="active"><a href="#home-tab" role="tab" data-toggle="tab">About</a></li>
+	    <!-- filled dynamically through main.js -->
+	    <li id="a-hld"></li>
+	    <li id="fenwick"></li>
+	    <li id="fft" class="dropdown">
+	      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" 
+		 aria-expanded="false"> Fast Fourier <span class="caret"></span></a>
+	      <ul class="dropdown-menu inverse-dropdown" role="menu">
+		<li id="fft1-tran"></li>
+		<li id="fft2-mult"></li>
+	      </ul>
+	    </li>
+	    <li id="graphs-1-dsu"></li>
+	    <li id="search-1-binary"></li>
+	    <li id="sorting-quick"></li>
+	  </ul>
+	</div><!-- /.navbar-collapse -->
+
+	<!-- uses the bootstrap responsive utilities to hide itself on small devices -->
+	<a href="https://github.com/dem42/algo-raptor" target="_blank" class="hidden-sm hidden-xs"><img style="position: absolute; top: 0; right: 0; border: 0; width=70%; height=70%" src="https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"></a>
+      </div><!-- /.container-fluid -->
+    </nav>
+
+
+    <div class="tab-content" id="algoContainer">
+      <div class="tab-pane active" id="home-tab">
+	<div class="jumbotron">
+	  <div class="container">
+	    <h1>Algo Raptor</h1>
+	    <p> Snack on some tasty algorithm visualizations! </p>
+	    <ul>
+	      <li> "Clever girl!" - Robert Muldoon, Jurassic Park's game warden </li>
+	      <li> "Seeing is believing" - Farseer, Warcraft 3 hero </li>
+	    </ul>
 	  </div>
 	</div>
-      </div>
-      <footer role="contentinfo">
 	<div class="container">
 	  <div class="row">
 	    <div class="col-md-12">
-	      <p>
-	  
+	      <div>
+		<h2 class="page-header"> How to use? </h2>
+		<p class="lead">Algorithm visualizations can be accessed through links in the navigation toolbar. Each visualization is accompanied with the source code of the algorithm, implemented in Javascript. </p>
+		<p class="lead">Using the buttons in the <i>"General Controls"</i> section, you can start/stop the algorithm, adjust its speed or even step through the visualization line-by-line.</p>
+		<p class="lead">The small raptor heads are clickable and when clicked expand to display additional comments and observations about what is going on.</p>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	<!-- filled dynamically through main.js -->
+      </div>
+    </div>
+
+    <footer role="contentinfo">
+      <div class="container-fluid">
+	<div class="hzline"></div>
+	<div class="row">
+	  <div class="col-md-6 col-md-offset-3">
+	    <p>
+	      
 	      <iframe src="http://ghbtns.com/github-btn.html?user=dem42&repo=algo-raptor&type=watch&count=true&size=small"
 		      allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
-	  
+	      
 	      <iframe src="http://ghbtns.com/github-btn.html?user=dem42&repo=algo-raptor&type=fork&count=true&size=small"
 		      allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
 	      <iframe src="http://ghbtns.com/github-btn.html?user=dem42&repo=algo-raptor&type=follow&size=small"
@@ -126,28 +132,24 @@
 	      <iframe id="twitter-widget-0" scrolling="no" frameborder="0" allowtransparency="true" src="http://platform.twitter.com/widgets/tweet_button.1407888064.html#_=1408135292880&amp;count=horizontal&amp;id=twitter-widget-0&amp;lang=en&amp;original_referer=http%3A%2F%2Flocalhost%3A8989%2F%23home-tab&amp;size=m&amp;url=https%3A%2F%2Fgithub.com%2Fdem42%2Falgo-raptor" class="twitter-share-button twitter-tweet-button twitter-share-button twitter-count-horizontal" title="Twitter Tweet Button" data-twttr-rendered="true" style="width: 150px; height: 20px; padding-left:40px"></iframe>
 	      <!--	  <a href="https://twitter.com/share" class="twitter-share-button" data-url="https://github.com/dem42/algo-raptor" style="margin-left: 40px">Tweet</a>
 			  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>-->
-	      </p>
-	    </div>
+	    </p>
 	  </div>
 	</div>
-	
-      </footer>
-    </div>
-    <!-- filled dynamically through main.js -->
-  </div>
+      </div>
+    </footer>
 
 
-  <!-- bootstrap css script which contains all plugins -->
-  <script src="libs/bootstrap.min.js"></script>
-  <script src="libs/bootbox.min.js"></script>
-  <!-- algorithm visualization d3 scripts -->
-  <script src="visualizations/bs.js"></script>
-  <script src="visualizations/dsu.js"></script>
-  <script src="visualizations/quicksort.js"></script>
-  <script src="visualizations/fft.js"></script>
-  <script src="visualizations/hld.js"></script>
-  <script src="visualizations/fenwick.js"></script>
-  <script src="core/main.js"></script>
-  <script src="libs/run_prettify.js"></script>
-</body>
+    <!-- bootstrap css script which contains all plugins -->
+    <script src="libs/bootstrap.min.js"></script>
+    <script src="libs/bootbox.min.js"></script>
+    <!-- algorithm visualization d3 scripts -->
+    <script src="visualizations/bs.js"></script>
+    <script src="visualizations/dsu.js"></script>
+    <script src="visualizations/quicksort.js"></script>
+    <script src="visualizations/fft.js"></script>
+    <script src="visualizations/hld.js"></script>
+    <script src="visualizations/fenwick.js"></script>
+    <script src="core/main.js"></script>
+    <script src="libs/run_prettify.js"></script>
+  </body>
 </html>

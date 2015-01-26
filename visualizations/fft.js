@@ -13,9 +13,9 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     /*      Setup the panels       */
     /*******************************/
 
-    var layout_tran = _my.AlgorithmUtils.setupLayout(algorithm1TabId, algorithm1Name, {priority:"fft1-tran"}, [5, 7]);
+    var layout_tran = _my.AlgorithmUtils.setupLayout(algorithm1TabId, algorithm1Name, {priority:"fft1-tran"}, [5, 7], "You may modify the input polynomial here:");
     layout_tran.customControlsLayout.append("div").attr("class", "fft-trans-forms");
-    var layout_mult = _my.AlgorithmUtils.setupLayout(algorithm2TabId, algorithm2Name,  {priority:"fft2-mult"}, [5, 7]);
+    var layout_mult = _my.AlgorithmUtils.setupLayout(algorithm2TabId, algorithm2Name,  {priority:"fft2-mult"}, [6, 6], "You may modify the input polynomials here:");
     var forms_holder = layout_mult.customControlsLayout.append("div");
     forms_holder.append("div").attr("class", "fft-mult-forms-left pull-left");
     forms_holder.append("div").attr("class", "fft-mult-forms-right pull-right");

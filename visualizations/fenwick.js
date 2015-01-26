@@ -24,11 +24,11 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     console.debug("downloaded fenwick");
 
     var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName,  {priority:"fenwick"}, [7, 5], "You may modify the input array here:");
-    var fen_container = layout.customControlsLayout.append("div").style("width", "100%");
+    var fen_container = layout.customControlsLayout.append("div").attr("class", "clearfix").style("width", "100%");
     var float_container = fen_container.append("div").attr("class", "fen-float-container pull-left")
     var fen_labels = float_container.append("div").attr("class", "fen-labels");
     var fen_forms = float_container.append("div").attr("class", "fen-forms");
-    var fenIndexData = fen_container.append("div").attr("class", "fen-index-data pull-right");
+    var fenIndexData = fen_container.append("div").attr("class", "fen-index-data");
     var summaryField = fenIndexData.append("p");
     summaryField.append("span").attr("class", "fen-dyn-lbl").text("");
     summaryField.append("span").attr("class", "fen-dyn-val").text("");

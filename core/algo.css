@@ -215,3 +215,10 @@ svg.gauge {
 .speed-controls-buttons-div > p {
     margin: 0px 0px 1px 0px;
 }
+.hzline {
+
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), #CCC, rgba(255, 255, 255, 0)) repeat scroll 0% 0% transparent;
+    height: 1px;
+    margin-top: 2.5em;
+    margin-bottom: 2.5em;
+}
