@@ -64,6 +64,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 	speedDialCell.append("p").attr("class", "controls-info-text").text("Adjust the speed at which to run the algorithm:");
 //	speedDialCell.append("div")
 	var gaugeObj = _my.vislib.addSpeedGauge("#" + algorithmId + "speed-dial-div", 0.6);
+	layout.gaugeObj = gaugeObj;
 	var buttonsDiv = speedDialCell.append("div").attr("class", "speed-controls-buttons-div");
 	buttonsDiv.append("p").append("button").attr("class", "btn btn-info btn-sm")
 	    .on("click", function() {

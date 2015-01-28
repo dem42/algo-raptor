@@ -293,7 +293,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
     
     /**** based off of a gist by msqr on github ****/
     // draws a speed gauge and returns an object to update and query the gauge for the speed values
-    _my.vislib.addSpeedGauge = function(holder_selector, scale) {
+    _my.vislib.addSpeedGauge = function(holder_selector, scale, speed_modifier) {
 	var labelData = [{l:'Very Slow', o: '0.8em'},
 			 {l:'Slow', o: '1.8em'},
 			 {l:'Medium', o:'1.1em'},
@@ -301,7 +301,14 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 			 {l:'Very Fast', o:'1em'}];
 	var arcColorFn = ['#0eb149', '#8ac441', '#ffef00', '#f5801e', '#ee1e26'];
 
-	var gaugeObj = gauge(labelData, arcColorFn, holder_selector, {scale: scale}); 
+	var config = {};
+	if (speed_modifier !== undefined) {
+	    config.speed_modifier = speed_modifier;
+	}
+	if (scale !== undefined) {
+	    config.scale = scale;
+	}
+	var gaugeObj = gauge(labelData, arcColorFn, holder_selector, config); 
 	gaugeObj.render(5);
 
 	function gauge(labelData, arcColorFn, container, configuration) {
@@ -353,6 +360,12 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 		return (maxValue - value) * config.speedModifier;
 	    }
 	    that.getSpeed = getSpeed;
+
+
+	    function setSpeedModifier(speed) {
+		config.speed_modifier = speed;
+	    }
+	    that.setSpeedModifier = setSpeedModifier;
 
 	    var prop = undefined;
 	    for ( prop in configuration ) {
