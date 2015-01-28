@@ -486,7 +486,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 
     function createRaptorPopupTemplate(text) {
 	var raptor_num = Math.floor(Math.random()*2) + 1;
-	var temp =  "<div class='clearfix'><img class='pull-left raptor-img' src='assets/raptor_fade" + raptor_num + ".jpg'><p>" + text + "</p></div>"
+	var temp =  "<div class='clearfix'><img class='pull-left raptor-img' src='assets/raptor_fade_sm" + raptor_num + ".jpg'><p>" + text + "</p></div>"
 	console.log(temp);
 	return temp;
     }
