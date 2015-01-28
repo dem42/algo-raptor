@@ -24,11 +24,11 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     console.debug("downloaded fenwick");
 
     var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName,  {priority:"fenwick"}, [7, 5], "You may modify the input array here:");
-    var fen_container = layout.customControlsLayout.append("div").style("width", "100%");
+    var fen_container = layout.customControlsLayout.append("div").attr("class", "clearfix").style("width", "100%");
     var float_container = fen_container.append("div").attr("class", "fen-float-container pull-left")
     var fen_labels = float_container.append("div").attr("class", "fen-labels");
     var fen_forms = float_container.append("div").attr("class", "fen-forms");
-    var fenIndexData = fen_container.append("div").attr("class", "fen-index-data pull-right");
+    var fenIndexData = fen_container.append("div").attr("class", "fen-index-data");
     var summaryField = fenIndexData.append("p");
     summaryField.append("span").attr("class", "fen-dyn-lbl").text("");
     summaryField.append("span").attr("class", "fen-dyn-val").text("");
@@ -60,6 +60,8 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	.attr("type","text")
 	.attr("class","fen-input-box")
 	.attr("maxlength", 1);
+
+    layout.introductionParagraph.html("<p>This datastructure is also known as the Binary Indexed Tree. One look into the visualization section will tell you way. Maybe... The idea is that we use the binary encoding of an index to compute the parents and children of this tree.</p><p> This algorithm helps you in computing prefix aggregates in <var>O(log N)</var> time on data that can be updated. This works because we store subtree sums inside parent nodes in the tree. To compute the aggregates we then travel diagonally through the tree. If you can compute prefix sums then you can compute the sum between any two arbitrary indices as shown in the <code>sumBetween</code> code.");
 
     /*populate the inputs*/
     var inputs = document.querySelectorAll(".fen-forms > input[type='text']");

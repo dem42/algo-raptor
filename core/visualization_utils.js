@@ -293,7 +293,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
     
     /**** based off of a gist by msqr on github ****/
     // draws a speed gauge and returns an object to update and query the gauge for the speed values
-    _my.vislib.addSpeedGauge = function(holder_selector, scale) {
+    _my.vislib.addSpeedGauge = function(holder_selector, scale, speed_modifier) {
 	var labelData = [{l:'Very Slow', o: '0.8em'},
 			 {l:'Slow', o: '1.8em'},
 			 {l:'Medium', o:'1.1em'},
@@ -301,7 +301,14 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 			 {l:'Very Fast', o:'1em'}];
 	var arcColorFn = ['#0eb149', '#8ac441', '#ffef00', '#f5801e', '#ee1e26'];
 
-	var gaugeObj = gauge(labelData, arcColorFn, holder_selector, {scale: scale}); 
+	var config = {};
+	if (speed_modifier !== undefined) {
+	    config.speed_modifier = speed_modifier;
+	}
+	if (scale !== undefined) {
+	    config.scale = scale;
+	}
+	var gaugeObj = gauge(labelData, arcColorFn, holder_selector, config); 
 	gaugeObj.render(5);
 
 	function gauge(labelData, arcColorFn, container, configuration) {
@@ -353,6 +360,12 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 		return (maxValue - value) * config.speedModifier;
 	    }
 	    that.getSpeed = getSpeed;
+
+
+	    function setSpeedModifier(speed) {
+		config.speed_modifier = speed;
+	    }
+	    that.setSpeedModifier = setSpeedModifier;
 
 	    var prop = undefined;
 	    for ( prop in configuration ) {
@@ -471,5 +484,30 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	return gaugeObj;
     };
 
+    function createRaptorPopupTemplate(text) {
+	var raptor_num = Math.floor(Math.random()*2) + 1;
+	var temp =  "<div class='clearfix'><img class='pull-left raptor-img' src='../assets/raptor_fade" + raptor_num + ".jpg'><p>" + text + "</p></div>"
+	console.log(temp);
+	return temp;
+    }
+
+    // adding raptor heads using absolute positioning inside a relatively positioned code block
+    _my.vislib.addRaptorHead = function(algorithmTabId, algorithmCodeClass, lineNum, text) {
+	_my.AlgorithmUtils.attachPrettyPrintCallback(algorithmTabId, function() {
+	    var algorithmCodeHolder =  "." + algorithmCodeClass + " .function-code-holder";
+	    $(algorithmCodeHolder).css("position", "relative");
+	    $(algorithmCodeHolder + " ol").css("margin-left", "15px");
+	    var lineR = lineNum % 10;
+	    var lineQ = Math.floor(lineNum / 10);
+	    var dvObj = $(algorithmCodeHolder)[0];
+	    var lineObj = $(algorithmCodeHolder + " " + "li.L" + lineR)[lineQ]; 
+	    var raptor_top = lineObj.getBoundingClientRect().top - dvObj.getBoundingClientRect().top;
+	    var raptor_left = 0;
+	    console.log("selecting", dvObj.getBoundingClientRect(), lineObj.getBoundingClientRect());
+
+	    var img = $(algorithmCodeHolder).append('<img class="' + algorithmCodeClass + lineNum + '" src="assets/raptor24.png" style="position: absolute; margin-left: 2px; z-index:10; top: ' + 
+						raptor_top + 'px; left: ' + raptor_left + 'px" data-toggle="popover" data-trigger="click focus" data-placement="top" data-html="true" data-content="' + createRaptorPopupTemplate(text) +'"></img>');
+	});
+    }
     return _my;
 }(ALGORITHM_MODULE || {}, d3, $));

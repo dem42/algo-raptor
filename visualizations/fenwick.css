@@ -101,6 +101,12 @@
 .fen-dyn-lbl {
     font-weight: bold;
 }
+.fen-index-data {
+    clear: left;
+    padding-top: 10px;
+}
 .fen-index-data > p {
     opacity: 0;
+    display: inline;
+    margin-right: 10px;
 }

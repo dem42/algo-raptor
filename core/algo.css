@@ -37,7 +37,7 @@ pre.prettyprint {
 .prettyprint ol.linenums > li { list-style-type: decimal; }
 
 li.highlighted-row {
-    background: #FFFF7F;
+    background: #FFFF7F !important;
 }
 
 .jumbotron {
@@ -214,4 +214,18 @@ svg.gauge {
 }
 .speed-controls-buttons-div > p {
     margin: 0px 0px 1px 0px;
+}
+.hzline {
+
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), #CCC, rgba(255, 255, 255, 0)) repeat scroll 0% 0% transparent;
+    height: 1px;
+    margin-top: 2.5em;
+    margin-bottom: 2.5em;
+}
+
+.raptor-img {
+    width:40%;
+    height:40%;
+    margin-left: -5px;
+    margin-right: 5px;
 }

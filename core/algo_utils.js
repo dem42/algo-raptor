@@ -64,6 +64,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 	speedDialCell.append("p").attr("class", "controls-info-text").text("Adjust the speed at which to run the algorithm:");
 //	speedDialCell.append("div")
 	var gaugeObj = _my.vislib.addSpeedGauge("#" + algorithmId + "speed-dial-div", 0.6);
+	layout.gaugeObj = gaugeObj;
 	var buttonsDiv = speedDialCell.append("div").attr("class", "speed-controls-buttons-div");
 	buttonsDiv.append("p").append("button").attr("class", "btn btn-info btn-sm")
 	    .on("click", function() {
@@ -332,6 +333,16 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
             .text(algo);
 	return code_holder;
     };
+
+    var pretty_print_callbacks = {};
+    // attach any code you need to get executed after pretty print here
+    AlgorithmUtils.attachPrettyPrintCallback = function(tab_id, callback) {
+	var tab_id_with_hash = "#" + tab_id; // we store them with hash since that's how we'll call them
+	(pretty_print_callbacks[tab_id_with_hash] = (pretty_print_callbacks[tab_id_with_hash] || [])).push(callback);
+    }
+    AlgorithmUtils.getPrettyPrintCallbacks = function(tab_id) {
+	return pretty_print_callbacks[tab_id];
+    }
     //return the augmented module
     _my.AlgorithmUtils = AlgorithmUtils;
     return _my;

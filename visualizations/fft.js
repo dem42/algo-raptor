@@ -8,16 +8,43 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     var algorithm2TabId = "fft-tab-mult";
     var algorithm1Name = "Fast Fourier Transform";
     var algorithm2Name = "Fast Fourier Multiplication";
-
+    console.debug("downloaded fft");
     /*******************************/
     /*      Setup the panels       */
     /*******************************/
-    console.debug("downloaded fft");
 
-    var layout_tran = _my.AlgorithmUtils.setupLayout(algorithm1TabId, algorithm1Name, {priority:"fft1-tran"}, [5, 7]);
-    layout_tran.customControlsLayout.style("display", "none");
-    var layout_mult = _my.AlgorithmUtils.setupLayout(algorithm2TabId, algorithm2Name,  {priority:"fft2-mult"}, [5, 7]);
-    layout_mult.customControlsLayout.style("display", "none");
+    var layout_tran = _my.AlgorithmUtils.setupLayout(algorithm1TabId, algorithm1Name, {priority:"fft1-tran"}, [5, 7], "You may modify the input polynomial here:");
+    layout_tran.customControlsLayout.append("div").attr("class", "fft-trans-forms");
+    layout_tran.gaugeObj.setSpeedModifier(30);
+    layout_tran.introductionParagraph.html("This algorithm uses the fact that a polynomial of degree <var>N</var> can be defined uniquely either using its coefficients or using <var>N</var> <var>(x, y)</var> pairs. This is because of <a href='http://en.wikipedia.org/wiki/Lagrange_polynomial#Definition'>Lagrange formula</a> which allows us to compute the coefficients uniquely from the input_value pairs. But evaluating a polynomial on <var>N</var> input points even with <a href='http://en.wikipedia.org/wiki/Horner%27s_method'>Horner's method</a> method is going to be <var>O(N^2)</var>. The idea of the FFT is that on a special set of <var>N</var> input points this can be improved to <var>O(N log N)</var>. This speical set is most commonly the roots of unity, because when we square roots of unity of even number we get more roots of unity. This allows us to employ a great divide and conquer technique. Check out the visualization and the raptor heads for more, because this is a pretty complicated algorithm.");
+    var layout_mult = _my.AlgorithmUtils.setupLayout(algorithm2TabId, algorithm2Name,  {priority:"fft2-mult"}, [6, 6], "You may modify the input polynomials here:");
+    layout_mult.gaugeObj.setSpeedModifier(30);
+    var forms_holder = layout_mult.customControlsLayout.append("div");
+    forms_holder.append("div").attr("class", "fft-mult-forms-left pull-left");
+    forms_holder.append("div").attr("class", "fft-mult-forms-right pull-right");
+    layout_mult.introductionParagraph.html("The normal way to multiply polynomials is pretty straighforward right? You take the first coefficient, multiply it with all the other coefficients, do this for every coefficient and then add up the results. Simple, but slow .. <var>O(N^2)</var> no es bueno, amigo. Fortunately we already saw that we can evaluate a polynomial at <var>N</var> points in <var>N log N</var> time <a href='#fft-tab-tran'>here</a>. We could multiply two polynomials by multiplying these points individually and then if we just had a way to go from the points to the coefficients quickly as well we would be good! Fortuantely the FFT can also be used for that too because if applied on the points it will give the coefficients. Check out the raptor heads for more, once again.");
+
+    /*function to create the input boxes for the polynomial .. you also have to read from them before kicking it off*/
+    function createInputBoxes(formClass, inputBoxClass, poly) {
+	var reversed_poly = [];
+	for (var j = poly.length-1; j >=0; j--) {
+	    reversed_poly.push(poly[j]);
+	}
+	var forms_spans = d3.select("." + formClass).selectAll("input[type='text']")
+	    .data(reversed_poly)
+	    .enter().append("span");
+	forms_spans.append("input")
+	    .attr("type","text")
+	    .attr("class",inputBoxClass)
+	    .attr("maxlength", 2)
+	    .attr("value", function(d) { return d; })
+	var labels = forms_spans.append("span")
+	    .text(function(d, i) { return i < poly.length-1 ? "x" : ""});
+	forms_spans.append("sup")
+	    .text(function(d, i) { return i < poly.length-1 ? "" + (poly.length-i-1) : ""});
+	forms_spans.append("span")
+	    .text(function(d, i) { return i < poly.length-1 ? " +" : ""});
+    }
     /*******************************/
     /*      Complex number type    */
     /*******************************/
@@ -98,7 +125,6 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	var coef = (2*Math.PI*idx) / N;
 	return Complex.create(Math.cos(coef), Math.sin(coef));
     };
-    
     /***********************
      **    Functions     ***
      **********************/
@@ -172,15 +198,13 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     var width = 900;
     var svg_fft_elem = d3.select("#" + algorithm1TabId + " .graphics").append("svg")
 	.attr("width",  width + "px")
-	.attr("height", "1050px")
-	.style("display", "inline");
+	.attr("height", "800px")
     var fft_group = svg_fft_elem.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
     var svg_multiply_elem = d3.select("#" + algorithm2TabId + " .graphics").append("svg")
 	.attr("width",  1.42*width + "px")
-	.attr("height", "1050px")
-	.style("display", "none");
+	.attr("height", "800px")
     var multiply_group = svg_multiply_elem.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
@@ -188,13 +212,22 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
      ** Wire up the Algos *
      **********************/
     var poly_ev = [Complex.create(-1,0), Complex.ZERO, Complex.create(-5,0)];
+    createInputBoxes("fft-trans-forms", "fft-input-box fft-trans-box", poly_ev);
     var poly_p = [Complex.create(11,0), Complex.ZERO, Complex.create(-3,0), Complex.create(2,0)];
+    createInputBoxes("fft-mult-forms-left", "fft-input-box fft-mult-box-left", poly_p);
     var poly_q = [Complex.create(-3,0), Complex.create(3.4, 0), Complex.create(-7, 0)];
+    createInputBoxes("fft-mult-forms-right", "fft-input-box fft-mult-box-right", poly_q);
+
+    function populate(poly, boxClass) {
+	d3.selectAll("." + boxClass).each(function(d, i) {
+	    var value = +this.value;
+	    poly[poly.length - i - 1] = value != 0 ? Complex.create(value,0) : Complex.ZERO;
+	});
+    }
 
     var elem_between = 2;
     var btw_elem = 10;
     var per_width = (width - 100) / (poly_p.length + poly_q.length + elem_between);
-
 
     /***** this function creates a tree layout that we can then write the polynomials to and move them around in*/
     function prepareLayoutForPolys(N, node_size, fft_group, group_name, left_margin, top_margin, inverted) {
@@ -548,9 +581,8 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 
 	var transition = _my.vislib.animateGrowingArrows(down_top_tree, down_top_tree.selectAll(".fft-link-to" + our_id), animation_duration, 0, false, 0.7).transition;
 	transition.each("end", function() {
-	    drawCoefs(poly.slice(start, start + N), elem_to_draw_into, false)
-	    drawCoefs(poly.slice(start, start + N), elem_to_draw_into, true);
-	    elem_to_draw_into.selectAll("text").attr("transform", "scale(1,-1)");
+	    drawCoefs(poly.slice(start, start + N), elem_to_draw_into, false, true)
+	    drawCoefs(poly.slice(start, start + N), elem_to_draw_into, true, true);
 	});
 	return 1.2 * animation_duration;
     };
@@ -615,8 +647,20 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	return 2 * animation_duration;
     };
     ev_calls[32] = ev_calls[2] = { 
-	"pre": function() { 
+	"pre": function(poly, N) { 
 	    recursion_depth--;
+	    if (recursion_depth == 0) {
+		var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
+		var lvl = Math.log2(N);
+		var down_top_tree = d3.select("#fft-poly-tree-upside-down");
+		var elem_to_draw_into = down_top_tree.select("#fft-node-num1");
+
+		var transition = _my.vislib.animateGrowingArrows(down_top_tree, down_top_tree.selectAll(".fft-link-to1"), animation_duration, 0, false, 0.7).transition;
+		transition.each("end", function() {
+		    drawCoefs(poly, elem_to_draw_into, false, true);
+		});
+		return 1.2 * animation_duration;
+	    }
 	}
     };
     var fft_algo_context = _my.AlgorithmUtils.createAlgorithmContext(layout_tran.defaultControlsObj);
@@ -656,6 +700,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     }
     // we need a kickoff function that will start the transform algorithm
     function kickoff_fft_trans(executionFunction) {
+	populate(poly_ev, "fft-trans-box");
 	console.log("Before fft transform", "" + poly_ev);
 	cleanup();
 	var sharedCalc = function(idx, N, Complex) {
@@ -666,6 +711,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	var p = poly_ev.slice();
 	var result = ev.startAnimation(p, 0, p.length, [], ComplexClone);
 	console.log("After fft transform", "" + p);
+	
 	executionFunction();
     };
 
@@ -814,6 +860,8 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 
     // we need a kickoff function that will start the multiply algorithm
     function kickoff_fft_multiply(executionFunction) {
+	populate(poly_p, "fft-mult-box-left");
+	populate(poly_q, "fft-mult-box-right");
 	console.log("Before fft multiply", "" + poly_p, "" + poly_q);
 	cleanup();
 	var sharedEv = function(poly, len, start, helper_arr, Complex) {
