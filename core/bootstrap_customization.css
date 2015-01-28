@@ -1,4 +1,4 @@
-.inverse-dropdown{
+/*.inverse-dropdown{
     background-color: #222;
     border-color: #080808;
 }
@@ -11,4 +11,8 @@
 }
 .inverse-dropdown > .divider {
     background-color: #000;
+}
+*/
+.navbar-default {
+    background : #f5f5f5;
 }
