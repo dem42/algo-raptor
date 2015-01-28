@@ -13,7 +13,8 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
     console.debug("downloaded quicksort");
 
     var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName,  {priority:"sorting-quick"}, [6, 6]);
-
+    layout.introductionParagraph.html("<p>This is the most famous sorting algorithm, although contrary to the name not really the quickest. In the worst case scenario the algorithm sorts in <var>O(N<sup>2</sup>)</var> time, even though on average you can expect <var>O(N log N)</var>. The choice of the pivot affects the worst case probability.</p><p>This implementation of quicksort sorts in place by swapping elements around. Maintaining a left and right pointer to find elements which are either larger or smaller than the pivot element and moving them to the left or right of the pivot accordingly.</p>");
+    
     /*******************************/
     /*      Define the functions   */
     /*******************************/
@@ -62,7 +63,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
     var margin = { left: 10, top: 30, right: 10, bottom: 100};
     var svg = d3.select("#" + algorithmTabId + " .graphics").append("svg")
 	.attr("width",  "900px")
-	.attr("height", "1050px")
+	.attr("height", "478px")
 	.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
