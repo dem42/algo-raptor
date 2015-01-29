@@ -220,8 +220,9 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
     }
     var tree = createRandomTree(TREE_SIZE);
     initialize(tree);
+    layout.customControlsHeader.style("display", "inline-block");
     layout.customControlsLayout.append("button")
-	.attr("class", "btn btn-info btn-sm")
+	.attr("class", "btn btn-info btn-sm hld-shuffle-btn")
 	.attr("title", "Permute the tree input data. (You want to do this .. Trust me!")
         .on("click", function() {
 	    d3.select("#hld-tree-group").remove();

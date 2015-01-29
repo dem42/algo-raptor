@@ -34,13 +34,14 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 
     AlgorithmUtils.insertCustomControls = function(layout, algorithmId, algorithmName, comments) {
 	var customControlsHolder = layout.visPanelContents.append("div").attr("class", "custom-controls-holder");
-	customControlsHolder.append("div").attr("class", "custom-controls-header").text(algorithmName + " Controls:");
+	var customControlsHeader = customControlsHolder.append("div").attr("class", "custom-controls-header").text(algorithmName + " Controls:");
 
 	if (comments !== undefined) {
 	    customControlsHolder.append("div").attr("class", "custom-controls-comments-section")
 		.append("p").attr("class", "controls-info-text").text(comments);
 	}
-	return customControlsHolder;
+	layout.customControlsLayout = customControlsHolder;
+	layout.customControlsHeader = customControlsHeader;
     }
 
     // create and populate a section for standard algorithm controls
@@ -89,7 +90,6 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 	    controlsDiv.transition().duration(200).attr("width", 50);
 	});
 	*/
-
 	return {"speedGauge" : gaugeObj};
     }
 
@@ -315,7 +315,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 
 	// insert the controls objects
 	layout.defaultControlsObj = AlgorithmUtils.insertDefaultControls(layout, algorithmTabId);
-	layout.customControlsLayout = AlgorithmUtils.insertCustomControls(layout, algorithmTabId, algorithmName, comments);
+	AlgorithmUtils.insertCustomControls(layout, algorithmTabId, algorithmName, comments);
 
 	return layout;
     };

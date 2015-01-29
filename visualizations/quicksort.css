@@ -30,3 +30,9 @@
     text-anchor: middle; 
     font-size: 120%;
 }
+
+.quick-shuffle-btn {
+    position: relative;
+    bottom: 2px;
+    left: 20px;
+}

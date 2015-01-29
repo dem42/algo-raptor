@@ -327,8 +327,9 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	    this[i] = x;
 	}
     };
+    layout.customControlsHeader.style("display", "inline-block");
     layout.customControlsLayout.append("button")
-	.attr("class", "btn btn-info btn-sm")
+	.attr("class", "btn btn-info btn-sm quick-shuffle-btn")
 	.attr("title", "Permute the quicksort input data. (The balls!)")
         .on("click", function() {
 	    sequence_to_sort.shuffle();
