@@ -295,23 +295,22 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 	layout.controlsPanelBody = layout.controlsPanel.append("div").attr("class", "panel-body");
 	layout.ops = layout.controlsPanelBody.append("div").attr("class", "options");
 	
-
+	// row 1
 	layout.row1 = layout.container.append("div").attr("class", "row");
-	layout.leftPanel = layout.row1.append("div").attr("class", "col-md-" + columnWidths[0])
+	layout.visHeader = layout.row1.append("div").attr("class", "col-md-12");
+	layout.visHeader.append("h4").attr("class", "page-header").text("Visualization");
 
+	// row 2
+	layout.row2 = layout.container.append("div").attr("class", "row");
+	layout.leftPanel = layout.row2.append("div").attr("class", "col-md-" + columnWidths[0])
 	layout.visPanel = layout.leftPanel.append("div").attr("class", "row")
     	    .append("div").attr("class", "col-md-12")
-    	    .append("div").attr("class", "panel panel-default");
-	layout.visPanel.append("div").attr("class", "panel-heading").append("h6").attr("class", "panel-title")
-	    .text("Algorithm Visualization");
-	layout.visPanelContents = layout.visPanel.append("div").attr("class", "panel-body graphics");
+    	    .append("div");
+	layout.visPanelContents = layout.visPanel.append("div").attr("class", "graphics");
 	
-	
-	layout.codePanel = layout.row1.append("div").attr("class", "col-md-" + columnWidths[1])
-    	    .append("div").attr("class", "panel panel-default");
-	layout.codePanel.append("div").attr("class", "panel-heading").append("h6").attr("class", "panel-title")
-	    .text("Code");
-	layout.codePanel.append("div").attr("class", "panel-body code");
+	layout.codePanel = layout.row2.append("div").attr("class", "col-md-" + columnWidths[1])
+    	    .append("div");
+	layout.codePanel.append("div").attr("class", "code");
 
 	// insert the controls objects
 	layout.defaultControlsObj = AlgorithmUtils.insertDefaultControls(layout, algorithmTabId);
