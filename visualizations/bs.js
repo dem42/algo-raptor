@@ -99,6 +99,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 
     function prep_fun_gen(svg, svgg, algorithmTabId) {
 	return function(data, key) {
+	    svgg.selectAll("*").remove();
 	    var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	    var viewBox = _my.AlgorithmUtils.calcViewBox("#" + algorithmTabId + " .graphics", width, height);
 	    svg.attr("width", viewBox.width)

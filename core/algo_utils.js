@@ -48,13 +48,15 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
     AlgorithmUtils.insertDefaultControls = function(layout, algorithmId) {
 
 	var controlsDiv = layout.ops;
+	var controlsExp = controlsDiv.append("div").attr("class", "controls-expanded-view");
+	var controlsColp = controlsDiv.append("div").attr("class", "controls-collapsed-view");
 	function appendButton(div, classname, algorithmName, tooltip) {
 	    var button = div.append("a").attr("href", "#").classed("a-btn enabled-btn", true).attr("id", classname + "-of-" + algorithmId);
 	    button.append("span").attr("class", "a-btn-icon").attr("title", tooltip).append("span").attr("class", classname);
 	}
 
-	controlsDiv.append("div").attr("class", "controls-header").text("General Controls:");
-	var defaultControls = controlsDiv.append("table").attr("class", "default-controls table").append("tr");
+	controlsExp.append("div").attr("class", "controls-header").text("General Controls:");
+	var defaultControls = controlsExp.append("table").attr("class", "default-controls table").append("tr");
 	var exRadioDiv = defaultControls.append("td")
 	    .style("vertical-align", "top")
 	    .append("div").attr("class", "execution-type-radios");
@@ -79,17 +81,24 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 		gaugeObj.update(current-1);
 	    }).append("span").attr("class", "glyphicon glyphicon-minus");
 
-	/*
-	var miniBtn = controlsDiv.append("button").attr("type","button")
-	miniBtn.append("span").attr("class", "sr-only");
-	miniBtn.append("span").attr("class", "icon-bar");
-	miniBtn.append("span").attr("class", "icon-bar");
-	miniBtn.append("span").attr("class", "icon-bar");
+	
+	var miniBtn = controlsExp.append("button").attr("type","button").attr("class","btn btn-default btn-xs").attr("aria-label", "Toggle menu");
+	miniBtn.append("span").attr("class", "glyphicon glyphicon-menu-right").attr("aria-hidden", "true");
 	miniBtn.on("click", function(d) { 
-	    console.log("in mini btn click"); 
-	    controlsDiv.transition().duration(200).attr("width", 50);
+	    controlsExp.style("display", "none");
+	    controlsColp.style("display", "block");
+	    layout.introHeader.attr("class", "col-md-11");
+	    //layout.controlsPanelHolder.attr("class", "col-md-1");
 	});
-	*/
+	controlsColp.style("display", "none");
+	var maxiBtn = controlsColp.append("button").attr("type","button").attr("class","btn btn-default btn-xs maxi-btn").attr("aria-label", "Toggle menu");
+	maxiBtn.append("span").attr("class", "glyphicon glyphicon-menu-left").attr("aria-hidden", "true");
+	maxiBtn.on("click", function(d) { 
+	    controlsExp.style("display", "block");
+	    controlsColp.style("display", "none");
+	    layout.introHeader.attr("class", "col-md-8");
+	    //layout.controlsPanelHolder.attr("class", "col-md-4");
+	});
 	return {"speedGauge" : gaugeObj};
     }
 
@@ -281,16 +290,16 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 	var layout = {};
 	
 	AlgorithmUtils.insertIntoHeaderList("#" + algorithmTabId, algorithmName, menuConfig);
-	layout.container = d3.select("#algoContainer")
-    	    .append("div").attr("class", "tab-pane").attr("id", algorithmTabId)
-            .append("div").attr("class", "container-fluid");
+	var tab = d3.select("#algoContainer")
+    	    .append("div").attr("class", "tab-pane").attr("id", algorithmTabId);
+	layout.container = tab.append("div").attr("class", "container-fluid");
 	layout.row0 = layout.container.append("div").attr("class", "row");
 	layout.introHeader = layout.row0.append("div").attr("class", "col-md-8");
 	layout.introHeader.append("div").attr("class", "page-header").append("h4").text(algorithmName);
 	layout.introductionParagraph = layout.introHeader.append("p").text("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum");
 
-	layout.controlsPanel = layout.row0.append("div").attr("class", "col-md-4 controls")
-    	    .append("div").attr("class", "panel panel-default controls-affix").attr("data-spy", "affix");
+	layout.controlsPanelHolder = tab.append("div").attr("class", "controls controls-affix").attr("data-spy", "affix").style("top","0%").style("right","0%");
+    	layout.controlsPanel = layout.controlsPanelHolder.append("div").attr("class", "panel panel-default")
 
 	layout.controlsPanelBody = layout.controlsPanel.append("div").attr("class", "panel-body");
 	layout.ops = layout.controlsPanelBody.append("div").attr("class", "options");
