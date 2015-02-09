@@ -16,3 +16,13 @@
 .navbar-default {
     background : #f5f5f5;
 }
+
+.kwd {
+    color: #07a;
+}
+.lit {
+    color: #905;
+}
+.function:not(.kwd) {
+    color:#dd4a68;
+}

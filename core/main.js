@@ -30,6 +30,7 @@ $(function (ALGORITHM_MODULE) {
     $(function() {
 	console.debug("loaded");
 	prettyPrint();
+	postPrettificationTagging();
 	prettification_complete = true;
 	var current_tab = window.location.hash;
 	if (current_tab !== undefined && current_tab !== null && current_tab !== "") {
@@ -117,5 +118,10 @@ $(function (ALGORITHM_MODULE) {
 		.attr("viewBox", viewBox.string)
 		.attr("data-adjusted", "true");
 	});
+    }
+
+    function postPrettificationTagging() {
+	console.log("calling this thing");
+	$("span.pun:contains(()").prev().addClass("function");
     }
 }(ALGORITHM_MODULE));
