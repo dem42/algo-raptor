@@ -404,7 +404,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 		    .attr('class', 'gauge')
 		    .attr('width', config.clipWidth*config.scale)
 		    .attr('height', config.clipHeight*config.scale)
-		    .attr("transform", "scale(" + config.scale + ")")
+		    .attr("viewBox", "0 0 " + config.clipWidth + " " + config.clipHeight)
 		    .append("g")
 		    .attr("transform", "translate(" + (r*1) + "," + (r*.95) + ")");		
 		var defs = svg.append('defs')
