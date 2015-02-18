@@ -53,8 +53,8 @@
     width: 20px;
     margin: 10px;
     text-align: center;
-    -webkit-filter: drop-shadow( -5px -5px 5px #000 );
-    filter: drop-shadow( -5px -5px 5px #000 );
+    -webkit-filter: drop-shadow( -5px -5px 5px #333 );
+    filter: drop-shadow( -5px -5px 5px #333 );
 }
 
 .fen-rect-highlighted {
@@ -69,7 +69,7 @@
 
 .fen-link {
     fill: none;
-    stroke: #000;
+    stroke: #333;
     stroke-width: 1.5px;
 }
 
@@ -77,6 +77,7 @@
     pointer-events: none;
     text-anchor: middle;
     dominant-baseline: middle;
+    font-size: 70%;
 }
 .fen-arrow {
     fill: none;
@@ -88,10 +89,10 @@
 }
 
 .fen-text {
-    fill: black;
+    fill: #333;
     stroke: none;
     text-decoration: underline;
-    font-size:120%;
+    font-size:84%;
 }
 
 .fen-text-highlight {

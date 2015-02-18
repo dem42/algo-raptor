@@ -146,14 +146,12 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 
 	var texts = svgNodes.append("text")
 	    .attr("class", "dsu-node-name")
-            .attr("dx", function(d) {var num = ("" + d.name).length; return (num * -5);})
-            .attr("dy", "5")
 	    .attr("onmousedown", "return false;")
 	    .text(function(d) { return d.name; })
 	    .attr("font-size", "0")
 	    .transition()
 	    .delay(2*animation_duration)
-	    .attr("font-size", "16");
+	    .attr("font-size", "20");
 
 	var rankInfos = svgNodes.append("text")
 	    .attr("class", "dsu-node-rank")

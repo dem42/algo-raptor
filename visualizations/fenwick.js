@@ -128,14 +128,15 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     var svg_data = function init() {
 	var margin = { left: 10, top: 70, right: 10, bottom: 100};
 	var svg = d3.select("#" + algorithmTabId + " .graphics").append("svg")
-	.attr("width",  "700px")
-	.attr("height", "1050px")
+	.attr("width",  "600px")
+	.attr("height", "850px")
 	.style("float", "left")
 	.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 	svg.append("text").attr("class", "fen-text").text("Fenwick Tree:")
 	var highest2Pow = 1 << log2N;
+	var node_size = [461, 322];
 
 	var cluster = d3.layout.cluster()
 	    .children(function(node) {
@@ -149,7 +150,7 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 		}
 		return node.children;
 	    })
-	    .size([660, 460]);
+	    .size(node_size);
 
 	var nodes = cluster.nodes({val: highest2Pow});
 	var links = cluster.links(nodes);
@@ -160,7 +161,7 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	    .append("path").attr("class", "fen-link")
 	    .attr("d", d3.svg.diagonal());
 
-	var radius = 80;
+	var radius = 56;
 	var fen_nodes = svg.selectAll("fen-node")
 	    .data(nodes)
 	    .enter()
