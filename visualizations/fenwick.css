@@ -69,8 +69,8 @@
 
 .fen-link {
     fill: none;
-    stroke: #333;
-    stroke-width: 1.5px;
+    stroke: steelblue;
+    stroke-width: 1px;
 }
 
 .fen-node-lbl {

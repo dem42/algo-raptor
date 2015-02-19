@@ -137,7 +137,7 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 
 	svg.append("text").attr("class", "fen-text").text("Fenwick Tree:")
 	var highest2Pow = 1 << log2N;
-	var node_size = [461, 322];
+	var node_size = [471, 322];
 
 	var cluster = d3.layout.cluster()
 	    .children(function(node) {

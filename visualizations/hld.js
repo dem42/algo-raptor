@@ -83,7 +83,7 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
 	}
 	return links;
     }
-    var radius = 20;
+    var radius = 32;
     function initialize(tree) {
 	var tree_group = svg.append("g").attr("id", "hld-tree-group");
 	var nodes = createNodes(tree);

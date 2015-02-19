@@ -1,6 +1,6 @@
 .hld-link {
     fill: none;
-    stroke: #000;
+    stroke: steelblue;
     stroke-width: 1.5px;
 }
 
@@ -12,17 +12,18 @@
 
 .hld-circle {
     cursor: move;
-    fill: #ccc;
-    stroke: #333;
+    fill: #f5f5f5;
+    stroke: steelblue;
     stroke-width: 1.5px;
 }
 
 .hld-root-id {
     cursor: move;
     pointer-events: none;
-    fill: #f00;
+    fill: #905;
     stroke: none;
-    font-size: small;
+    font-size: 20px;
+    dominant-baseline: middle;
     font-family: monospace;
 }
 
