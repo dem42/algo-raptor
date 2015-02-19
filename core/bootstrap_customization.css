@@ -1,13 +1,13 @@
-.inverse-dropdown{
+.inverse-dropdown {
     background-color: #222;
     border-color: #080808;
 }
-.inverse-dropdown > li > a{
+.inverse-dropdown > li > a {
     color: #999;
 }
-.inverse-dropdown > li > a:hover{
-    color: #000;
-    background-color: #000;
+.inverse-dropdown > li > a:hover {
+    color: #fff;
+    background-color: #999;
 }
 .inverse-dropdown > .divider {
     background-color: #000;

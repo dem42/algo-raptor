@@ -12,7 +12,8 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
     /*******************************/
     console.debug("downloaded hld");
     var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName,  {priority:"a-hld"}, [5, 7]);
-    layout.introductionParagraph.html("Balanced trees are great, right? But what if you end up with an unbalanced tree? We probably don't want to restructure our tree to balance it, if the parent child relationships are important. This is where heavy light decomposition steps in. This algorithm is all about getting <var>O(log n)</var> out of unbalanced trees. The idea is to build preferred paths by always picking the child node with the largest subtree size. We can then use these paths to quickly jump over a bunch of nodes without having to visit them. If we can make it so that from any leaf node we only have to traverse <var>log N</var> chains to get to the root then the tree is basically balanced.");
+    layout.introduction.setIntroTlDr("<p>Balanced trees are great, right? But what if you end up with an unbalanced tree? We probably don't want to restructure our tree to balance it, if the parent child relationships are important. This is where heavy light decomposition steps in. This algorithm is all about getting <var>O(log n)</var> out of unbalanced trees.</p>");
+    layout.introduction.setIntroReadMore("<p>The idea is to build preferred paths by always picking the child node with the largest subtree size. We can then use these paths to quickly jump over a bunch of nodes without having to visit them. If we can make it so that from any leaf node we only have to traverse <var>log N</var> chains to get to the root then the tree is basically balanced.</p>");
     /*********************/
     /*** HLD functions ***/
     /*********************/

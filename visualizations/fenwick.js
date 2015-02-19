@@ -61,7 +61,8 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	.attr("class","fen-input-box")
 	.attr("maxlength", 1);
 
-    layout.introductionParagraph.html("<p>This datastructure is also known as the Binary Indexed Tree. One look into the visualization section will tell you why. Maybe... The idea is that we use the binary encoding of an index to compute the parents and children of this tree.</p><p> This algorithm helps you in computing prefix aggregates in <var>O(log N)</var> time on data that can be updated. This works because we store subtree sums inside parent nodes in the tree. To compute the aggregates we then travel diagonally through the tree. If you can compute prefix sums you can then compute the sum between any two arbitrary indices as shown in the <code>sumBetween</code> code.");
+    layout.introduction.setIntroTlDr("<p>This datastructure is also known as the Binary Indexed Tree. One look into the visualization section will tell you why. Maybe... The idea is that we use the binary encoding of an index to compute the parents and children of this tree.</p>");
+    layout.introduction.setIntroReadMore("<p>This algorithm helps you in computing prefix aggregates in <var>O(log N)</var> time on data that can be updated. This works because we store subtree sums inside parent nodes in the tree. To compute the aggregates we then travel diagonally through the tree. If you can compute prefix sums you can then compute the sum between any two arbitrary indices as shown in the <code>sumBetween</code> code.</p>");
 
     /*populate the inputs*/
     var inputs = document.querySelectorAll(".fen-forms > input[type='text']");

@@ -15,7 +15,8 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 
     var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName, {priority: "graphs-1-dsu"}, [7, 5]);
     layout.customControlsLayout.style("display", "none");
-    layout.introductionParagraph.html("This algorithm may not look like much. Basically all it is about is picking a captain, a leader of each group and joining groups by joining their leaders. The trick is in how we decide which to make the new leader. The DSU always makes the leader the one which has the largest rank. Surprisingly, this guarantees a logarithmic depth of the resulting groups, which means that from any node you can walk up to the leader in <var>log N</var> steps. This is because the trees really always just grow by one level and the only time a tree grows is if we join it with a tree of the same size. Worst case is therefore join all two halfs, before that join quarters to get halfs etc.");
+    layout.introduction.setIntroTlDr("<p>This algorithm may not look like much. Basically all it is about is picking a captain, a leader of each group and joining groups by joining their leaders. The trick is in how we decide which to make the new leader. The DSU always makes the leader the one which has the largest rank. Surprisingly, this guarantees a logarithmic depth of the resulting groups, which means that from any node you can walk up to the leader in <var>log N</var> steps.</p>");
+    layout.introduction.setIntroReadMore("<p>This is because the trees really always just grow by one level and the only time a tree grows is if we join it with a tree of the same size. Worst case is therefore join all two halfs, before that join quarters to get halfs etc.</p>");
     
     /*******************************/
     /*      Setup the svg stuff    */

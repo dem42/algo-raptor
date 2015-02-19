@@ -239,3 +239,6 @@ svg.gauge {
     bottom: 0px;
     left: 0px;
 }
+.read-more-lnk {
+    cursor: pointer;
+}

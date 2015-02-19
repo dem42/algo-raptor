@@ -296,7 +296,38 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 	layout.row0 = layout.container.append("div").attr("class", "row");
 	layout.introHeader = layout.row0.append("div").attr("class", "col-md-8");
 	layout.introHeader.append("div").attr("class", "page-header").append("h4").text(algorithmName);
-	layout.introductionParagraph = layout.introHeader.append("p").text("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum");
+	layout.introduction = function() {
+	    var introObject = Object.create(null);
+	    introObject.tldr = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum";
+	    introObject.readMore = "";
+	    function tldr(tldr) {
+		this.tldr = tldr;
+		layout.introductionParagraph.html(tldr);
+	    }
+	    function readMore(readMore) {
+		this.readMore = readMore;
+	    }
+	    introObject.setIntroTlDr = tldr;
+	    introObject.setIntroReadMore = readMore;
+
+	    layout.introductionParagraph = layout.introHeader.append("p").text(introObject.tldr);
+	    var readMoreTxt = "Read more...";
+	    var readMoreLink = layout.introHeader.append("p").append("a").attr("class", "read-more-lnk")
+		.text(readMoreTxt);
+	    var clicked = false;
+	    readMoreLink.on("click", function() {
+		if (!clicked) {
+		    layout.introductionParagraph.html(introObject.tldr + introObject.readMore);
+		    readMoreLink.text("tl;dr");
+		}
+		else {
+		    layout.introductionParagraph.html(introObject.tldr);
+		    readMoreLink.text(readMoreTxt);
+		}
+		clicked = !clicked;
+	    });
+	    return introObject;
+	}();
 
 	layout.controlsPanelHolder = tab.append("div").attr("class", "controls controls-affix").attr("data-spy", "affix").style("top","0%").style("right","0%");
     	layout.controlsPanel = layout.controlsPanelHolder.append("div").attr("class", "panel panel-default")
