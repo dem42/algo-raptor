@@ -54,7 +54,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	var result = undefined;
 	var args = this.param[1].split(",");
 	for (var i=0;i < args.length; i++) {
-	    this.varname_map[$.trim(args[i])] = {"row_num": 0, "idx": i};
+	    this.varname_map[$.trim(args[i])] = {"row_num": 1, "idx": i};
 	}
 
 	var var_pat = /\s*var\s+([a-zA-Z_$][0-9a-zA-Z_$]*)\s*=/;
@@ -70,11 +70,11 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    var result = trimmed.match(var_pat);
 	    if (result != null) {
 		args += "," + result[1];
-		this.var_map[_found_vars] = {"row_num" : i, "name" : result[1]};
-		this.varname_map[result[1]] = {"row_num" : i, "idx" : _found_vars};
+		this.var_map[_found_vars] = {"row_num" : i+1, "name" : result[1]};
+		this.varname_map[result[1]] = {"row_num" : i+1, "idx" : _found_vars};
 		_found_vars++;
 	    }
-	    this.return_rows[i] = ret_pat.test(tokens[i]) || i == LN-1;
+	    this.return_rows[i+1] = ret_pat.test(tokens[i]) || i == LN-1;
 	}
 	this.found_vars = args;
 	/*
@@ -83,7 +83,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	this.AlgorithmContext = algorithmContext;
 
 	function getRowToHighlightSelector(rowNumber, codeContainerId) {
-	    return "." + codeContainerId + " div:last-of-type li:nth-child(" + (rowNumber + 1) +")";
+	    return "." + codeContainerId + " div:last-of-type li:nth-child(" + rowNumber + ")";
 	}
 
 	this.highlightRow = function highlightRow(codeContainerId, rowNumber, startDelay, durationOfHighlight) {
@@ -243,14 +243,14 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	{
 	    // preExecute is for rows like if or while conditions that get evaluated to false
 	    if (i > 0 && $.trim(tokens[i]) != "" && $.trim(tokens[i]).indexOf("{") != 0 && $.trim(tokens[i]).indexOf("else") != 0) {
-		nfun += "self.preRowExecute(" + i + ", [" + this.found_vars + "]);";
+		nfun += "self.preRowExecute(" + (i+1) + ", [" + this.found_vars + "]);";
 	    }
 
    	    nfun += tokens[i];
 	    if (i < tokens.length-1 && ($.trim(tokens[i+1]).indexOf("{") != 0) && ($.trim(tokens[i+1]).indexOf("else") != 0)) { 
 		// add the handle row function to every row except for the first and last
 		// this function will deal with row highlighting and var printing
-		nfun += "self.postRowExecute(" + i + ", [" + this.found_vars + "]);";
+		nfun += "self.postRowExecute(" + (i+1) + ", [" + this.found_vars + "]);";
 
 	    }
 	    nfun += "\n";
@@ -357,12 +357,14 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    var codeId = this.animation_queue[0].codeContainerId;
 	    var frameAlgoCtx = this.animation_queue[0].algorithmCtx;
 
+	    // only do one step in non-continuous mode
 	    if (!this.runningInContMode && rownum != prevRowNum) {
 		return;
 	    }
 
+	    // stack frame visualization adds extra time because it takes a bit to animate
 	    var preanimation_extra_time = 0;
-	    if (rownum == 0) {
+	    if (rownum == 1) {
 		if (existsOnTheStack(codeId, this.functionStack)) {
 		    preanimation_extra_time += _my.AlgorithmUtils.visualizeNewStackFrame(codeId, frameAlgoCtx);
 		}
@@ -370,9 +372,23 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    }
 	    var doFrameRemoval = this.animation_queue[0].isReturnRow();
 
-	    var this_obj = this;
 	    var animationFunction = this.animation_queue[0].animationFunction;
-	    setTimeout(function() {
+	    var frameAnimator = frameAnimatorGenerator(this, rownum, doFrameRemoval, codeId, frameAlgoCtx, prevRowNum, animationFunction);
+	    setTimeout(frameAnimator, preanimation_extra_time);
+	}
+	else {
+	    var lastFunc = this.runningCodeStack.pop();
+	    this.removeAllRowHighlighting(lastFunc);
+	    if(this.resetControls != undefined) {
+		this.resetControls(this.codeContainerId);
+	    }
+	    this.runningInContMode = false;
+	    this.runningInStepMode = false;
+	}
+
+	function frameAnimatorGenerator(this_obj, rownum, doFrameRemoval, codeId, frameAlgoCtx, prevRowNum, animationFunction) { 
+	    return function() {
+		// this is where the animation frame is scheduled
 		if (this_obj.runningInContMode && rownum != prevRowNum) {
 		    var lastFunc = this_obj.runningCodeStack.pop();
 		    this_obj.removeAllRowHighlighting(lastFunc);
@@ -383,36 +399,32 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 		this_obj.animation_queue.shift();
 
 		var animation_duration = animationFunction.call(this_obj);
-		
-		setTimeout(function() {
-		    if (doFrameRemoval) {
-			// a function has returned so we need to handle that
-			if(isRecursionFrame(codeId, this_obj.functionStack)) {
-			    var removal_duration = _my.AlgorithmUtils.popStackFrame(codeId, frameAlgoCtx);
-			    setTimeout(function() {
-				this_obj.__executeNextRow(rownum);
-			    }, removal_duration);
-			}
-			else {
-			    _my.AlgorithmUtils.clearComments(codeId);
+		var removalAnimator = removalAnimatorGenerator(this_obj, rownum, doFrameRemoval, codeId, frameAlgoCtx);
+		setTimeout(removalAnimator, animation_duration);
+	    };
+	}
+
+	// this is what removes recursion frames
+	function removalAnimatorGenerator(this_obj, rownum, doFrameRemoval, codeId, frameAlgoCtx) {
+	    return function() {
+		if (doFrameRemoval) {
+		    // a function has returned so we need to handle that
+		    if(isRecursionFrame(codeId, this_obj.functionStack)) {
+			var removal_duration = _my.AlgorithmUtils.popStackFrame(codeId, frameAlgoCtx);
+			setTimeout(function() {
 			    this_obj.__executeNextRow(rownum);
-			}
-			this_obj.functionStack.pop();
+			}, removal_duration);
 		    }
 		    else {
+			_my.AlgorithmUtils.clearComments(codeId);
 			this_obj.__executeNextRow(rownum);
 		    }
-		}, animation_duration);
-	    }, preanimation_extra_time);
-	}
-	else {
-	    var lastFunc = this.runningCodeStack.pop();
-	    this.removeAllRowHighlighting(lastFunc);
-	    if(this.resetControls != undefined) {
-		this.resetControls(this.codeContainerId);
-	    }
-	    this.runningInContMode = false;
-	    this.runningInStepMode = false;
+		    this_obj.functionStack.pop();
+		}
+		else {
+		    this_obj.__executeNextRow(rownum);
+		}
+	    };
 	}
 	
 	function existsOnTheStack(codeId, stack) {

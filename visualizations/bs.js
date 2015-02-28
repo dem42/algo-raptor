@@ -239,32 +239,32 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     /* callback called right after entering the function
      * it initializes the data
      */
-    prep_calls_def[0] = prep_fun_gen(svg_def, svgg_def, algorithmDefTabId);
-    prep_calls_norm[0] = prep_fun_gen(svg_norm, svgg_norm, algorithmNormTabId);
+    prep_calls_def[1] = prep_fun_gen(svg_def, svgg_def, algorithmDefTabId);
+    prep_calls_norm[1] = prep_fun_gen(svg_norm, svgg_norm, algorithmNormTabId);
     /* callback called after the array has been sorted
      * it draws the data
      */
-    prep_calls_def[2] = prep_sort_gen(svgg_def);
-    prep_calls_norm[2] = prep_sort_gen(svgg_norm);
+    prep_calls_def[3] = prep_sort_gen(svgg_def);
+    prep_calls_norm[3] = prep_sort_gen(svgg_norm);
     /*callback called inside every iteration
      * updates the arrow pointer
      */
-    cbs_def[0] = bs_enter_gen(svgg_def);
-    cbs_norm[0] = bs_enter_gen(svgg_norm);
-    cbs_def[5] = cbs_def[12] = mid_gen(svgg_def);
-    cbs_norm[5] = mid_gen(svgg_norm);
-    cbs_def[7] = low_up_gen(svgg_def);
-    cbs_norm[10] = low_up_gen(svgg_norm);
-    cbs_def[9] = high_up_gen(svgg_def);
-    cbs_norm[12] = high_up_gen(svgg_norm);
+    cbs_def[1] = bs_enter_gen(svgg_def);
+    cbs_norm[1] = bs_enter_gen(svgg_norm);
+    cbs_def[6] = cbs_def[13] = mid_gen(svgg_def);
+    cbs_norm[6] = mid_gen(svgg_norm);
+    cbs_def[8] = low_up_gen(svgg_def);
+    cbs_norm[11] = low_up_gen(svgg_norm);
+    cbs_def[10] = high_up_gen(svgg_def);
+    cbs_norm[13] = high_up_gen(svgg_norm);
     /*callback called after a match was found
      */
-    cbs_def[14] = res_check_gen(svgg_def);
-    cbs_norm[7] = res_check_gen(svgg_norm);
+    cbs_def[15] = res_check_gen(svgg_def);
+    cbs_norm[8] = res_check_gen(svgg_norm);
     /*callback called if a match was NOT found
      */
-    cbs_def[16] = not_found_gen(svgg_def);
-    cbs_norm[15] = not_found_gen(svgg_norm);
+    cbs_def[17] = not_found_gen(svgg_def);
+    cbs_norm[16] = not_found_gen(svgg_norm);
 
     /*setup the data*/	 
     var data_def = new Array(N);

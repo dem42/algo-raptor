@@ -200,13 +200,13 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     var width = 900;
     var svg_fft_elem = d3.select("#" + algorithm1TabId + " .graphics").append("svg")
 	.attr("width",  width + "px")
-	.attr("height", "800px")
+	.attr("height", "850px")
     var fft_group = svg_fft_elem.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
     var svg_multiply_elem = d3.select("#" + algorithm2TabId + " .graphics").append("svg")
 	.attr("width",  1.42*width + "px")
-	.attr("height", "800px")
+	.attr("height", "620px")
     var multiply_group = svg_multiply_elem.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
@@ -481,7 +481,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     var tree1_y_offset = 70;
     var tree2_y_offset = 1660;
 
-    ev_calls[0] = function(poly, start, N) {
+    ev_calls[1] = function(poly, start, N) {
 	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	recursion_depth++;
 	if (recursion_depth == 1) {
@@ -507,7 +507,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	}
 	return animation_duration;
     };
-    ev_calls[10] = function(poly, start, N) {
+    ev_calls[11] = function(poly, start, N) {
 	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	var top_down_tree = d3.select("#fft-poly-tree");
 	var transition = _my.vislib.animateGrowingArrow(top_down_tree, top_down_tree.selectAll(".fft-link-to" + 1), animation_duration, 0, false, 0.7).transition;
@@ -518,7 +518,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	drawLayerLabel(fft_group, N, recursion_depth, 2.5, elem_to_draw_into.datum().y + tree1_y_offset);
 	return animation_duration;
     }
-    ev_calls[13] = { "pre" : function(poly, start, N) {
+    ev_calls[14] = { "pre" : function(poly, start, N) {
 	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	if (recursion_depth == 1) {
 	    current_id++;
@@ -540,7 +540,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	}
 	return 1.2 * animation_duration;
     }};
-    ev_calls[15] = function(poly, start, i, x, half_N) {
+    ev_calls[16] = function(poly, start, i, x, half_N) {
 	var animation_duration = (4/5) * this.AlgorithmContext.getBaselineAnimationSpeed();
 	var top_down_tree = d3.select("#fft-poly-tree");
 	var elem_to_draw_into = top_down_tree.select("#fft-node-num" + current_id)
@@ -556,7 +556,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	}, animation_duration);
 	return animation_duration;
     };
-    ev_calls[16] = function(poly, start, i, x, half_N, N) {
+    ev_calls[17] = function(poly, start, i, x, half_N, N) {
 	var animation_duration = (4/5) * this.AlgorithmContext.getBaselineAnimationSpeed();
 	var top_down_tree = d3.select("#fft-poly-tree");
 	var elem_to_draw_into = top_down_tree.select("#fft-node-num" + current_id);
@@ -573,7 +573,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	}, animation_duration);
 	return animation_duration;
     };
-    ev_calls[22] = function(poly, start, N) {
+    ev_calls[23] = function(poly, start, N) {
 	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	var lvl = Math.log2(N);
 	var subtree_nodenum = (1 << (lvl + 1)) - 2;
@@ -588,7 +588,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	});
 	return 1.2 * animation_duration;
     };
-    ev_calls[23] = { "pre" : function(N) {
+    ev_calls[24] = { "pre" : function(N) {
 	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	var lvl = Math.log2(N);
 	var down_top_tree = d3.select("#fft-poly-tree-upside-down");
@@ -600,7 +600,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    });*/
 	return 1.1 * animation_duration;
     }};
-    ev_calls[26] = function(poly, unity, k, start, N, half_N, helper_arr) {
+    ev_calls[27] = function(poly, unity, k, start, N, half_N, helper_arr) {
 	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	var lvl = Math.log2(N);
 	var elem_to_draw_into = getElemToDrawInto("#fft-poly-tree-upside-down", current_id, N);
@@ -624,7 +624,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	}, 2 * animation_duration);
 	return 2 * animation_duration;
     };
-    ev_calls[27] = function(poly, unity, k, start, N, half_N, helper_arr) {
+    ev_calls[28] = function(poly, unity, k, start, N, half_N, helper_arr) {
 	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	var lvl = Math.log2(N);
 	var elem_to_draw_into = getElemToDrawInto("#fft-poly-tree-upside-down", current_id, N);
@@ -648,7 +648,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	}, 2 * animation_duration);
 	return 2 * animation_duration;
     };
-    ev_calls[32] = ev_calls[2] = { 
+    ev_calls[33] = ev_calls[3] = { 
 	"pre": function(poly, N) { 
 	    recursion_depth--;
 	    if (recursion_depth == 0) {
@@ -771,7 +771,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     var tree_mult_offset_y = 1080;
     var mult_node_size = 50;
     var fft_calls = [];
-    fft_calls[2] = function(p, q, N, nearest2Pow) {
+    fft_calls[3] = function(p, q, N, nearest2Pow) {
 	multiply_group.select("#multiply-poly-tree").remove();
 	prepareMultiplyLayout(nearest2Pow, mult_node_size, multiply_group, "multiply-poly-tree", 0, 0);
 	var mult_tree = d3.select("#multiply-poly-tree");
@@ -781,24 +781,24 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	var nodeb = mult_tree.select("#fft-node-num8");
 	drawPoly(q, nodeb, true, true);
     }
-    fft_calls[6] = function(p) {
+    fft_calls[7] = function(p) {
 	return animateNodeMultDrawing(4, drawPoly, p, false, this.AlgorithmContext);
     };
-    fft_calls[9] = function(q) {
+    fft_calls[10] = function(q) {
 	return animateNodeMultDrawing(7, drawPoly, q, false, this.AlgorithmContext);
     };
-    fft_calls[10] = function(p) {
+    fft_calls[11] = function(p) {
 	return animateNodeMultDrawing(3, drawCoefs, p, false, this.AlgorithmContext);
     };
-    fft_calls[11] = function(q) {
+    fft_calls[12] = function(q) {
 	return animateNodeMultDrawing(6, drawCoefs, q, false, this.AlgorithmContext);
     };
-    fft_calls[13] = {"pre" : function(nearest2Pow) {
+    fft_calls[14] = {"pre" : function(nearest2Pow) {
 	var empty_pol = new Array(nearest2Pow);
 	empty_pol.fill(0);
 	return animateNodeMultDrawing(2, drawCoefs, empty_pol, true, this.AlgorithmContext);
     }};
-    fft_calls[14] = function(res, p, q, i, nearest2Pow) {
+    fft_calls[15] = function(res, p, q, i, nearest2Pow) {
 	var animation_duration = (4/5) * this.AlgorithmContext.getBaselineAnimationSpeed();
 	var mult_tree = d3.select("#multiply-poly-tree");
 	var elem_to_draw_from1 = mult_tree.select("#fft-node-num3")
@@ -819,10 +819,10 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	}, animation_duration);
 	return animation_duration;
     };
-    fft_calls[16] = function(res) {
+    fft_calls[17] = function(res) {
 	return animateNodeMultDrawing(1, drawCoefs, res, false, this.AlgorithmContext);
     };
-    fft_calls[21] = function(res, i, nearest2Pow, temp) {
+    fft_calls[22] = function(res, i, nearest2Pow, temp) {
 	var animation_duration = (4/5) * this.AlgorithmContext.getBaselineAnimationSpeed();
 	var mult_tree = d3.select("#multiply-poly-tree");
 	var elem_to_draw_into = mult_tree.select("#fft-node-num1")
@@ -840,7 +840,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	}, animation_duration);
 	return 2*animation_duration;
     };
-    fft_calls[24] = function(res, i, nearest2Pow) {
+    fft_calls[25] = function(res, i, nearest2Pow) {
 	var animation_duration = (1/5) * this.AlgorithmContext.getBaselineAnimationSpeed();
 	var idx = (i == 0) ? 0 : (i < nearest2Pow / 2) ? nearest2Pow - i : i;
 	var mult_tree = d3.select("#multiply-poly-tree");
@@ -852,7 +852,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	}, animation_duration);
 	return animation_duration;
     };
-    fft_calls[26] = { "pre": function(res) {
+    fft_calls[27] = { "pre": function(res) {
 	return animateNodeMultDrawing(0, drawPoly, res, true, this.AlgorithmContext);
     }};
     var mult_algo_ctx = _my.AlgorithmUtils.createAlgorithmContext(layout_mult.defaultControlsObj);

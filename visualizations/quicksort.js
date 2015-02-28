@@ -137,7 +137,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
     /*************************/
     var q_callbacks = [];
     var recursion_depth = -1; // this is used by the callbacks to determine the depth of the recursion
-    q_callbacks[0] = function(data, left, right) {
+    q_callbacks[1] = function(data, left, right) {
 	var animationDuration = this.AlgorithmContext.getBaselineAnimationSpeed();
         recursion_depth++; // a new stack frame has been added so we increase the recursion depth
 	d3.selectAll("text.q-left-text").remove();
@@ -168,7 +168,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	return animationDuration;
     }
     // pivot animation
-    q_callbacks[4] = function(pivot, data) {
+    q_callbacks[5] = function(pivot, data) {
 	var pi = data[pivot].old_idx;
 	var g = d3.select("#q-g-" + pi)
 	var radius = g.select(".quicksort-circle").attr("r");
@@ -225,20 +225,20 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	g.classed(class_name, true);
 	return this.AlgorithmContext.getBaselineAnimationSpeed();
     };
-    q_callbacks[6] = q_callbacks[10] = q_callbacks[19] = function(data, new_left) {
+    q_callbacks[7] = q_callbacks[11] = q_callbacks[20] = function(data, new_left) {
 	return updateLeft.apply(this, arguments);
     };
-    q_callbacks[7] = q_callbacks[13] = q_callbacks[20] = function(data, new_right) {
+    q_callbacks[8] = q_callbacks[14] = q_callbacks[21] = function(data, new_right) {
 	return updateRight.apply(this, arguments);
     }
     // end of while cleanup
-    q_callbacks[22] = function() {
+    q_callbacks[23] = function() {
 	svg.selectAll("#qsort-pivot").remove();
 	return 0.5 * this.AlgorithmContext.getBaselineAnimationSpeed();
     };
 
     // move subarray back
-    q_callbacks[24] = q_callbacks[1] = function(data, left, right) {
+    q_callbacks[25] = q_callbacks[2] = function(data, left, right) {
 	var animationDuration = this.AlgorithmContext.getBaselineAnimationSpeed();
 	if (left == 0 && right == data.length - 1) {
 	    return animationDuration; // we don't want to move the entire array up, only subarrays
@@ -257,7 +257,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
     }
     // we are going to do the animation inside swap and return the length of that
     // animation in the post swap callbacks to correctly animate the delay
-    q_callbacks[16] = {
+    q_callbacks[17] = {
 	post: function(data, new_left, new_right) {
 	    var animationDuration = 6 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	    updateLeft.call(this, data, new_left);
@@ -289,12 +289,6 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	    // the swapping animation duration is returned in the post callback
 	    return 0;
 	}
-    };
-    q_callbacks[19] = function(data, new_left) {
-	updateLeft.call(this, data, new_left);
-    };
-    q_callbacks[20] = function(data, new_right) {
-	updateRight.call(this, data, new_right);
     };
     var algo_context = _my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj);
     var qual_algo = new _my.Algorithm(quicksort, q_callbacks, "quicksort-code", algo_context, function() {

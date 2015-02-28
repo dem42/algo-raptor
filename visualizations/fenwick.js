@@ -241,11 +241,11 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	return elem;
     }
 
-    sum_callbacks[0] = function() {
+    sum_callbacks[1] = function() {
 	removeFenResultMessage(fenIndexData);
     }
 
-    sum_callbacks[4] = {"pre": function(start, end, sum) {
+    sum_callbacks[5] = {"pre": function(start, end, sum) {
 	var animation_duration = this.AlgorithmContext.getBaselineAnimationSpeed();
 	var par = fenIndexData.append("p").attr("class", "fen-sum-result");
 	par.append("span").text("The sum of array values in the index range: ");
@@ -256,7 +256,7 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	fadeIn(par, animation_duration);
     }}
 
-    read_callbacks[0] = function(idx) {
+    read_callbacks[1] = function(idx) {
 	var animation_duration = this.AlgorithmContext.getBaselineAnimationSpeed();
 	commonStartup(idx);
 	fadeIn(dynamicData.summaryField, animation_duration).select("span:first-child").text("sum: ");
@@ -264,7 +264,7 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	fadeIn(dynamicData.currentField, 1.2 * animation_duration).select("span:last-child").text(bitPattern(idx));
 	return 1.2 * animation_duration;
     }
-    update_callbacks[0] = function(idx, value) {
+    update_callbacks[1] = function(idx, value) {
 	var animation_duration = this.AlgorithmContext.getBaselineAnimationSpeed();
 	removeFenResultMessage(fenIndexData);
 	commonStartup(idx);
@@ -273,23 +273,23 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	fadeIn(dynamicData.currentField, 1.2 * animation_duration).select("span:last-child").text(bitPattern(idx));
 	return 1.2 * animation_duration;
     }
-    update_callbacks[3] = function(i) {
+    update_callbacks[4] = function(i) {
 	var animation_duration = (1/2) * this.AlgorithmContext.getBaselineAnimationSpeed();
 	fadeIn(dynamicData.minusCurrentField, animation_duration).select("span:last-child").text(bitPattern(-i));
 	fadeIn(dynamicData.andCurrentField, 2 * animation_duration).select("span:last-child").text(bitPattern(i & -i));
 	return animation_duration * 2;
     }
-    read_callbacks[2] = update_callbacks[1] = function(i) {
+    read_callbacks[3] = update_callbacks[2] = function(i) {
 	dynamicData.currentField.select("span:last-child").text(bitPattern(i));
 	highlighting(i);
     }
-    read_callbacks[4] = function(i) {
+    read_callbacks[5] = function(i) {
 	var animation_duration = (1/2) * this.AlgorithmContext.getBaselineAnimationSpeed();
 	fadeIn(dynamicData.minusCurrentField, animation_duration).select("span:last-child").text(bitPattern(-i));
 	fadeIn(dynamicData.andCurrentField, 2 * animation_duration).select("span:last-child").text(bitPattern(i & -i));
 	return animation_duration * 2;
     }
-    read_callbacks[5] = function(i, lowest_set_bit) {
+    read_callbacks[6] = function(i, lowest_set_bit) {
 	var animation_duration = (1/2) * this.AlgorithmContext.getBaselineAnimationSpeed();
 	fadeIn(dynamicData.nextField, animation_duration).select("span:last-child").text(bitPattern(i));
 	var duration = Math.max(animation_duration, arrowAnimate.call(this, i + lowest_set_bit, i));
@@ -300,7 +300,7 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	    .delay(duration).duration(animation_duration).select("span:last-child").text(bitPattern(i));
 	return duration + animation_duration;
     }
-    update_callbacks[2] = function(tree, i) {
+    update_callbacks[3] = function(tree, i) {
 	var animation_duration = this.AlgorithmContext.getBaselineAnimationSpeed();
 	var node = svg.select("#fen-node-" + i).select(".fen-sum");
 	node.classed("fen-text-highlight", true).text("Sum: " + (tree[i] || 0));
@@ -309,7 +309,7 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	}, animation_duration);
 	return animation_duration;
     }
-    update_callbacks[4] = function(i, lowest_set_bit) {
+    update_callbacks[5] = function(i, lowest_set_bit) {
 	var animation_duration = (1/2) * this.AlgorithmContext.getBaselineAnimationSpeed();
 	fadeIn(dynamicData.nextField, animation_duration).select("span:last-child").text(bitPattern(i));
 	var duration = Math.max(animation_duration, arrowAnimate.call(this, i - lowest_set_bit, i));

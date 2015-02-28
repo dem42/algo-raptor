@@ -130,23 +130,23 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
 	});
     }
     // compute subtree size callbacks -> show small number of subtree size and colorful edges that are done
-    ss_callbacks[1] = function(tree, current_node) {
+    ss_callbacks[2] = function(tree, current_node) {
 	svg.select("#hld-node-" + current_node).append("text").attr("class", "hld-size-label")
 	    .attr("dx", -radius).attr("dy", -radius).attr("text-anchor", "middle").text(tree[current_node].subTreeSize);
     };
-    ss_callbacks[4] = function(tree, current_node, idx, sub_result) {
+    ss_callbacks[5] = function(tree, current_node, idx, sub_result) {
 	var id = tree[current_node].children[idx];
 	svg.select("#hld-link-from-" + current_node + "-to-" + id).classed("hld-link-highlighted", true);
 	svg.select("#hld-node-" + current_node + " .hld-size-label").text(tree[current_node].subTreeSize + " + " + sub_result);
 	return this.AlgorithmContext.getBaselineAnimationSpeed();
     };
-    ss_callbacks[5] = function(tree, current_node, idx) {
+    ss_callbacks[6] = function(tree, current_node, idx) {
 	svg.select("#hld-node-" + current_node + " .hld-size-label").text(tree[current_node].subTreeSize);	
     };
 
     // hld callbacks colors for chains and special child animation 
     var chain_colors = d3.scale.category10();
-    hld_callbacks[4] = function(tree, current_chain, current_node, chains) {
+    hld_callbacks[5] = function(tree, current_chain, current_node, chains) {
 	svg.selectAll(".hld-special-child-lbl").remove();
 	svg.selectAll(".hld-special-child-rect").remove();
 	svg.selectAll(".hld-new-chain-lbl").remove();
@@ -160,7 +160,7 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
 		       "stroke-width": "3px"});
 	}
     };
-    hld_callbacks[16] = function(tree, current_chain, specialChild) {
+    hld_callbacks[17] = function(tree, current_chain, specialChild) {
 	svg.selectAll(".hld-special-child-rect").remove();
 	svg.selectAll(".hld-special-child-lbl").remove();
 	var node = svg.select("#hld-node-" + specialChild);
@@ -176,10 +176,10 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
 	    .text("Special child candidate");
 
     };
-    hld_callbacks[19] = {"pre" : function() {
+    hld_callbacks[20] = {"pre" : function() {
 	svg.select(".hld-special-child-lbl").text("Special child winner!");
     }};
-    hld_callbacks[22] = function(new_chain_num, children, idx) {
+    hld_callbacks[23] = function(new_chain_num, children, idx) {
 	var animation_duration = 1.5 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	var new_chain_lbl = svg.select("#hld-node-" + children[idx]).append("text")
 	    .attr("class", "hld-new-chain-lbl")
