@@ -29,22 +29,7 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     var fen_labels = float_container.append("div").attr("class", "fen-labels");
     var fen_forms = float_container.append("div").attr("class", "fen-forms");
     var fenIndexData = fen_container.append("div").attr("class", "fen-index-data");
-    var summaryField = fenIndexData.append("p");
-    summaryField.append("span").attr("class", "fen-dyn-lbl").text("");
-    summaryField.append("span").attr("class", "fen-dyn-val").text("");
-    var currentField = fenIndexData.append("p");
-    currentField.append("span").attr("class", "fen-dyn-lbl").text("index: ");
-    currentField.append("span").attr("class", "fen-dyn-val").text("");
-    var minusCurrentField = fenIndexData.append("p");
-    minusCurrentField.append("span").attr("class", "fen-dyn-lbl").text("-index: ");
-    minusCurrentField.append("span").attr("class", "fen-dyn-val").text("");
-    var andCurrentField = fenIndexData.append("p");
-    andCurrentField.append("span").attr("class", "fen-dyn-lbl").text("index & -index: ");
-    andCurrentField.append("span").attr("class", "fen-dyn-val").text("");
-    var nextField = fenIndexData.append("p");
-    nextField.append("span").attr("class", "fen-dyn-lbl").text("new index: ");
-    nextField.append("span").attr("class", "fen-dyn-val").text("");
-
+    var dynamicData = resetFenIndexData(fenIndexData);
     fen_labels.append("span").text("index:").attr("class", "fen-table-lbl");
     var labels = d3.select(".fen-labels").selectAll("fen-label")
 	.data(idxs)
@@ -100,6 +85,29 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     /*****************************/
     /*** svg setup and wiring ***/
     /*****************************/
+    function removeFenResultMessage(fenIndexData) {
+	fenIndexData.selectAll(".fen-sum-result").remove();
+    }
+    function resetFenIndexData(fenIndexData) {
+	var dynamicData = {};
+	fenIndexData.selectAll("p:not(.fen-sum-result)").remove();
+	dynamicData.summaryField = fenIndexData.append("p");
+	dynamicData.summaryField.append("span").attr("class", "fen-dyn-lbl").text("");
+	dynamicData.summaryField.append("span").attr("class", "fen-dyn-val").text("");
+	dynamicData.currentField = fenIndexData.append("p");
+	dynamicData.currentField.append("span").attr("class", "fen-dyn-lbl").text("index: ");
+	dynamicData.currentField.append("span").attr("class", "fen-dyn-val").text("");
+	dynamicData.minusCurrentField = fenIndexData.append("p");
+	dynamicData.minusCurrentField.append("span").attr("class", "fen-dyn-lbl").text("-index: ");
+	dynamicData.minusCurrentField.append("span").attr("class", "fen-dyn-val").text("");
+	dynamicData.andCurrentField = fenIndexData.append("p");
+	dynamicData.andCurrentField.append("span").attr("class", "fen-dyn-lbl").text("index & -index: ");
+	dynamicData.andCurrentField.append("span").attr("class", "fen-dyn-val").text("");
+	dynamicData.nextField = fenIndexData.append("p");
+	dynamicData.nextField.append("span").attr("class", "fen-dyn-lbl").text("new index: ");
+	dynamicData.nextField.append("span").attr("class", "fen-dyn-val").text("");
+	return dynamicData;
+    }
     var log2N = Math.ceil(Math.log2(N));
     function bitPattern(num) {
 	var res = [];
@@ -228,46 +236,69 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	elem.transition().duration(duration).style("opacity", "1");
 	return elem;
     }
-    function fadeOut(elem, duration) {
-	elem.transition().duration(duration).style("opacity", "0");
+    function fadeOut(elem, duration, delay) {
+	elem.transition().delay(delay).duration(duration).style("opacity", "0");
 	return elem;
     }
+
+    sum_callbacks[0] = function() {
+	removeFenResultMessage(fenIndexData);
+    }
+
+    sum_callbacks[4] = {"pre": function(start, end, sum) {
+	var animation_duration = this.AlgorithmContext.getBaselineAnimationSpeed();
+	var par = fenIndexData.append("p").attr("class", "fen-sum-result");
+	par.append("span").text("The sum of array values in the index range: ");
+	par.append("span").attr("class", "fen-sum-result-num").text("(" + start + ",");
+	par.append("span").attr("class", "fen-sum-result-num").text(end + ")");
+	par.append("span").text(" is equal to ");
+	par.append("span").attr("class", "fen-sum-result-num").text(sum);
+	fadeIn(par, animation_duration);
+    }}
 
     read_callbacks[0] = function(idx) {
 	var animation_duration = this.AlgorithmContext.getBaselineAnimationSpeed();
 	commonStartup(idx);
-	fadeIn(summaryField, animation_duration).select("span:first-child").text("sum: ");
-	summaryField.select("span:last-child").text(0);
-	fadeIn(currentField, animation_duration).select("span:last-child").text(bitPattern(idx));
-	return animation_duration;
+	fadeIn(dynamicData.summaryField, animation_duration).select("span:first-child").text("sum: ");
+	dynamicData.summaryField.select("span:last-child").text(0);
+	fadeIn(dynamicData.currentField, 1.2 * animation_duration).select("span:last-child").text(bitPattern(idx));
+	return 1.2 * animation_duration;
     }
     update_callbacks[0] = function(idx, value) {
 	var animation_duration = this.AlgorithmContext.getBaselineAnimationSpeed();
+	removeFenResultMessage(fenIndexData);
 	commonStartup(idx);
-	fadeIn(summaryField, animation_duration).select("span:first-child").text("increment: ");
-	summaryField.select("span:last-child").text(value);
-	fadeIn(currentField, animation_duration).select("span:last-child").text(bitPattern(idx));
+	fadeIn(dynamicData.summaryField, animation_duration).select("span:first-child").text("increment: ");
+	dynamicData.summaryField.select("span:last-child").text(value);
+	fadeIn(dynamicData.currentField, 1.2 * animation_duration).select("span:last-child").text(bitPattern(idx));
+	return 1.2 * animation_duration;
     }
     update_callbacks[3] = function(i) {
 	var animation_duration = (1/2) * this.AlgorithmContext.getBaselineAnimationSpeed();
-	fadeIn(minusCurrentField, animation_duration).select("span:last-child").text(bitPattern(-i));
-	fadeIn(andCurrentField, 2 * animation_duration).select("span:last-child").text(bitPattern(i & -i));
+	fadeIn(dynamicData.minusCurrentField, animation_duration).select("span:last-child").text(bitPattern(-i));
+	fadeIn(dynamicData.andCurrentField, 2 * animation_duration).select("span:last-child").text(bitPattern(i & -i));
 	return animation_duration * 2;
     }
     read_callbacks[2] = update_callbacks[1] = function(i) {
-	currentField.select("span:last-child").text(bitPattern(i));
+	dynamicData.currentField.select("span:last-child").text(bitPattern(i));
 	highlighting(i);
     }
     read_callbacks[4] = function(i) {
 	var animation_duration = (1/2) * this.AlgorithmContext.getBaselineAnimationSpeed();
-	fadeIn(minusCurrentField, animation_duration).select("span:last-child").text(bitPattern(-i));
-	fadeIn(andCurrentField, 2 * animation_duration).select("span:last-child").text(bitPattern(i & -i));
+	fadeIn(dynamicData.minusCurrentField, animation_duration).select("span:last-child").text(bitPattern(-i));
+	fadeIn(dynamicData.andCurrentField, 2 * animation_duration).select("span:last-child").text(bitPattern(i & -i));
 	return animation_duration * 2;
     }
     read_callbacks[5] = function(i, lowest_set_bit) {
 	var animation_duration = (1/2) * this.AlgorithmContext.getBaselineAnimationSpeed();
-	fadeIn(nextField, animation_duration).select("span:last-child").text(bitPattern(i));
-	return arrowAnimate.call(this, i + lowest_set_bit, i);
+	fadeIn(dynamicData.nextField, animation_duration).select("span:last-child").text(bitPattern(i));
+	var duration = Math.max(animation_duration, arrowAnimate.call(this, i + lowest_set_bit, i));
+	fadeOut(dynamicData.minusCurrentField, animation_duration, duration);
+	fadeOut(dynamicData.andCurrentField, animation_duration, duration);
+	fadeOut(dynamicData.nextField, animation_duration, duration);
+	dynamicData.currentField.transition()
+	    .delay(duration).duration(animation_duration).select("span:last-child").text(bitPattern(i));
+	return duration + animation_duration;
     }
     update_callbacks[2] = function(tree, i) {
 	var animation_duration = this.AlgorithmContext.getBaselineAnimationSpeed();
@@ -280,8 +311,14 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     }
     update_callbacks[4] = function(i, lowest_set_bit) {
 	var animation_duration = (1/2) * this.AlgorithmContext.getBaselineAnimationSpeed();
-	fadeIn(nextField, animation_duration).select("span:last-child").text(bitPattern(i));
-	return arrowAnimate.call(this, i - lowest_set_bit, i);
+	fadeIn(dynamicData.nextField, animation_duration).select("span:last-child").text(bitPattern(i));
+	var duration = Math.max(animation_duration, arrowAnimate.call(this, i - lowest_set_bit, i));
+	fadeOut(dynamicData.minusCurrentField, animation_duration, duration);
+	fadeOut(dynamicData.andCurrentField, animation_duration, duration);
+	fadeOut(dynamicData.nextField, animation_duration, duration);
+	dynamicData.currentField.transition()
+	    .delay(duration).duration(animation_duration).select("span:last-child").text(bitPattern(i));
+	return duration + animation_duration;
     }
 
     function cleanup() {
@@ -291,6 +328,7 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	svg.selectAll(".fen-rect-highlighted").classed("fen-rect-highlighted", false);
 	_my.AlgorithmUtils.resetControls(algorithmTabId);
 	reinitButtons();
+	dynamicData = resetFenIndexData(fenIndexData);
     }
     var fenwick_sum = new _my.Algorithm(sumBetween, sum_callbacks, "fen-sum-code", 
 						_my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj),

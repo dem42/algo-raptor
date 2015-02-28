@@ -111,3 +111,12 @@
     display: inline;
     margin-right: 10px;
 }
+
+.fen-sum-result {
+    color: #333;
+}
+
+.fen-sum-result-num {
+    color: #e83b3b;
+    font-weight: bold;
+}
