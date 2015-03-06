@@ -270,6 +270,23 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
 	};
     }
 
+    // fill is ecma6
+    if (!Array.prototype.fill) {
+	Array.prototype.fill = function(value) {
+	    if (this == null) {
+		throw new TypeError('this is null or not defined');
+	    }
+	    var O = Object(this);
+	    var len = O.length >>> 0;
+	    var k = 0;
+	    while (k < len) {
+		O[k] = value;
+		k++;
+	    }
+	    return O;
+	};
+    }
+
     AlgorithmUtils.createAlgorithmContext = function(controlsObj) {
 	if (controlsObj === undefined) {
 	    return {
