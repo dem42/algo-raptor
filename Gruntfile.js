@@ -21,13 +21,32 @@ module.exports = function(grunt) {
 	    },
 	},
 	qunit: {
+	    options: {
+		console: false
+	    },
 	    all: ['test/**/*.html']
+	},
+	watch: {
+	    files: ['core/*.js', 'visualizations/*.js', '**/*.html', '**/*.css'],
+	    tasks: ['concat']
+	},
+	notify_hooks: {
+	    options: {
+		enabled: true,
+		max_jshint_notifications: 5,
+		success: false,
+		duration: 3
+	    }
 	}
     });
 
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-qunit');
+    grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-notify');
+
+    grunt.task.run('notify_hooks');
 
     grunt.registerTask('default', ['concat', 'qunit']);
 }
