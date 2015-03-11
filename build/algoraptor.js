@@ -1,11 +1,80 @@
-/////////////////////////////////////////////////////////////////
+/*** we want some functionality only available in ecma6 .. polyfill it **/
+(function(Math) {
+        /**
+     * Decimal adjustment of a number.
+     *
+     * @param	{String}	type	The type of adjustment.
+     * @param	{Number}	value	The number.
+     * @param	{Integer}	exp		The exponent (the 10 logarithm of the adjustment base).
+     * @returns	{Number}			The adjusted value.
+     */
+    function decimalAdjust(type, value, exp) {
+	// If the exp is undefined or zero...
+	if (typeof exp === 'undefined' || +exp === 0) {
+	    return Math[type](value);
+	}
+	value = +value;
+	exp = +exp;
+	// If the value is not a number or the exp is not an integer...
+	if (isNaN(value) || !(typeof exp === 'number' && exp % 1 === 0)) {
+	    return NaN;
+	}
+	// Shift
+	value = value.toString().split('e');
+	value = Math[type](+(value[0] + 'e' + (value[1] ? (+value[1] - exp) : -exp)));
+	// Shift back
+	value = value.toString().split('e');
+	return +(value[0] + 'e' + (value[1] ? (+value[1] + exp) : exp));
+    }
+
+    // Decimal round
+    if (!Math.round10) {
+	Math.round10 = function(value, exp) {
+	    return decimalAdjust('round', value, exp);
+	};
+    }
+    // Decimal floor
+    if (!Math.floor10) {
+	Math.floor10 = function(value, exp) {
+	    return decimalAdjust('floor', value, exp);
+	};
+    }
+    // Decimal ceil
+    if (!Math.ceil10) {
+	Math.ceil10 = function(value, exp) {
+	    return decimalAdjust('ceil', value, exp);
+	};
+    }
+
+    // fill is ecma6
+    if (!Array.prototype.fill) {
+	Array.prototype.fill = function(value) {
+	    if (this == null) {
+		throw new TypeError('this is null or not defined');
+	    }
+	    var O = Object(this);
+	    var len = O.length >>> 0;
+	    var k = 0;
+	    while (k < len) {
+		O[k] = value;
+		k++;
+	    }
+	    return O;
+	};
+    }
+
+    Math.log2 = Math.log2 || function(x) {
+	return Math.log(x) / Math.LN2;
+    };
+}(Math));
+;/////////////////////////////////////////////////////////////////
 // Algorithm utilities class ///
 /////////////////////////////////////////////////////////////////
 /**
  * This class is a collection of static method that help 
  * can be used when creating new algorithm visualizations
  */
-var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
+var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 
     // alias our algorithm module
     var _my = ALGORITHM_MODULE;
@@ -224,69 +293,6 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
     }
 
 
-    /**
-     * Decimal adjustment of a number.
-     *
-     * @param	{String}	type	The type of adjustment.
-     * @param	{Number}	value	The number.
-     * @param	{Integer}	exp		The exponent (the 10 logarithm of the adjustment base).
-     * @returns	{Number}			The adjusted value.
-     */
-    function decimalAdjust(type, value, exp) {
-	// If the exp is undefined or zero...
-	if (typeof exp === 'undefined' || +exp === 0) {
-	    return Math[type](value);
-	}
-	value = +value;
-	exp = +exp;
-	// If the value is not a number or the exp is not an integer...
-	if (isNaN(value) || !(typeof exp === 'number' && exp % 1 === 0)) {
-	    return NaN;
-	}
-	// Shift
-	value = value.toString().split('e');
-	value = Math[type](+(value[0] + 'e' + (value[1] ? (+value[1] - exp) : -exp)));
-	// Shift back
-	value = value.toString().split('e');
-	return +(value[0] + 'e' + (value[1] ? (+value[1] + exp) : exp));
-    }
-
-    // Decimal round
-    if (!Math.round10) {
-	Math.round10 = function(value, exp) {
-	    return decimalAdjust('round', value, exp);
-	};
-    }
-    // Decimal floor
-    if (!Math.floor10) {
-	Math.floor10 = function(value, exp) {
-	    return decimalAdjust('floor', value, exp);
-	};
-    }
-    // Decimal ceil
-    if (!Math.ceil10) {
-	Math.ceil10 = function(value, exp) {
-	    return decimalAdjust('ceil', value, exp);
-	};
-    }
-
-    // fill is ecma6
-    if (!Array.prototype.fill) {
-	Array.prototype.fill = function(value) {
-	    if (this == null) {
-		throw new TypeError('this is null or not defined');
-	    }
-	    var O = Object(this);
-	    var len = O.length >>> 0;
-	    var k = 0;
-	    while (k < len) {
-		O[k] = value;
-		k++;
-	    }
-	    return O;
-	};
-    }
-
     AlgorithmUtils.createAlgorithmContext = function(controlsObj) {
 	if (controlsObj === undefined) {
 	    return {
@@ -402,7 +408,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3, Math) {
     //return the augmented module
     _my.AlgorithmUtils = AlgorithmUtils;
     return _my;
-})(ALGORITHM_MODULE || {}, $, d3, Math);
+})(ALGORITHM_MODULE || {}, $, d3);
 ;/*** this module contains helper functions for visualizations */
 var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
     var _my = ALGORITHM_MODULE;
@@ -1741,7 +1747,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     _my.vislib.addRaptorHead(algorithmNormTabId, "bs-code-norm", 5, "This way of computing the mid value might seem odd, but it has an important advantage to the more common <code>(low + high) / 2</code>. If either your <code>low</code> or <code>high</code> value is close to the maximum integer value then the addition might overflow which will mess up your algorithm completely. Now this may not happen when you are searching an array, but if your search condition is something else then it could so it's not a bad habit to get into.");
    _my.vislib.addRaptorHead(algorithmNormTabId, "bs-code-norm", 15, "What you return can be important. Some versions of binary search choose for example to return the index where you would insert the value, but times negative one.");
 
-    return {"bsearch": bsearch, "bsearch-algorithm": balgo_def};
+    return {"bsearch": bsearch, "deferred_bsearch": deferred_bsearch, "bsearch-algorithm": balgo_def};
 
 })(ALGORITHM_MODULE, $, d3, bootbox);
 

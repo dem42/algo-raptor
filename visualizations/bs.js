@@ -357,7 +357,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     _my.vislib.addRaptorHead(algorithmNormTabId, "bs-code-norm", 5, "This way of computing the mid value might seem odd, but it has an important advantage to the more common <code>(low + high) / 2</code>. If either your <code>low</code> or <code>high</code> value is close to the maximum integer value then the addition might overflow which will mess up your algorithm completely. Now this may not happen when you are searching an array, but if your search condition is something else then it could so it's not a bad habit to get into.");
    _my.vislib.addRaptorHead(algorithmNormTabId, "bs-code-norm", 15, "What you return can be important. Some versions of binary search choose for example to return the index where you would insert the value, but times negative one.");
 
-    return {"bsearch": bsearch, "bsearch-algorithm": balgo_def};
+    return {"bsearch": bsearch, "deferred_bsearch": deferred_bsearch, "bsearch-algorithm": balgo_def};
 
 })(ALGORITHM_MODULE, $, d3, bootbox);
 
