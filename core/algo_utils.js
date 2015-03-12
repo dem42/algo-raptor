@@ -123,7 +123,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 		    d3.select("#" + "play-btn-of-" + algorithmId + " span").attr("title", "Pause the algorithm");
 		    d3.select("#" + "next-btn-of-" + algorithmId).classed("disabled-btn", true);
 		    d3.select("#" + "next-btn-of-" + algorithmId).classed("enabled-btn", false);
-     		    algorithm.runStack();
+     		    algorithm.executeInContinuousMode();
 		}
 		else {
 		    algorithm.runningInContMode = false; //stopping

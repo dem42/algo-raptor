@@ -711,7 +711,7 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	var ComplexClone = _my.AlgorithmUtils.clone(Complex);
 	ComplexClone.calc_unity = sharedCalc;
 	var p = poly_ev.slice();
-	var result = ev.startAnimation(p, 0, p.length, [], ComplexClone);
+	var result = ev.runCodeAndPopulateAnimationQueue(p, 0, p.length, [], ComplexClone);
 	console.log("After fft transform", "" + p);
 	
 	executionFunction();
@@ -873,8 +873,8 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    return calc.run(idx, N, Complex);
 	}
 	Complex.calc_unity = sharedCalc;
-	var result = fft.startAnimation(poly_p.slice(), poly_q.slice(), sharedEv, Complex);
-	//var result = ev.startAnimation(poly_ev, poly_ev.length, 0, [], Complex);
+	var result = fft.runCodeAndPopulateAnimationQueue(poly_p.slice(), poly_q.slice(), sharedEv, Complex);
+	//var result = ev.runCodeAndPopulateAnimationQueue(poly_ev, poly_ev.length, 0, [], Complex);
 	console.log("After fft multiply", "" + result);
 	executionFunction();
     };

@@ -304,7 +304,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 
     function kickoff(executionFunction) {
 	console.log("Before", data.map(function(d) { return d.val; }));
-	qual_algo.startAnimation(data, 0, data.length - 1, function(data, i, j) {
+	qual_algo.runCodeAndPopulateAnimationQueue(data, 0, data.length - 1, function(data, i, j) {
 	    return swap_algo.run(data, i, j); 
 	});
 	console.log("After", data.map(function(d) { return d.val; }));

@@ -313,7 +313,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 			    var bs_wrapped = function(data, tf) {
 				return balgo.runWithSharedAnimationQueue(prep_algo, data, tf);
 			    }
-			    console.log(prep_algo.startAnimation(data, tf, bs_wrapped));
+			    console.log(prep_algo.runCodeAndPopulateAnimationQueue(data, tf, bs_wrapped));
 			    executionFunction();
 			}
 		    }

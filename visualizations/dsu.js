@@ -367,7 +367,7 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 				    var findInClosure = function(node, data) {
 					return dsuFind.runWithSharedAnimationQueue(dsuUnion, node, data);
 				    }
-				    dsuUnion.startAnimation(selected1, selected2, data, findInClosure);
+				    dsuUnion.runCodeAndPopulateAnimationQueue(selected1, selected2, data, findInClosure);
 				    selected = [];
 				    // remove the click function
 				    svg.selectAll(".dsu-node").on("click", function() {});

@@ -192,7 +192,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 		    d3.select("#" + "play-btn-of-" + algorithmId + " span").attr("title", "Pause the algorithm");
 		    d3.select("#" + "next-btn-of-" + algorithmId).classed("disabled-btn", true);
 		    d3.select("#" + "next-btn-of-" + algorithmId).classed("enabled-btn", false);
-     		    algorithm.runStack();
+     		    algorithm.executeInContinuousMode();
 		}
 		else {
 		    algorithm.runningInContMode = false; //stopping
@@ -935,6 +935,11 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
  * callback you should give the callback arguments the same name as the
  * name of the local variable that they should bind to.
  *
+ * USAGE:
+ * var algo = new Algorithm(..);
+ * algo.runCodeAndPopulateAnimationQueue();
+ * algo.executeInContinuousMode(); or algo.executeNextRowInStepMode();
+ *
  * @author mpapanek
  */
 var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
@@ -963,9 +968,9 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	this.varname_map = {};
 	this.funcName = func.toString().match(/function\s*(.*?)\s*\(/)[1];
 	this.animation_queue = [];
-	// used by the runStack command to kick off the animation in continuous mode
+	// used by the executeInContinuousMode command to kick off the animation in continuous mode
 	this.runningInContMode = false;
-	// used by the runStack command to kick off the animation in step mode
+	// used by the executeInContinuousMode command to kick off the animation in step mode
 	this.runningInStepMode = false;
 	this.runningCodeStack = [];
 	this.functionStack = [];
@@ -1208,7 +1213,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     /**
      * Start algorithm animation
      */
-    Algorithm.prototype.startAnimation = function() {
+    Algorithm.prototype.runCodeAndPopulateAnimationQueue = function() {
 	this.runningInContMode = false;
 	this.runningCodeStack = [];
 	this.functionStack = [];
@@ -1231,7 +1236,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     }
 
     // a visualization is always limited to just one animation queue
-    // this will be the animation queue of the function that you started with startAnimation
+    // this will be the animation queue of the function that you started with runCodeAndPopulateAnimationQueue
     // if you have multiple functions and want to visualize the calling of these other functions you 
     // can use the runWithSharedAnimationQueue function to attach them
     //
@@ -1249,7 +1254,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	return this.run.apply(this, params);
     }
 
-    Algorithm.prototype.runStack = function() {
+    Algorithm.prototype.executeInContinuousMode = function() {
 	this.runningInContMode = true;
 	this.__executeNextRow();
     }
@@ -1703,7 +1708,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 			    var bs_wrapped = function(data, tf) {
 				return balgo.runWithSharedAnimationQueue(prep_algo, data, tf);
 			    }
-			    console.log(prep_algo.startAnimation(data, tf, bs_wrapped));
+			    console.log(prep_algo.runCodeAndPopulateAnimationQueue(data, tf, bs_wrapped));
 			    executionFunction();
 			}
 		    }
@@ -2120,7 +2125,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 				    var findInClosure = function(node, data) {
 					return dsuFind.runWithSharedAnimationQueue(dsuUnion, node, data);
 				    }
-				    dsuUnion.startAnimation(selected1, selected2, data, findInClosure);
+				    dsuUnion.runCodeAndPopulateAnimationQueue(selected1, selected2, data, findInClosure);
 				    selected = [];
 				    // remove the click function
 				    svg.selectAll(".dsu-node").on("click", function() {});
@@ -3275,7 +3280,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	var ComplexClone = _my.AlgorithmUtils.clone(Complex);
 	ComplexClone.calc_unity = sharedCalc;
 	var p = poly_ev.slice();
-	var result = ev.startAnimation(p, 0, p.length, [], ComplexClone);
+	var result = ev.runCodeAndPopulateAnimationQueue(p, 0, p.length, [], ComplexClone);
 	console.log("After fft transform", "" + p);
 	
 	executionFunction();
@@ -3437,8 +3442,8 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    return calc.run(idx, N, Complex);
 	}
 	Complex.calc_unity = sharedCalc;
-	var result = fft.startAnimation(poly_p.slice(), poly_q.slice(), sharedEv, Complex);
-	//var result = ev.startAnimation(poly_ev, poly_ev.length, 0, [], Complex);
+	var result = fft.runCodeAndPopulateAnimationQueue(poly_p.slice(), poly_q.slice(), sharedEv, Complex);
+	//var result = ev.runCodeAndPopulateAnimationQueue(poly_ev, poly_ev.length, 0, [], Complex);
 	console.log("After fft multiply", "" + result);
 	executionFunction();
     };
@@ -4028,7 +4033,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 
     function kickoff(executionFunction) {
 	console.log("Before", data.map(function(d) { return d.val; }));
-	qual_algo.startAnimation(data, 0, data.length - 1, function(data, i, j) {
+	qual_algo.runCodeAndPopulateAnimationQueue(data, 0, data.length - 1, function(data, i, j) {
 	    return swap_algo.run(data, i, j); 
 	});
 	console.log("After", data.map(function(d) { return d.val; }));

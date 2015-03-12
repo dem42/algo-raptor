@@ -11,6 +11,11 @@
  * callback you should give the callback arguments the same name as the
  * name of the local variable that they should bind to.
  *
+ * USAGE:
+ * var algo = new Algorithm(..);
+ * algo.runCodeAndPopulateAnimationQueue();
+ * algo.executeInContinuousMode(); or algo.executeNextRowInStepMode();
+ *
  * @author mpapanek
  */
 var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
@@ -39,9 +44,9 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	this.varname_map = {};
 	this.funcName = func.toString().match(/function\s*(.*?)\s*\(/)[1];
 	this.animation_queue = [];
-	// used by the runStack command to kick off the animation in continuous mode
+	// used by the executeInContinuousMode command to kick off the animation in continuous mode
 	this.runningInContMode = false;
-	// used by the runStack command to kick off the animation in step mode
+	// used by the executeInContinuousMode command to kick off the animation in step mode
 	this.runningInStepMode = false;
 	this.runningCodeStack = [];
 	this.functionStack = [];
@@ -284,7 +289,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     /**
      * Start algorithm animation
      */
-    Algorithm.prototype.startAnimation = function() {
+    Algorithm.prototype.runCodeAndPopulateAnimationQueue = function() {
 	this.runningInContMode = false;
 	this.runningCodeStack = [];
 	this.functionStack = [];
@@ -307,7 +312,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     }
 
     // a visualization is always limited to just one animation queue
-    // this will be the animation queue of the function that you started with startAnimation
+    // this will be the animation queue of the function that you started with runCodeAndPopulateAnimationQueue
     // if you have multiple functions and want to visualize the calling of these other functions you 
     // can use the runWithSharedAnimationQueue function to attach them
     //
@@ -325,7 +330,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	return this.run.apply(this, params);
     }
 
-    Algorithm.prototype.runStack = function() {
+    Algorithm.prototype.executeInContinuousMode = function() {
 	this.runningInContMode = true;
 	this.__executeNextRow();
     }
