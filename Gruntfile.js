@@ -28,7 +28,10 @@ module.exports = function(grunt) {
 	},
 	watch: {
 	    files: ['core/*.js', 'visualizations/*.js', '**/*.html', '**/*.css'],
-	    tasks: ['concat']
+	    tasks: ['concat'],
+	    options : {
+		livereload: true
+	    }
 	},
 	notify_hooks: {
 	    options: {
@@ -37,7 +40,17 @@ module.exports = function(grunt) {
 		success: false,
 		duration: 3
 	    }
-	}
+	},
+	express: {
+	    all: {
+		options: {
+		    port: 8999,
+		    hostname: "0.0.0.0",
+		    bases: [__dirname], 
+		    livereload: true
+		}
+	    }
+	}, 
     });
 
     grunt.loadNpmTasks('grunt-contrib-concat');
@@ -45,10 +58,11 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-qunit');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-notify');
+    grunt.loadNpmTasks('grunt-express');
 
     grunt.task.run('notify_hooks');
 
-    grunt.registerTask('default', ['concat', 'qunit']);
+    grunt.registerTask('default', ['concat', 'qunit', 'express', 'watch']);
 }
 
 
