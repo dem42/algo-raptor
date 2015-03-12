@@ -10,14 +10,10 @@ Stepping through visualizations is an excellent and quick way to learn how an al
 How do I run it locally?
 ----------------
 
-1. Get `docker`
-2. Get `dockerfile/nodejs-bower-grunt`
-3. Start the docker daemon
-4. `sudo docker run -i -t dockerfile/nodejs-bower-grunt /bin/bash`
-5. `apt-get update`
-6. `apt-get install libfontconfig1 fontconfig libfontconfig1-dev libfreetype6-dev`
-7. `git clone https://github.com/dem42/algo-raptor.git`
-8. `cd algo-raptor`
-9. `npm install`
-10. exit docker shell
-11. `sudo docker run -d -p 8999:8999 dockerfile/nodejs-bower-grunt grunt --base /data/algo-raptor`
+First clone this repository using git. Then get `docker` and start the docker daemon. Then 
+
+    > sudo docker pull dem42/algoraptor
+    > sudo docker run -p 9000:8999 -v /absolute-path-to-host-algoraptor:/aboslute-path-to-client-algoraptor algoraptor grunt --gruntfile /aboslute-path-to-client-algoraptor/Gruntfile.js
+
+The last command starts the algoraptor app in docker. The path `/absolute-path-to-host-algoraptor` is where you cloned the algoraptor repository. The path `/aboslute-path-to-client-algoraptor` is where this repository will be mounted in docker.
+
