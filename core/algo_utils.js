@@ -181,6 +181,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     AlgorithmUtils.visualizeNewStackFrame = function(codeContainerId, algorithmCtx) {
 	var duration = 2 * algorithmCtx.getBaselineAnimationSpeed();
 	var delay = algorithmCtx.getBaselineAnimationSpeed();
+	$('[data-toggle="popover"]').popover('destroy'); // hide all popover because they don't play nice
 	var selector = "." + codeContainerId + " div:last-of-type";
 	var height = $(selector).height();
 	var frow_height = $(selector + " li:nth-child(1)").height();
@@ -200,6 +201,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     AlgorithmUtils.popStackFrame = function(codeContainerId, algorithmCtx) {
 	var duration = 2 * algorithmCtx.getBaselineAnimationSpeed();
 	var delay = algorithmCtx.getBaselineAnimationSpeed();
+	$('[data-toggle="popover"]').popover('destroy'); // hide all popover because they don't play nice
 	var selector = "." + codeContainerId + " div:last-of-type";
 	d3.select(selector).remove();
 	var ds = d3.select(selector);

@@ -250,6 +250,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     AlgorithmUtils.visualizeNewStackFrame = function(codeContainerId, algorithmCtx) {
 	var duration = 2 * algorithmCtx.getBaselineAnimationSpeed();
 	var delay = algorithmCtx.getBaselineAnimationSpeed();
+	$('[data-toggle="popover"]').popover('destroy'); // hide all popover because they don't play nice
 	var selector = "." + codeContainerId + " div:last-of-type";
 	var height = $(selector).height();
 	var frow_height = $(selector + " li:nth-child(1)").height();
@@ -269,6 +270,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     AlgorithmUtils.popStackFrame = function(codeContainerId, algorithmCtx) {
 	var duration = 2 * algorithmCtx.getBaselineAnimationSpeed();
 	var delay = algorithmCtx.getBaselineAnimationSpeed();
+	$('[data-toggle="popover"]').popover('destroy'); // hide all popover because they don't play nice
 	var selector = "." + codeContainerId + " div:last-of-type";
 	d3.select(selector).remove();
 	var ds = d3.select(selector);
@@ -918,7 +920,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    console.log("selecting", dvObj.getBoundingClientRect(), lineObj.getBoundingClientRect());
 
 	    var img = $(algorithmCodeHolder).append('<img class="' + algorithmCodeClass + lineNum + '" src="assets/raptor24.png" style="position: absolute; margin-left: 2px; z-index:10; top: ' + 
-						raptor_top + 'px; left: ' + raptor_left + 'px" data-toggle="popover" data-trigger="click focus" data-placement="top" data-html="true" data-content="' + createRaptorPopupTemplate(text) +'"></img>');
+						raptor_top + 'px; left: ' + raptor_left + 'px" data-toggle="popover" data-trigger="click focus" data-title="Dr.Raptor\'s Hint" data-placement="left" data-html="true" data-content="' + createRaptorPopupTemplate(text) +'"></img>');
 	});
     }
     return _my;
@@ -3785,8 +3787,8 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     /*************************/
     /**  Initialize svg   ****/
     /*************************/
-    var N = 8, MAX_VAL = 12, MIN_VAL = 3;
-    var sequence_to_sort = getRandomArray(N, MAX_VAL, MIN_VAL);
+    var LEN = 8, MAX_VAL = 12, MIN_VAL = 3;
+    var sequence_to_sort = getRandomArray(LEN, MAX_VAL, MIN_VAL);
     // create data which includes an old index that is used to identify the circle group an element belongs to
     var data = sequence_to_sort.map(function(d, i) {
 	return {val : d, old_idx: i};

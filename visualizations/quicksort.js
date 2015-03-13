@@ -55,8 +55,8 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
     /*************************/
     /**  Initialize svg   ****/
     /*************************/
-    var N = 8, MAX_VAL = 12, MIN_VAL = 3;
-    var sequence_to_sort = getRandomArray(N, MAX_VAL, MIN_VAL);
+    var LEN = 8, MAX_VAL = 12, MIN_VAL = 3;
+    var sequence_to_sort = getRandomArray(LEN, MAX_VAL, MIN_VAL);
     // create data which includes an old index that is used to identify the circle group an element belongs to
     var data = sequence_to_sort.map(function(d, i) {
 	return {val : d, old_idx: i};

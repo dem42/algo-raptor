@@ -507,7 +507,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    console.log("selecting", dvObj.getBoundingClientRect(), lineObj.getBoundingClientRect());
 
 	    var img = $(algorithmCodeHolder).append('<img class="' + algorithmCodeClass + lineNum + '" src="assets/raptor24.png" style="position: absolute; margin-left: 2px; z-index:10; top: ' + 
-						raptor_top + 'px; left: ' + raptor_left + 'px" data-toggle="popover" data-trigger="click focus" data-placement="top" data-html="true" data-content="' + createRaptorPopupTemplate(text) +'"></img>');
+						raptor_top + 'px; left: ' + raptor_left + 'px" data-toggle="popover" data-trigger="click focus" data-title="Dr.Raptor\'s Hint" data-placement="left" data-html="true" data-content="' + createRaptorPopupTemplate(text) +'"></img>');
 	});
     }
     return _my;
