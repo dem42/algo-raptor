@@ -348,14 +348,14 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     _my.AlgorithmUtils.appendCode(algorithmNormTabId, "prep-code-norm", prep_algo_norm).style("display", "none");
     _my.AlgorithmUtils.appendCode(algorithmNormTabId, "bs-code-norm", balgo_norm);
 
-    _my.vislib.addRaptorHead(algorithmDefTabId, "bs-code-def", 4, "Notice that it says <code>low < high</code>. This is specific to the deferred evaluation binary search and is different to normal binary search where the condition is <code>low <= high</code>");
-    _my.vislib.addRaptorHead(algorithmDefTabId, "bs-code-def", 6, "Hum, hum... Notice that we aren't checking <b>equality</b> here in the deferred equality binary search. Instead we check on line 14 after the loop... This is where the deferred equality name comes from, yah yah!");
-    _my.vislib.addRaptorHead(algorithmDefTabId, "bs-code-def", 9, "In deferred evaluation binary search we only move the <code>low</code> pointer not the <code>high</code> one");
-    _my.vislib.addRaptorHead(algorithmDefTabId, "bs-code-def", 13, "In deferred evaluation we check for equality outside of the <code>while</code> loop");
+    _my.vislib.addRaptorHead(algorithmDefTabId, "bs-code-def", 5, "Notice that it says <code>low < high</code>. This is specific to the deferred evaluation binary search and is different to normal binary search where the condition is <code>low <= high</code>");
+    _my.vislib.addRaptorHead(algorithmDefTabId, "bs-code-def", 7, "Hum, hum... Notice that we aren't checking <b>equality</b> here in the deferred equality binary search. Instead we check on line 14 after the loop... This is where the deferred equality name comes from, yah yah!");
+    _my.vislib.addRaptorHead(algorithmDefTabId, "bs-code-def", 10, "In deferred evaluation binary search we only move the <code>low</code> pointer not the <code>high</code> one");
+    _my.vislib.addRaptorHead(algorithmDefTabId, "bs-code-def", 14, "In deferred evaluation we check for equality outside of the <code>while</code> loop");
 
-    _my.vislib.addRaptorHead(algorithmNormTabId, "bs-code-norm", 4, "Note that the check here is <code>low <= high</code> This is an easy one to get wrong to watch out!");
-    _my.vislib.addRaptorHead(algorithmNormTabId, "bs-code-norm", 5, "This way of computing the mid value might seem odd, but it has an important advantage to the more common <code>(low + high) / 2</code>. If either your <code>low</code> or <code>high</code> value is close to the maximum integer value then the addition might overflow which will mess up your algorithm completely. Now this may not happen when you are searching an array, but if your search condition is something else then it could so it's not a bad habit to get into.");
-   _my.vislib.addRaptorHead(algorithmNormTabId, "bs-code-norm", 15, "What you return can be important. Some versions of binary search choose for example to return the index where you would insert the value, but times negative one.");
+    _my.vislib.addRaptorHead(algorithmNormTabId, "bs-code-norm", 5, "Note that the check here is <code>low <= high</code> This is an easy one to get wrong to watch out!");
+    _my.vislib.addRaptorHead(algorithmNormTabId, "bs-code-norm", 6, "This way of computing the mid value might seem odd, but it has an important advantage to the more common <code>(low + high) / 2</code>. If either your <code>low</code> or <code>high</code> value is close to the maximum integer value then the addition might overflow which will mess up your algorithm completely. Now this may not happen when you are searching an array, but if your search condition is something else then it could so it's not a bad habit to get into.");
+   _my.vislib.addRaptorHead(algorithmNormTabId, "bs-code-norm", 16, "What you return can be important. Some versions of binary search choose for example to return the index where you would insert the value, but times negative one.");
 
     return {"bsearch": bsearch, "deferred_bsearch": deferred_bsearch, "bsearch-algorithm": balgo_def};
 

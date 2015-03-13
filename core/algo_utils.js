@@ -204,9 +204,9 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	d3.select(selector).remove();
 	var ds = d3.select(selector);
 	var oldh = ds.attr("data-oldheight");
-	ds.transition().delay(delay).duration(duration).style("height", oldh);
+	ds.transition().delay(delay).style("height", oldh);
 
-	return duration + delay;
+	return delay;
     }
 
     //remove dynamic comments (values of variables appended with // during execution of the algorithm)

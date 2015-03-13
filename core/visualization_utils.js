@@ -497,6 +497,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    var algorithmCodeHolder =  "." + algorithmCodeClass + " .function-code-holder";
 	    $(algorithmCodeHolder).css("position", "relative");
 	    $(algorithmCodeHolder + " ol").css("margin-left", "15px");
+	    lineNum = lineNum - 1; // pretify indexes li.L starting at 0, we start at 1
 	    var lineR = lineNum % 10;
 	    var lineQ = Math.floor(lineNum / 10);
 	    var dvObj = $(algorithmCodeHolder)[0];

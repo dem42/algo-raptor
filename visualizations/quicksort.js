@@ -55,7 +55,8 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
     /*************************/
     /**  Initialize svg   ****/
     /*************************/
-    var sequence_to_sort = [12, 8, 9, 4, 3, 5, 10, 5];
+    var N = 8, MAX_VAL = 12, MIN_VAL = 3;
+    var sequence_to_sort = getRandomArray(N, MAX_VAL, MIN_VAL);
     // create data which includes an old index that is used to identify the circle group an element belongs to
     var data = sequence_to_sort.map(function(d, i) {
 	return {val : d, old_idx: i};
@@ -313,21 +314,20 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
     // setup the controls
     _my.AlgorithmUtils.attachAlgoToControls(qual_algo, algorithmTabId, kickoff);
 
-    Array.prototype.shuffle = function() {
-	var N = this.length;
-	for (var i = 0, j = N - 1, x = 0; j >= 0; j--) {
-	    i = Math.floor(Math.random() * (j+1));
-	    x = this[j]; 
-	    this[j] = this[i];
-	    this[i] = x;
+    function getRandomArray(len, max_val, min_val) {
+	var result = [];
+	for (var i = 0; i < len; i++) {
+	    result.push(Math.floor(Math.random() * (max_val - min_val) + min_val));
 	}
-    };
+	return result;
+    }
+
     layout.customControlsHeader.style("display", "inline-block");
     layout.customControlsLayout.append("button")
 	.attr("class", "btn btn-info btn-sm quick-shuffle-btn")
 	.attr("title", "Permute the quicksort input data. (The balls!)")
         .on("click", function() {
-	    sequence_to_sort.shuffle();
+	    sequence_to_sort = getRandomArray(LEN, MAX_VAL, MIN_VAL);
 	    sequence_to_sort.forEach(function(d, i) {
 		data[i].val = d;
 		data[i].old_idx = i;
@@ -336,11 +336,12 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	    d3.select("#" + defs_id).remove();
 	    init_circles(data);
 	})
-	.text("Shuffle Data");
+	.text("Randomize");
 
-    //_my.vislib.addRaptorHead("quicksort-code", 14, "hello world ashdh asjdhaj dhsa jdhs ad ja!");
-    
+    _my.vislib.addRaptorHead(algorithmTabId, "quicksort-code", 5, "Here our pivot selection strategy is to simply pick the middle element as the pivot. Feh!! This will lead to quadratic performance for example with an array like <code>[3, 0, 1, 2]</code>");
+    _my.vislib.addRaptorHead(algorithmTabId, "quicksort-code", 10, "Move the left pointer right until we find an element larger than pivot. Elementary my dear Tyranosaurus.");
+    _my.vislib.addRaptorHead(algorithmTabId, "quicksort-code", 13, "Move the right pointer left until we find an element smaller than pivot. Elementary my dear Brachiosaurus.");
 
-    return {"quicksort": quicksort, "quicksort-algorithm": qual_algo};
+    return {"quicksort": quicksort, "swap_function": swap_function, "quicksort-algorithm": qual_algo, "getRandomArray" : getRandomArray};
 
 })(ALGORITHM_MODULE, $, d3, bootbox);

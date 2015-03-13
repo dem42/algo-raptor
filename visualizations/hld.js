@@ -199,10 +199,10 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
     var ss_algo = new _my.Algorithm(computeSubtreeSize, ss_callbacks, "ss-code", context, remover);
 
     _my.AlgorithmUtils.appendCode(algorithmTabId, "ss-code", ss_algo);
-    _my.vislib.addRaptorHead(algorithmTabId, "ss-code", 0, "To be able to decompose our unbalanced tree we first need to compute the subtree sizes using this depth first search");
+    _my.vislib.addRaptorHead(algorithmTabId, "ss-code", 1, "To be able to decompose our unbalanced tree we first need to compute the subtree sizes using this depth first search");
     _my.AlgorithmUtils.appendCode(algorithmTabId, "hld-code", hld_algo);
-    _my.vislib.addRaptorHead(algorithmTabId, "hld-code", 14, "To build a chain decomposition which guarantees <var>O(log N)</var> we always pick the largest subtree as the next node in the chain.");
-    _my.vislib.addRaptorHead(algorithmTabId, "hld-code", 23, "Since we picked the largest subtree for the main chain, the other subtrees now have a size of at most half the size of the current subtree. This means that everytime we start a new chain the subtree sizes halves! That's where the <var>log N</var> comes from.");
+    _my.vislib.addRaptorHead(algorithmTabId, "hld-code", 15, "To build a chain decomposition which guarantees <var>O(log N)</var> we always pick the largest subtree as the next node in the chain.");
+    _my.vislib.addRaptorHead(algorithmTabId, "hld-code", 24, "Since we picked the largest subtree for the main chain, the other subtrees now have a size of at most half the size of the current subtree. This means that everytime we start a new chain the subtree sizes halves! That's where the <var>log N</var> comes from.");
     // the randomness here isn't good i think .. certain shapes are very improbable whereas
     // all shapes should have the same probablitity (maybe it's okay .. the prob of a every labelled shape is 
     // the same isn't it? at every stage the prob of picking the number we picked is the same 

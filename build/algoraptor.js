@@ -273,9 +273,9 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	d3.select(selector).remove();
 	var ds = d3.select(selector);
 	var oldh = ds.attr("data-oldheight");
-	ds.transition().delay(delay).duration(duration).style("height", oldh);
+	ds.transition().delay(delay).style("height", oldh);
 
-	return duration + delay;
+	return delay;
     }
 
     //remove dynamic comments (values of variables appended with // during execution of the algorithm)
@@ -908,6 +908,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    var algorithmCodeHolder =  "." + algorithmCodeClass + " .function-code-holder";
 	    $(algorithmCodeHolder).css("position", "relative");
 	    $(algorithmCodeHolder + " ol").css("margin-left", "15px");
+	    lineNum = lineNum - 1; // pretify indexes li.L starting at 0, we start at 1
 	    var lineR = lineNum % 10;
 	    var lineQ = Math.floor(lineNum / 10);
 	    var dvObj = $(algorithmCodeHolder)[0];
@@ -1743,14 +1744,14 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     _my.AlgorithmUtils.appendCode(algorithmNormTabId, "prep-code-norm", prep_algo_norm).style("display", "none");
     _my.AlgorithmUtils.appendCode(algorithmNormTabId, "bs-code-norm", balgo_norm);
 
-    _my.vislib.addRaptorHead(algorithmDefTabId, "bs-code-def", 4, "Notice that it says <code>low < high</code>. This is specific to the deferred evaluation binary search and is different to normal binary search where the condition is <code>low <= high</code>");
-    _my.vislib.addRaptorHead(algorithmDefTabId, "bs-code-def", 6, "Hum, hum... Notice that we aren't checking <b>equality</b> here in the deferred equality binary search. Instead we check on line 14 after the loop... This is where the deferred equality name comes from, yah yah!");
-    _my.vislib.addRaptorHead(algorithmDefTabId, "bs-code-def", 9, "In deferred evaluation binary search we only move the <code>low</code> pointer not the <code>high</code> one");
-    _my.vislib.addRaptorHead(algorithmDefTabId, "bs-code-def", 13, "In deferred evaluation we check for equality outside of the <code>while</code> loop");
+    _my.vislib.addRaptorHead(algorithmDefTabId, "bs-code-def", 5, "Notice that it says <code>low < high</code>. This is specific to the deferred evaluation binary search and is different to normal binary search where the condition is <code>low <= high</code>");
+    _my.vislib.addRaptorHead(algorithmDefTabId, "bs-code-def", 7, "Hum, hum... Notice that we aren't checking <b>equality</b> here in the deferred equality binary search. Instead we check on line 14 after the loop... This is where the deferred equality name comes from, yah yah!");
+    _my.vislib.addRaptorHead(algorithmDefTabId, "bs-code-def", 10, "In deferred evaluation binary search we only move the <code>low</code> pointer not the <code>high</code> one");
+    _my.vislib.addRaptorHead(algorithmDefTabId, "bs-code-def", 14, "In deferred evaluation we check for equality outside of the <code>while</code> loop");
 
-    _my.vislib.addRaptorHead(algorithmNormTabId, "bs-code-norm", 4, "Note that the check here is <code>low <= high</code> This is an easy one to get wrong to watch out!");
-    _my.vislib.addRaptorHead(algorithmNormTabId, "bs-code-norm", 5, "This way of computing the mid value might seem odd, but it has an important advantage to the more common <code>(low + high) / 2</code>. If either your <code>low</code> or <code>high</code> value is close to the maximum integer value then the addition might overflow which will mess up your algorithm completely. Now this may not happen when you are searching an array, but if your search condition is something else then it could so it's not a bad habit to get into.");
-   _my.vislib.addRaptorHead(algorithmNormTabId, "bs-code-norm", 15, "What you return can be important. Some versions of binary search choose for example to return the index where you would insert the value, but times negative one.");
+    _my.vislib.addRaptorHead(algorithmNormTabId, "bs-code-norm", 5, "Note that the check here is <code>low <= high</code> This is an easy one to get wrong to watch out!");
+    _my.vislib.addRaptorHead(algorithmNormTabId, "bs-code-norm", 6, "This way of computing the mid value might seem odd, but it has an important advantage to the more common <code>(low + high) / 2</code>. If either your <code>low</code> or <code>high</code> value is close to the maximum integer value then the addition might overflow which will mess up your algorithm completely. Now this may not happen when you are searching an array, but if your search condition is something else then it could so it's not a bad habit to get into.");
+   _my.vislib.addRaptorHead(algorithmNormTabId, "bs-code-norm", 16, "What you return can be important. Some versions of binary search choose for example to return the index where you would insert the value, but times negative one.");
 
     return {"bsearch": bsearch, "deferred_bsearch": deferred_bsearch, "bsearch-algorithm": balgo_def};
 
@@ -3661,10 +3662,10 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     var ss_algo = new _my.Algorithm(computeSubtreeSize, ss_callbacks, "ss-code", context, remover);
 
     _my.AlgorithmUtils.appendCode(algorithmTabId, "ss-code", ss_algo);
-    _my.vislib.addRaptorHead(algorithmTabId, "ss-code", 0, "To be able to decompose our unbalanced tree we first need to compute the subtree sizes using this depth first search");
+    _my.vislib.addRaptorHead(algorithmTabId, "ss-code", 1, "To be able to decompose our unbalanced tree we first need to compute the subtree sizes using this depth first search");
     _my.AlgorithmUtils.appendCode(algorithmTabId, "hld-code", hld_algo);
-    _my.vislib.addRaptorHead(algorithmTabId, "hld-code", 14, "To build a chain decomposition which guarantees <var>O(log N)</var> we always pick the largest subtree as the next node in the chain.");
-    _my.vislib.addRaptorHead(algorithmTabId, "hld-code", 23, "Since we picked the largest subtree for the main chain, the other subtrees now have a size of at most half the size of the current subtree. This means that everytime we start a new chain the subtree sizes halves! That's where the <var>log N</var> comes from.");
+    _my.vislib.addRaptorHead(algorithmTabId, "hld-code", 15, "To build a chain decomposition which guarantees <var>O(log N)</var> we always pick the largest subtree as the next node in the chain.");
+    _my.vislib.addRaptorHead(algorithmTabId, "hld-code", 24, "Since we picked the largest subtree for the main chain, the other subtrees now have a size of at most half the size of the current subtree. This means that everytime we start a new chain the subtree sizes halves! That's where the <var>log N</var> comes from.");
     // the randomness here isn't good i think .. certain shapes are very improbable whereas
     // all shapes should have the same probablitity (maybe it's okay .. the prob of a every labelled shape is 
     // the same isn't it? at every stage the prob of picking the number we picked is the same 
@@ -3784,7 +3785,8 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     /*************************/
     /**  Initialize svg   ****/
     /*************************/
-    var sequence_to_sort = [12, 8, 9, 4, 3, 5, 10, 5];
+    var N = 8, MAX_VAL = 12, MIN_VAL = 3;
+    var sequence_to_sort = getRandomArray(N, MAX_VAL, MIN_VAL);
     // create data which includes an old index that is used to identify the circle group an element belongs to
     var data = sequence_to_sort.map(function(d, i) {
 	return {val : d, old_idx: i};
@@ -4042,21 +4044,20 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     // setup the controls
     _my.AlgorithmUtils.attachAlgoToControls(qual_algo, algorithmTabId, kickoff);
 
-    Array.prototype.shuffle = function() {
-	var N = this.length;
-	for (var i = 0, j = N - 1, x = 0; j >= 0; j--) {
-	    i = Math.floor(Math.random() * (j+1));
-	    x = this[j]; 
-	    this[j] = this[i];
-	    this[i] = x;
+    function getRandomArray(len, max_val, min_val) {
+	var result = [];
+	for (var i = 0; i < len; i++) {
+	    result.push(Math.floor(Math.random() * (max_val - min_val) + min_val));
 	}
-    };
+	return result;
+    }
+
     layout.customControlsHeader.style("display", "inline-block");
     layout.customControlsLayout.append("button")
 	.attr("class", "btn btn-info btn-sm quick-shuffle-btn")
 	.attr("title", "Permute the quicksort input data. (The balls!)")
         .on("click", function() {
-	    sequence_to_sort.shuffle();
+	    sequence_to_sort = getRandomArray(LEN, MAX_VAL, MIN_VAL);
 	    sequence_to_sort.forEach(function(d, i) {
 		data[i].val = d;
 		data[i].old_idx = i;
@@ -4065,12 +4066,13 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    d3.select("#" + defs_id).remove();
 	    init_circles(data);
 	})
-	.text("Shuffle Data");
+	.text("Randomize");
 
-    //_my.vislib.addRaptorHead("quicksort-code", 14, "hello world ashdh asjdhaj dhsa jdhs ad ja!");
-    
+    _my.vislib.addRaptorHead(algorithmTabId, "quicksort-code", 5, "Here our pivot selection strategy is to simply pick the middle element as the pivot. Feh!! This will lead to quadratic performance for example with an array like <code>[3, 0, 1, 2]</code>");
+    _my.vislib.addRaptorHead(algorithmTabId, "quicksort-code", 10, "Move the left pointer right until we find an element larger than pivot. Elementary my dear Tyranosaurus.");
+    _my.vislib.addRaptorHead(algorithmTabId, "quicksort-code", 13, "Move the right pointer left until we find an element smaller than pivot. Elementary my dear Brachiosaurus.");
 
-    return {"quicksort": quicksort, "quicksort-algorithm": qual_algo};
+    return {"quicksort": quicksort, "swap_function": swap_function, "quicksort-algorithm": qual_algo, "getRandomArray" : getRandomArray};
 
 })(ALGORITHM_MODULE, $, d3, bootbox);
 ;// this is jquery syntax for adding this as a callback to run on a document ready event
