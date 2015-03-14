@@ -177,37 +177,30 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    .text(headerText);
     }
 
+    function addStackFramePreview(codeContainerId) {
+	var selector = "." + codeContainerId + " li";
+	var lineClone = $(selector).filter(":first").clone();
+	$("." + codeContainerId).prepend(lineClone);
+	lineClone.wrap('<div class="preview-frame"><pre class="prettyprint lang-js linenums:1 prettyprinted" style=""><ol class="linenums" style="margin-left: 15px;"></ol></pre></div>');	
+    }
+
     // for adding a new frame for a recursive algorithm
     AlgorithmUtils.visualizeNewStackFrame = function(codeContainerId, algorithmCtx) {
 	var duration = 2 * algorithmCtx.getBaselineAnimationSpeed();
 	var delay = algorithmCtx.getBaselineAnimationSpeed();
-	$('[data-toggle="popover"]').popover('destroy'); // hide all popover because they don't play nice
-	var selector = "." + codeContainerId + " div:last-of-type";
-	var height = $(selector).height();
-	var frow_height = $(selector + " li:nth-child(1)").height();
-	var clone = $(selector).clone();
-	var ds = d3.select(selector);
-	ds.style({"overflow": "hidden", "margin-bottom": "5px"}).attr("data-oldheight", height + "px");
-	ds.style("height", frow_height + "px");
 	setTimeout(function() {
-	    clone.insertAfter(selector);
-	    AlgorithmUtils.clearComments(codeContainerId);
-	}, duration + delay);
+	    addStackFramePreview(codeContainerId);
+	}, delay);
 
-	return duration + delay;
+	return delay;
     }
 
    //remove an old stack frame and expand the previous one
     AlgorithmUtils.popStackFrame = function(codeContainerId, algorithmCtx) {
 	var duration = 2 * algorithmCtx.getBaselineAnimationSpeed();
 	var delay = algorithmCtx.getBaselineAnimationSpeed();
-	$('[data-toggle="popover"]').popover('destroy'); // hide all popover because they don't play nice
-	var selector = "." + codeContainerId + " div:last-of-type";
+	var selector = "." + codeContainerId + " .preview-frame";
 	d3.select(selector).remove();
-	var ds = d3.select(selector);
-	var oldh = ds.attr("data-oldheight");
-	ds.transition().delay(delay).style("height", oldh);
-
 	return delay;
     }
 

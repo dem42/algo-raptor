@@ -242,3 +242,6 @@ svg.gauge {
 .read-more-lnk {
     cursor: pointer;
 }
+.preview-frame {
+    margin-bottom: -5px;
+}
