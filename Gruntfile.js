@@ -33,14 +33,6 @@ module.exports = function(grunt) {
 		livereload: true
 	    }
 	},
-	notify_hooks: {
-	    options: {
-		enabled: true,
-		max_jshint_notifications: 5,
-		success: false,
-		duration: 3
-	    }
-	},
 	express: {
 	    all: {
 		options: {
@@ -50,17 +42,18 @@ module.exports = function(grunt) {
 		    livereload: true
 		}
 	    }
-	}, 
+	},
+	jshint: {
+	    all: ['Gruntfile.js', 'core/*.js', 'visualizations/*.js']
+	}
     });
 
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-qunit');
     grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks('grunt-notify');
     grunt.loadNpmTasks('grunt-express');
-
-    grunt.task.run('notify_hooks');
+    grunt.loadNpmTasks('grunt-contrib-jshint');
 
     grunt.registerTask('default', ['concat', 'qunit', 'express', 'watch']);
 }

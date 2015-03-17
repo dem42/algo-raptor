@@ -4084,7 +4084,6 @@ $(function (ALGORITHM_MODULE) {
 	cache: false
     });
 
-
     // close popovers when we click elsewhere
     $('body').on('click', function (e) {
 	$('[data-toggle="popover"]').each(function () {
@@ -4095,7 +4094,10 @@ $(function (ALGORITHM_MODULE) {
             }
 	});
     });
-
+    // if we don't initially collapse it causes odd flickers in the ui
+    var navMain = $(".navbar-collapse");
+    navMain.collapse('hide');
+    
     // using ready for now because load doesn't get triggered 
     // when our internet drops and the twitter/git imgs don't get loaded
     var prettification_complete = false;
@@ -4117,12 +4119,15 @@ $(function (ALGORITHM_MODULE) {
     });
     $('a', "#algoTabs").off("click");
     $('a', "#algoTabs").on('click', function(e) {
-	// modify the history and the url
-	// although the firefox back button does look quite strange after this
-	//history.pushState(null, null, this.href);
-	// alternative solution
-	window.location.href = $(this).attr("href"); 
-	window.scrollBy(0, -window.pageYOffset);
+    	// modify the history and the url
+    	// although the firefox back button does look quite strange after this
+    	//history.pushState(null, null, this.href);
+    	// alternative solution
+    	window.location.href = $(this).attr("href"); 
+    	window.scrollBy(0, -window.pageYOffset);
+	// close collapsed menu when clicking on items in a collapsed menu
+       navMain.collapse('hide');
+
     });
 
     $('#my-logo').on("click", function() {
