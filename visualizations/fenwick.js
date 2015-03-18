@@ -371,13 +371,15 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 
     function initOnValueChanges() {
 	$(".fen-input-box").on("input", function(d) {
-	    var value = $(this).val();
-	    var index = $(this).attr("data-fen-index");
-	    if (!isNaN(+value)) {
+	    var value = +$(this).val();
+	    var index = +$(this).attr("data-fen-index");
+	    if (!isNaN(value) && index <= input_data.length && value != input_data[index-1]) {
+		var dif = value - input_data[index-1];
+		input_data[index-1] = value;
 		var attacher = _my.AlgorithmUtils.createAlgoAttacher();
 		attacher.attach(fenwick_update_algo, algorithmTabId);
 		var play_function = attacher.play_maker(fenwick_update_algo, algorithmTabId);
-		fenwick_update_algo.run(+value, +index, tree);
+		fenwick_update_algo.run(dif, index, tree);
 		play_function();
 	    }
 	});
@@ -408,5 +410,5 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     _my.AlgorithmUtils.appendCode(algorithmTabId, "fen-read-code", fenwick_read_algo);
     _my.AlgorithmUtils.appendCode(algorithmTabId, "fen-update-code", fenwick_update_algo);
 
-    return {};
+    return {"read" : read, "update": update, "sumBetween": sumBetween};
 }(ALGORITHM_MODULE, jQuery, d3, bootbox));
