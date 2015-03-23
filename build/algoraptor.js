@@ -49,7 +49,7 @@
     // fill is ecma6
     if (!Array.prototype.fill) {
 	Array.prototype.fill = function(value) {
-	    if (this == null) {
+	    if (this === null) {
 		throw new TypeError('this is null or not defined');
 	    }
 	    var O = Object(this);
@@ -86,20 +86,20 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     // create a deep clone of obj
     AlgorithmUtils.clone = function clone(obj) {
 	
-	if (obj == null || typeof obj != "object") {
+	if (obj === null || typeof obj !== "object") {
 	    // these are immutable and can be returned
 	    return obj;
 	}
 
 	var cpy = new obj.constructor();
-	for (prop in obj) {
+	for (var prop in obj) {
 	    if (obj.hasOwnProperty(prop)) {
 		//console.log(obj.constructor, cpy, obj);
 		cpy[prop] = clone(obj[prop]);
 	    }
 	}
 	return cpy;
-    }
+    };
 
     AlgorithmUtils.insertCustomControls = function(layout, algorithmId, algorithmName, comments) {
 	var customControlsHolder = layout.visPanelContents.append("div").attr("class", "custom-controls-holder");
@@ -111,7 +111,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	}
 	layout.customControlsLayout = customControlsHolder;
 	layout.customControlsHeader = customControlsHeader;
-    }
+    };
 
     // create and populate a section for standard algorithm controls
     AlgorithmUtils.insertDefaultControls = function(layout, algorithmId) {
@@ -141,7 +141,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	buttonsDiv.append("p").append("button").attr("class", "btn btn-info btn-sm")
 	    .on("click", function() {
 		var current = gaugeObj.getValue();
-		gaugeObj.update(current+1);
+		gaugeObj.update(current + 1);
 	    })
 	    .append("span").attr("class", "glyphicon glyphicon-plus");
 	buttonsDiv.append("p").append("button").attr("class", "btn btn-info btn-sm")
@@ -169,14 +169,14 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    //layout.controlsPanelHolder.attr("class", "col-md-4");
 	});
 	return {"speedGauge" : gaugeObj};
-    }
+    };
 
     AlgorithmUtils.resetControls = function(algorithmId) {
 	d3.select("#" + "play-btn-of-" + algorithmId + " span span").attr("class", "play-btn");
 	d3.select("#" + "play-btn-of-" + algorithmId + " span").attr("title", "Start the algorithm in continuous mode (the algorithm will run on its own)");
 	d3.select("#" + "next-btn-of-" + algorithmId).classed("disabled-btn", false);
 	d3.select("#" + "next-btn-of-" + algorithmId).classed("enabled-btn", true);
-    }
+    };
 
     // connect the algorithm to default control callbacks
     // this is necessary if you want the default controls to kick the algorithm off
@@ -212,7 +212,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	// allows us to reattach the controls as we like
 	res.attach = function(algorithm, algorithmId, kickoffCallback) {
 	    d3.select("#" + "play-btn-of-" + algorithmId).on("click", function() {
-		if (!algorithm.isRunning() && kickoffCallback != undefined) {
+		if (!algorithm.isRunning() && kickoffCallback !== undefined) {
 		    kickoffCallback(res.play_maker(algorithm, algorithmId));
 		}
 		else {
@@ -220,7 +220,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 		}
 	    });
 	    d3.select("#" + "next-btn-of-" + algorithmId).on("click", function() {
-		if (!algorithm.isRunning() && kickoffCallback != undefined) {
+		if (!algorithm.isRunning() && kickoffCallback !== undefined) {
 		    kickoffCallback(res.next_maker(algorithm, algorithmId));
 		}
 		else {
@@ -229,12 +229,12 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    });
 	};
 	return res;
-    }
+    };
 
     AlgorithmUtils.attachAlgoToControls = function(algorithm, algorithmId, kickoffCallback) {
 	var attacher = AlgorithmUtils.createAlgoAttacher();
 	attacher.attach(algorithm, algorithmId, kickoffCallback);
-    }
+    };
 
     // create an item for the algorithm in the list of all available algorithms 
     AlgorithmUtils.insertIntoHeaderList = function(tabId, headerText, menuConfig) {
@@ -244,7 +244,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	listItem.append("a").data([listItemId]).attr("href", tabId).attr("role", "tab").attr("data-toggle", "tab")
 	    .attr("data-tab-id", tabId)
 	    .text(headerText);
-    }
+    };
 
     function addStackFramePreview(codeContainerId) {
 	var selector = "." + codeContainerId + " li";
@@ -262,7 +262,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	}, delay);
 
 	return delay;
-    }
+    };
 
    //remove an old stack frame and expand the previous one
     AlgorithmUtils.popStackFrame = function(codeContainerId, algorithmCtx) {
@@ -271,13 +271,13 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	var selector = "." + codeContainerId + " .preview-frame";
 	d3.select(selector).remove();
 	return delay;
-    }
+    };
 
     //remove dynamic comments (values of variables appended with // during execution of the algorithm)
     AlgorithmUtils.clearComments = function(codeContainerId) {
 	var selector = "." + codeContainerId + " div:last-of-type";
 	d3.select(selector).selectAll("span.com.dynamic").remove();
-    }
+    };
  
     //comupte a viewBox to scale svg contents properly on smaller screen sizes
     AlgorithmUtils.calcViewBox = function(parentId, width, height) {
@@ -285,7 +285,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	//ratio computed from parent width and made 10% smaller (smaller pixels than original) to fit inside the parent
 	var vbx_ratio = (width / parentWidth); 
 	return {"string" : "0 0 " + width + " " + (vbx_ratio * height), "width" : (parentWidth), "height" : height };
-    }
+    };
 
 
     AlgorithmUtils.createAlgorithmContext = function(controlsObj) {
@@ -318,15 +318,15 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    var introObject = Object.create(null);
 	    introObject.tldr = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum";
 	    introObject.readMore = "";
-	    function tldr(tldr) {
+	    function tldrFun(tldr) {
 		this.tldr = tldr;
 		layout.introductionParagraph.html(tldr);
 	    }
-	    function readMore(readMore) {
+	    function readMoreFun(readMore) {
 		this.readMore = readMore;
 	    }
-	    introObject.setIntroTlDr = tldr;
-	    introObject.setIntroReadMore = readMore;
+	    introObject.setIntroTlDr = tldrFun;
+	    introObject.setIntroReadMore = readMoreFun;
 
 	    layout.introductionParagraph = layout.introHeader.append("p").text(introObject.tldr);
 	    var readMoreTxt = "Read more...";
@@ -348,7 +348,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	}();
 
 	layout.controlsPanelHolder = tab.append("div").attr("class", "controls controls-affix").attr("data-spy", "affix").style("top","0%").style("right","0%");
-    	layout.controlsPanel = layout.controlsPanelHolder.append("div").attr("class", "panel panel-default")
+    	layout.controlsPanel = layout.controlsPanelHolder.append("div").attr("class", "panel panel-default");
 
 	layout.controlsPanelBody = layout.controlsPanel.append("div").attr("class", "panel-body");
 	layout.ops = layout.controlsPanelBody.append("div").attr("class", "options");
@@ -360,7 +360,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 
 	// row 2
 	layout.row2 = layout.container.append("div").attr("class", "row");
-	layout.leftPanel = layout.row2.append("div").attr("class", "col-md-" + columnWidths[0])
+	layout.leftPanel = layout.row2.append("div").attr("class", "col-md-" + columnWidths[0]);
 	layout.visPanel = layout.leftPanel.append("div").attr("class", "row")
     	    .append("div").attr("class", "col-md-12")
     	    .append("div");
@@ -380,7 +380,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     AlgorithmUtils.appendCode = function(algorithmTabId, codeContainerId, algo) {
 	var code_holder = d3.select("#" + algorithmTabId + " .code")
 	    .append("div")
-	    .attr("class", codeContainerId)
+	    .attr("class", codeContainerId);
 	code_holder.append("div")
 	    .attr("class", "function-code-holder")
 	    .append("pre")
@@ -396,10 +396,10 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     AlgorithmUtils.attachPrettyPrintCallback = function(tab_id, callback) {
 	var tab_id_with_hash = "#" + tab_id; // we store them with hash since that's how we'll call them
 	(pretty_print_callbacks[tab_id_with_hash] = (pretty_print_callbacks[tab_id_with_hash] || [])).push(callback);
-    }
+    };
     AlgorithmUtils.getPrettyPrintCallbacks = function(tab_id) {
 	return pretty_print_callbacks[tab_id];
-    }
+    };
     //return the augmented module
     _my.AlgorithmUtils = AlgorithmUtils;
     return _my;
@@ -469,7 +469,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	_my.vislib.animatePath(path, duration, delay, make_proportional, length_to_show_percentage);
 	var tran = _my.vislib.animateMovingAlongAPath(arrow, path, duration, delay, make_proportional, length_to_show_percentage, true, -90);
 	return {"arrow": arrow, "transition": tran};
-    }
+    };
 
     /*** ice cold coolness!! takes a selection which should be translateable and animates it moving along a path
      * .. with_rotate only works properly for straight paths .. we could calculate tangent more often too tho so
@@ -484,7 +484,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    .duration(duration)
 	    .delay(delay)
 	    .ease("linear")
-	    .attrTween("transform", translateAlong(path.node()))
+	    .attrTween("transform", translateAlong(path.node()));
 
 	// Returns an attrTween for translating along the specified path element.
 	function translateAlong(path) {
@@ -515,7 +515,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	// kudos to elusive-code on stackoverflow for this nice code
 	var line = d3.svg.line()
             .x( function(point) { return point.lx; })
-            .y( function(point) { return point.ly; })
+            .y( function(point) { return point.ly; });
 
 	if (interpolateType !== undefined) {
 	    line = line.interpolate(interpolateType);
@@ -607,7 +607,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	result.transition = transition;
 	result.arrows = arrows;
 	return result;
-    }
+    };
 
     /*** ice cold coolness!! takes a selection which should be translateable and animates it moving along a path
      * .. with_rotate only works properly for straight paths .. we could calculate tangent more often too tho so
@@ -634,7 +634,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    .duration(duration)
 	    .delay(delay)
 	    .ease("linear")
-	    .attrTween("transform", function(d) { return d.translateAlong(); })
+	    .attrTween("transform", function(d) { return d.translateAlong(); });
 
 	// Returns an attrTween for translating along the specified path element.
 	function translateAlong(path) {
@@ -662,30 +662,30 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
     /** fetch the window coordinates of an element accounting for scroll */
     _my.vislib.getOffsetRect = function(elem) {
 	// (1)
-	var box = elem.getBoundingClientRect()
+	var box = elem.getBoundingClientRect();
 	
-	var body = document.body
-	var docElem = document.documentElement
+	var body = document.body;
+	var docElem = document.documentElement;
 	
 	// (2)
-	var scrollTop = window.pageYOffset || docElem.scrollTop || body.scrollTop
-	var scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft
+	var scrollTop = window.pageYOffset || docElem.scrollTop || body.scrollTop;
+	var scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft;
 	
 	// (3)
-	var clientTop = docElem.clientTop || body.clientTop || 0
-	var clientLeft = docElem.clientLeft || body.clientLeft || 0
+	var clientTop = docElem.clientTop || body.clientTop || 0;
+	var clientLeft = docElem.clientLeft || body.clientLeft || 0;
 	
 	// (4)
-	var top  = box.top +  scrollTop - clientTop
-	var left = box.left + scrollLeft - clientLeft
+	var top  = box.top +  scrollTop - clientTop;
+	var left = box.left + scrollLeft - clientLeft;
 	
-	return { y: Math.round(top), x: Math.round(left) }
-    }
+	return { y: Math.round(top), x: Math.round(left) };
+    };
     _my.vislib.getCoordsInSvg = function(elem, svg_elem) {
 	var document_coords_elem = _my.vislib.getOffsetRect(elem);
 	var document_coords_svg = _my.vislib.getOffsetRect(svg_elem.node());
 	return { "y": document_coords_elem.y - document_coords_svg.y, "x": document_coords_elem.x - document_coords_svg.x};
-    }
+    };
     _my.vislib.getCoordWithTranApplied = function(shape_and_coord, svg) {
 	console.log(svg);
 	var matrix = shape_and_coord.shape.getCTM();
@@ -695,7 +695,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	position.y = shape_and_coord.coord.y;
 	position = position.matrixTransform(matrix);
 	return position;
-    }
+    };
     
     /**** based off of a gist by msqr on github ****/
     // draws a speed gauge and returns an object to update and query the gauge for the speed values
@@ -734,20 +734,13 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 			  scale: 1,
 			  speedModifier: 100
 	    };
-	    var range = undefined;
-	    var r = undefined;
-	    var pointerHeadLength = undefined;
+	    var range, r, pointerHeadLength;
 	    var value = 0;
 	    var majorTicks = labelData.length;
 	    var minValue = 0;
 	    var maxValue = 2*labelData.length;
 	    
-	    var svg = undefined;
-	    var arc = undefined;
-	    var scale = undefined;
-	    var ticks = undefined;
-	    var tickData = undefined;
-	    var pointer = undefined;
+	    var svg, arc, scale, ticks, tickData, pointer;
 
 	    function deg2rad(deg) {
 		return deg * Math.PI / 180;
@@ -755,8 +748,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    
 	    function newAngle(d) {
 		var ratio = scale(d);
-		var newAngle = config.minAngle + (ratio * range);
-		return newAngle;
+		return config.minAngle + (ratio * range);
 	    }
 	    function getValue() {
 		return value;
@@ -773,7 +765,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    }
 	    that.setSpeedModifier = setSpeedModifier;
 
-	    var prop = undefined;
+	    var prop;
 	    for ( prop in configuration ) {
 		config[prop] = configuration[prop];
 	    }
@@ -801,7 +793,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 		    var ratio = d * (i+1);
 		    return deg2rad(config.minAngle + (ratio * range));
 		})
-		.padAngle(0.01)
+		.padAngle(0.01);
 
 	    
 	    function render(newValue) {
@@ -812,10 +804,10 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 		    .attr('height', config.clipHeight*config.scale)
 		    .attr("viewBox", "0 0 " + config.clipWidth + " " + config.clipHeight)
 		    .append("g")
-		    .attr("transform", "translate(" + (r*1) + "," + (r*.95) + ")");		
-		var defs = svg.append('defs')
+		    .attr("transform", "translate(" + (r * 1) + "," + (r * 0.95) + ")");
+		var defs = svg.append('defs');
 		var arcs = svg.append('g')
-		    .attr('class', 'arc')
+		    .attr('class', 'arc');
 		
 		defs.selectAll('path')
 		    .data(tickData)
@@ -828,7 +820,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 		    .attr('xlink:href', function(d, i) { return "#mypath" + i + "-of(" + holder_selector + ")"; })
 		    .attr('fill', function(d, i) {
 			return arcColorFn[i % arcColorFn.length];
-		    })
+		    });
 		svg.selectAll('.arc-label')
 		    .data(labelData)
 		    .enter().append('text')
@@ -850,19 +842,19 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 				 [0, -pointerHeadLength] ];
 		var pointerLine = d3.svg.line().interpolate('monotone');
 		pointer = svg.append('g')
-		    .attr('transform', 'rotate(' +config.minAngle +')')
+		    .attr('transform', 'rotate(' +config.minAngle +')');
 		pointer.append('circle').attr('class', 'circle-big')
 		    .attr('r', config.pointerWidth / 2);
 		var pg1 = pointer.append('g').data([lineData1])
-		    .attr('class', 'pointer_dark')
+		    .attr('class', 'pointer_dark');
 		var pg2 = pointer.append('g').data([lineData2])
-		    .attr('class', 'pointer_light')
+		    .attr('class', 'pointer_light');
 		pointer.append('circle').attr('class', 'circle-small')
 		    .attr('r', config.pointerWidth / 4);
 		pg1.append('path')
-		    .attr('d', pointerLine)
+		    .attr('d', pointerLine);
 		pg2.append('path')
-		    .attr('d', pointerLine)
+		    .attr('d', pointerLine);
 		
 		update(newValue === undefined ? 0 : newValue);
 	    }
@@ -885,14 +877,14 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    }
 	    that.update = update;
 	    return that;
-	};
+	}
 
 	return gaugeObj;
     };
 
     function createRaptorPopupTemplate(text) {
 	var raptor_num = Math.floor(Math.random()*2) + 1;
-	var temp =  "<div class='clearfix'><img class='pull-left raptor-img' src='assets/raptor_fade_sm" + raptor_num + ".jpg'><p>" + text + "</p></div>"
+	var temp =  "<div class='clearfix'><img class='pull-left raptor-img' src='assets/raptor_fade_sm" + raptor_num + ".jpg'><p>" + text + "</p></div>";
 	console.log(temp);
 	return temp;
     }
@@ -915,7 +907,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    var img = $(algorithmCodeHolder).append('<img class="' + algorithmCodeClass + lineNum + '" src="assets/raptor24.png" style="position: absolute; margin-left: 2px; z-index:10; top: ' + 
 						raptor_top + 'px; left: ' + raptor_left + 'px" data-toggle="popover" data-trigger="click focus" data-title="Dr.Raptor\'s Hint" data-placement="left" data-html="true" data-content="' + createRaptorPopupTemplate(text) +'"></img>');
 	});
-    }
+    };
     return _my;
 }(ALGORITHM_MODULE || {}, d3, $));
 ;/////////////////////////////////////////////////////////////////
@@ -942,11 +934,11 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 
     // alias our algorithm module
     var _my = ALGORITHM_MODULE;
-    if (_my == undefined) {
+    if (_my === undefined) {
 	throw "Algorithm module is not defined!";
     }
 
-    console.debug("executing definitions of algo.js")
+    console.debug("executing definitions of algo.js");
     
     // used for transition refactoring from default to baseline speed
     function getAnimationDuration(algoContext) {
@@ -976,30 +968,31 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	var tokens = func.toString().split("\n");
 	var LN = tokens.length;
 	this.lastRowNum = LN;
-	var result = undefined;
+	var result;
+	var i = 0;
 	var args = this.param[1].split(",");
-	for (var i=0;i < args.length; i++) {
+	for (i = 0;i < args.length; i++) {
 	    this.varname_map[$.trim(args[i])] = {"row_num": 1, "idx": i};
 	}
 
 	var var_pat = /\s*var\s+([a-zA-Z_$][0-9a-zA-Z_$]*)\s*=/;
 	var ret_pat = /^return\s*;|^return\s+.*|.*\s+return\s*;|.*\s+return\s+.*/;
 	var _found_vars = args.length;
-	for (var i=0; i < LN; i++) {
+	for (i = 0; i < LN; i++) {
 	    // direct eval uses the global context so the variable names are in global
 	    var trimmed = $.trim(tokens[i]);
 	    var strm = trimmed.substring(0,2);
-	    if (strm == "//" || strm == "/*") {
+	    if (strm === "//" || strm === "/*") {
 		continue;
 	    }
-	    var result = trimmed.match(var_pat);
-	    if (result != null) {
+	    result = trimmed.match(var_pat);
+	    if (result !== null) {
 		args += "," + result[1];
 		this.var_map[_found_vars] = {"row_num" : i+1, "name" : result[1]};
 		this.varname_map[result[1]] = {"row_num" : i+1, "idx" : _found_vars};
 		_found_vars++;
 	    }
-	    this.return_rows[i+1] = ret_pat.test(tokens[i]) || i == LN-1;
+	    this.return_rows[i+1] = ret_pat.test(tokens[i]) || i === LN-1;
 	}
 	this.found_vars = args;
 	/*
@@ -1016,7 +1009,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    setTimeout(function() {
 		$(rowToHighlightSelector).toggleClass("highlighted-row");
 	    }, startDelay);
-	    if (durationOfHighlight != undefined) {
+	    if (durationOfHighlight !== undefined) {
 		setTimeout(function() {
 		    $(rowToHighlightSelector).toggleClass("highlighted-row");
 		}, startDelay + durationOfHighlight);
@@ -1042,10 +1035,10 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 		    var param_vals = [];
 		    fun_param[1].split(",").forEach(function(p) {
 			var trimmed = $.trim(p);
-			if (trimmed == "") {
+			if (trimmed === "") {
 			    return;
 			}
-			if (selfie.varname_map[$.trim(p)].idx == undefined) {
+			if (selfie.varname_map[$.trim(p)].idx === undefined) {
 			    console.error("Your callback is looking for a variable named", p, "which isn't defined in the function", selfie.funcName);
 			}
 	    		param_vals.push(var_array[selfie.varname_map[$.trim(p)].idx]);
@@ -1077,10 +1070,10 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 		    var param_vals = [];
 		    fun_param[1].split(",").forEach(function(p) {
 			var trimmed = $.trim(p);
-			if (trimmed == "") {
+			if (trimmed === "") {
 			    return;
 			}
-			if (selfie.varname_map[$.trim(p)].idx == undefined) {
+			if (selfie.varname_map[$.trim(p)].idx === undefined) {
 			    console.error("Your callback is looking for a variable named", p, "which isn't defined in the function", selfie.funcName);
 			}
 	    		param_vals.push(var_array[selfie.varname_map[$.trim(p)].idx]);
@@ -1092,17 +1085,17 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 		    animation_duration = getAnimationDuration(selfie.AlgorithmContext);
 		}
 
-		if (animation_duration == undefined) {
+		if (animation_duration === undefined) {
 		    animation_duration = getAnimationDuration(selfie.AlgorithmContext);
 		}
 
 		var_array.forEach(function(var_elem, idx) {
-		    if (selfie.var_map[idx] == undefined) {
+		    if (selfie.var_map[idx] === undefined) {
 			return;
 		    }
 		    var rowToHighlightSelector = getRowToHighlightSelector(selfie.var_map[idx].row_num, codeContainerId);
 		    /*** add or remove dynamic debugging info **/
-		    if (var_elem == undefined) {
+		    if (var_elem === undefined) {
 			setTimeout(function() {
 			    var comment_span = d3.select(rowToHighlightSelector).select("code").select("span.com");
 			    if (comment_span.empty()) {
@@ -1126,8 +1119,8 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	};
 
 	// variables that are used in callbacks must be set here
-	this.callbacks["AlgorithmContext"] = this.AlgorithmContext;
-	this.callbacks["var_map"] = this.var_map;
+	this.callbacks.AlgorithmContext = this.AlgorithmContext;
+	this.callbacks.var_map = this.var_map;
 	this.codeContainerId = codeContainerId;
     }
     /* statics */
@@ -1137,14 +1130,14 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    return Math.round10(object, -4);
 	}
 	return object;
-    }
+    };
 
     Algorithm.paramArg = function(N) {
 	var res = "";
 	for(var i=0;i<N;i++)
 	{
 	    res+="arguments["+i+"]";
-	    if(i != N-1)
+	    if(i !== N-1)
 		res+=",";
 	}
 	return res;
@@ -1158,7 +1151,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
      */
     Algorithm.prototype.addDebugging = function(fstr) {
 	var lmp = {}, i, nfun, tokens;
-	if (typeof(fstr) != "string")
+	if (typeof(fstr) !== "string")
 	{
 	    fstr = fstr.toString();
 	}
@@ -1167,12 +1160,12 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	for (i=0;i<tokens.length;i++)
 	{
 	    // preExecute is for rows like if or while conditions that get evaluated to false
-	    if (i > 0 && $.trim(tokens[i]) != "" && $.trim(tokens[i]).indexOf("{") != 0 && $.trim(tokens[i]).indexOf("else") != 0) {
+	    if (i > 0 && $.trim(tokens[i]) !== "" && $.trim(tokens[i]).indexOf("{") !== 0 && $.trim(tokens[i]).indexOf("else") !== 0) {
 		nfun += "self.preRowExecute(" + (i+1) + ", [" + this.found_vars + "]);";
 	    }
 
    	    nfun += tokens[i];
-	    if (i < tokens.length-1 && ($.trim(tokens[i+1]).indexOf("{") != 0) && ($.trim(tokens[i+1]).indexOf("else") != 0)) { 
+	    if (i < tokens.length-1 && ($.trim(tokens[i+1]).indexOf("{") !== 0) && ($.trim(tokens[i+1]).indexOf("else") !== 0)) { 
 		// add the handle row function to every row except for the first and last
 		// this function will deal with row highlighting and var printing
 		nfun += "self.postRowExecute(" + (i+1) + ", [" + this.found_vars + "]);";
@@ -1181,30 +1174,30 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    nfun += "\n";
 	}
 	return nfun;
-    }
+    };
     /**
      * Returns the number of parameters of the original function
      */
     Algorithm.prototype.getParams = function(){
 	return this.param[1].split(",");
-    }
+    };
     /**
      * Returns the string representation of the original undecorated function
      */
     Algorithm.prototype.toString = function(){
 	return this.func.toString();
-    }
+    };
     /**
      * Returns a string representation of the decorated function. 
      * A decorated function is one that has callbacks, preExecuteRow and postExecuteRows inserted in its source code
      */
     Algorithm.prototype.getDecorated = function() {
 	return this.addDebugging(this.func);
-    }
+    };
 
     Algorithm.prototype.getAnimationQueue = function() {
 	return this.animation_queue;
-    }
+    };
 
     /**
      * Start algorithm animation
@@ -1216,7 +1209,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	this.animation_queue = []; // reset the animation queue
 	var result = this.run.apply(this, arguments);
 	return result;
-    }
+    };
 
     /** 
      * Execute the function with using animating the algorithm
@@ -1229,7 +1222,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	//preserve this for the eval inside var self
 	var self = this;
 	return eval(c);
-    }
+    };
 
     // a visualization is always limited to just one animation queue
     // this will be the animation queue of the function that you started with runCodeAndPopulateAnimationQueue
@@ -1248,12 +1241,12 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	var params = Array.prototype.slice.call(arguments);
 	params.shift();
 	return this.run.apply(this, params);
-    }
+    };
 
     Algorithm.prototype.executeInContinuousMode = function() {
 	this.runningInContMode = true;
 	this.__executeNextRow();
-    }
+    };
 
     Algorithm.prototype.executeNextRowInStepMode = function() {
 	if (this.animation_queue.length > 0) {
@@ -1266,11 +1259,11 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    this.runningInStepMode = true;
 	    this.__executeNextRow(rownum);
 	}
-    }
+    };
 
     Algorithm.prototype.isRunning = function() {
 	return this.animation_queue.length > 0;
-    }
+    };
 
     /*** __executeNextRow is shared by both step by step and continuous execution and does all the animation frame queueing
          and recursion frame shennanigans */
@@ -1283,13 +1276,13 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    var frameAlgoCtx = this.animation_queue[0].algorithmCtx;
 
 	    // only do one step in non-continuous mode
-	    if (!this.runningInContMode && rownum != prevRowNum) {
+	    if (!this.runningInContMode && rownum !== prevRowNum) {
 		return;
 	    }
 
 	    // stack frame visualization adds extra time because it takes a bit to animate
 	    var preanimation_extra_time = 0;
-	    if (rownum == 1) {
+	    if (rownum === 1) {
 		if (existsOnTheStack(codeId, this.functionStack)) {
 		    preanimation_extra_time += _my.AlgorithmUtils.visualizeNewStackFrame(codeId, frameAlgoCtx);
 		}
@@ -1304,7 +1297,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	else {
 	    var lastFunc = this.runningCodeStack.pop();
 	    this.removeAllRowHighlighting(lastFunc);
-	    if(this.resetControls != undefined) {
+	    if(this.resetControls !== undefined) {
 		this.resetControls(this.codeContainerId);
 	    }
 	    this.runningInContMode = false;
@@ -1314,7 +1307,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	function frameAnimatorGenerator(this_obj, rownum, doFrameRemoval, codeId, frameAlgoCtx, prevRowNum, animationFunction) { 
 	    return function() {
 		// this is where the animation frame is scheduled
-		if (this_obj.runningInContMode && rownum != prevRowNum) {
+		if (this_obj.runningInContMode && rownum !== prevRowNum) {
 		    var lastFunc = this_obj.runningCodeStack.pop();
 		    this_obj.removeAllRowHighlighting(lastFunc);
 		    this_obj.highlightRow(codeId, rownum, 0, undefined);
@@ -1355,7 +1348,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	function existsOnTheStack(codeId, stack) {
 	    var N = stack.length;
 	    for (var i=0;i<N;i++) {
-		if (stack[i] == codeId) return true;
+		if (stack[i] === codeId) return true;
 	    }
 	    return false;
 	}
@@ -1364,13 +1357,13 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    var N = stack.length;
 	    var cnt = 0;
 	    for (var i=0;i<N;i++) {
-		if (stack[i] == codeId) {
+		if (stack[i] === codeId) {
 		    cnt++;
 		}
 	    }
 	    return cnt > 1;
 	}
-    }
+    };
 
     function AnimationFrame(type, rowNumber, returnRows, codeContainerId, algorithmCtx, animationFunction) {
 	this.type = type;
@@ -1382,7 +1375,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     }
     AnimationFrame.prototype.isReturnRow = function() {
 	return this.returnRows[this.rowNumber];
-    }
+    };
     _my.Algorithm = Algorithm;
     return _my;
 })(ALGORITHM_MODULE, $, d3);
@@ -1393,7 +1386,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 
     // alias our algorithm module -- since we are running this code from main it must be ready
     var _my = ALGORITHM_MODULE;
-    if (_my == undefined) {
+    if (_my === undefined) {
 	throw "Algorithm module is not defined!";
     }
 
@@ -1497,7 +1490,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    var viewBox = _my.AlgorithmUtils.calcViewBox("#" + algorithmTabId + " .graphics", width, height);
 	    svg.attr("width", viewBox.width)
 		.attr("height", viewBox.height)
-		.attr("viewBox", viewBox.string)
+		.attr("viewBox", viewBox.string);
 
 	    /* the gs have an old_i which is their old order .. we move the gs to where they are
 	     * in the old order
@@ -1540,24 +1533,27 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	return function(data, key) { 
 	    var animation_duration = 4 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	    var move_up_animation_duration = (1/5) * this.AlgorithmContext.getBaselineAnimationSpeed();
-
+	    var i = 0;
 	    /* the gs have an old_i which is their old order .. we move the gs to where they are
 	     * in the old order
 	     */
 	    var gs = svgg.selectAll(".bs-gs");
 	    map_of_new_pos = {};
-	    for (var i=0;i < data.length; i++) {
+	    for (i = 0;i < data.length; i++) {
 		map_of_new_pos[data[i].old_i] = i;
 	    }
 
+	    var translator_function = function(i) {
+		return function(d) {
+		    return "translate(" + (2*w*i) + "," + (2.5*Y) + ")";
+		};
+	    };
 	    var single_iterm_anim_duration = animation_duration / data.length;
-	    for (var i=0; i<data.length; i++) {
+	    for (i = 0; i<data.length; i++) {
 		svgg.select("#bs-item-" + data[i].old_i).transition()
 		    .delay(i*single_iterm_anim_duration)
 		    .duration(single_iterm_anim_duration)
-		    .attr("transform", function(d) {
-			return "translate(" + (2*w*i) + "," + (2.5*Y) + ")";
-		    });
+		    .attr("transform", translator_function(i));
 	    }
 
 	    /*interpolating works with transforms too .. so cool -> move to new spot*/
@@ -1664,7 +1660,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 
     function initialize(forms, data) {
 	/*setup the DOM elements*/
-	var forms = forms.selectAll("input[type='text']")
+	forms.selectAll("input[type='text']")
 	    .data(data)
 	    .enter().append("input")
 	    .attr("type","text")
@@ -1703,7 +1699,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 			    data.forEach(function (v,i) { v.old_i = i; });
 			    var bs_wrapped = function(data, tf) {
 				return balgo.runWithSharedAnimationQueue(prep_algo, data, tf);
-			    }
+			    };
 			    console.log(prep_algo.runCodeAndPopulateAnimationQueue(data, tf, bs_wrapped));
 			    executionFunction();
 			}
@@ -1713,7 +1709,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    // this is a jquery object and therefore the .on function can be used
 	    // to attach multiple handlers .. they will be called in order of addition
 	    // unless one of them call e.stopImmediatePropagation
-	    dialog.on("shown.bs.modal", function() { $("#bs-find").focus(); })
+	    dialog.on("shown.bs.modal", function() { $("#bs-find").focus(); });
 	};
     }
 
@@ -1755,7 +1751,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 ;ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) {
     // alias our algorithm module -- since we are running this code from main it must be ready
     var _my = ALGORITHM_MODULE;
-    if (_my == undefined) {
+    if (_my === undefined) {
 	throw "Algorithm module is not defined!";
     }
 
@@ -1852,7 +1848,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 
 	var diagonal = d3.svg.diagonal();
 	var movers = d3.selectAll(".dsu-link-g")
-	    .data(links, function (d) { return d.source.name + "-to-" + d.target.name })
+	    .data(links, function (d) { return d.source.name + "-to-" + d.target.name; });
 	
 	movers.transition()
 	    .duration(animation_duration)
@@ -1861,10 +1857,10 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	movers.select(".dsu-link")
 	    .transition()
 	    .duration(animation_duration)
-	    .attr("d", diagonal)
+	    .attr("d", diagonal);
 
 	var svgLinks = svg.selectAll(".dsu-link")
-	    .data(links, function (d) { return d.source.name + "-to-" + d.target.name })
+	    .data(links, function (d) { return d.source.name + "-to-" + d.target.name; })
 	    .enter()
 	    .append("g")
 	    .attr("class", "dsu-link-g")
@@ -1976,17 +1972,17 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    d3.select("#from-" + data[ptr].root + "-to-" + ptr).classed("highlight-elem", true);
 	}, animationDuration);
 	return animationDuration;
-    }
+    };
     cbsFind[4] = function(ptr, data) {
 	var animationDuration = this.AlgorithmContext.getBaselineAnimationSpeed();
 	setTimeout(function() {
 	    d3.select("#dsu-node-" + ptr).classed("highlight-elem", true);
 	}, animationDuration);
 	return animationDuration;
-    }
+    };
     cbsUnion[3] = function(r1,r2,a,b) {
 	return this.AlgorithmContext.getBaselineAnimationSpeed();
-    }
+    };
     cbsUnion[4] = function(r1, r2) {
 	d3.select("#dsu-node-" + r1).select(".dsu-node-rank").transition()
 	    .attr("dx","-30")
@@ -1997,15 +1993,15 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    .attr("dy","60")
 	    .style("font-size", "26");
 	return this.AlgorithmContext.getBaselineAnimationSpeed();
-    }
+    };
     cbsUnion[6] = function(r1, r2) {
 	d3.select("#dsu-node-" + r2).select(".dsu-node-rank").remove();
 	return cleanup(r1, r2, this.AlgorithmContext);
-    }
+    };
     cbsUnion[9] = function(r2, r1) {
 	d3.select("#dsu-node-" + r1).select(".dsu-node-rank").remove();
 	return cleanup(r2, r1, this.AlgorithmContext);
-    }
+    };
 
     cbsUnion[5] = cbsUnion[8] = cbsUnion[12] = function(data, r2, r1, prob) {
 
@@ -2049,10 +2045,10 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	}, animation_duration);
 
 	return animation_duration + transition_duration;
-    }
+    };
     cbsUnion[14] = function(r2, r1, data) {
 	return cleanup(r2, r1, this.AlgorithmContext);
-    }
+    };
     cbsUnion[15] = cbsUnion[19] = function(r2, r1, data) {
 	var a = r1, b = r2;
 	if (data[r2].rank > data[r1].rank) {
@@ -2062,15 +2058,15 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	d3.select("#dsu-node-" + a).select(".dsu-node-rank").transition().text("Rank = " + data[a].rank);
 	d3.select("#dsu-node-" + b).select(".dsu-node-rank").remove();
 	return this.AlgorithmContext.getBaselineAnimationSpeed();
-    }
+    };
     cbsUnion[18] = function(r1, r2, data) {
 	return cleanup(r1, r2, this.AlgorithmContext);
-    }
+    };
     cbsUnion[22] = function(r1, r2, data) {
 	d3.selectAll(".dsu-link").classed("highlight-elem", false);
 	d3.selectAll(".dsu-node").classed("highlight-elem", false);
 	return this.AlgorithmContext.getBaselineAnimationSpeed();
-    }
+    };
     // this object determines the behaviour of the algorighm code
     var algorithmContext = _my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj);
     var dsuFind = new _my.Algorithm(find, cbsFind, "dsu-find-code", algorithmContext);
@@ -2120,7 +2116,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 				    var selected2 = selected[1].data.name;
 				    var findInClosure = function(node, data) {
 					return dsuFind.runWithSharedAnimationQueue(dsuUnion, node, data);
-				    }
+				    };
 				    dsuUnion.runCodeAndPopulateAnimationQueue(selected1, selected2, data, findInClosure);
 				    selected = [];
 				    // remove the click function
@@ -2128,14 +2124,14 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 				    executionFunction();
 				}, 200);
 			    }
-			};
+			}
 		    }
 		}
 	    }
 	};
 
 	bootbox.dialog(dialog_obj);
-    };
+    }
     _my.AlgorithmUtils.attachAlgoToControls(dsuUnion, algorithmTabId, kickOff);
 
     /*calls google-prettify to make the code look nice
@@ -2155,7 +2151,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 
     // alias our algorithm module -- since we are running this code from main it must be ready
     var _my = ALGORITHM_MODULE;
-    if (_my == undefined) {
+    if (_my === undefined) {
 	throw "Algorithm module is not defined!";
     }
 
@@ -2178,7 +2174,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 
     var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName,  {priority:"fenwick"}, [7, 5], "You may modify the input array here:");
     var fen_container = layout.customControlsLayout.append("div").attr("class", "clearfix").style("width", "100%");
-    var float_container = fen_container.append("div").attr("class", "fen-float-container pull-left")
+    var float_container = fen_container.append("div").attr("class", "fen-float-container pull-left");
     var fen_labels = float_container.append("div").attr("class", "fen-labels");
     var fen_forms = float_container.append("div").attr("class", "fen-forms");
     var fenIndexData = fen_container.append("div").attr("class", "fen-index-data");
@@ -2264,8 +2260,9 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     var log2N = Math.ceil(Math.log2(N));
     function bitPattern(num) {
 	var res = [];
+	var i = 0;
 	if (num > 0) {
-	    for (var i = 0; i <= log2N; i++) {
+	    for (i = 0; i <= log2N; i++) {
 		res.push(num % 2);
 		num = num >> 1;
 	    }
@@ -2273,7 +2270,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	else {
 	    var carry = 1;
 	    var nabs = Math.abs(num);
-	    for (var i = 0; i <= log2N; i++) {
+	    for (i = 0; i <= log2N; i++) {
 		var e = 1 - num % 2;
 		res.push((e + carry)%2);
 		if (e + carry == 1) {
@@ -2296,7 +2293,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-	svg.append("text").attr("class", "fen-text").text("Fenwick Tree:")
+	svg.append("text").attr("class", "fen-text").text("Fenwick Tree:");
 	var highest2Pow = 1 << log2N;
 	var node_size = [471, 322];
 
@@ -2367,9 +2364,9 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     }
     function arrowAnimate(old_idx, i) {
 	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
-	if (i == 0 || old_idx == 0 || i > N || old_idx > N) return this.AlgorithmContext.getBaselineAnimationSpeed(); 
+	if (i === 0 || old_idx === 0 || i > N || old_idx > N) return this.AlgorithmContext.getBaselineAnimationSpeed();
 	var arrow_gen = _my.vislib.interpolatableDiagonal("linear");
-	var data = {"source": svg.select("#fen-node-" + old_idx).datum(), "target" : svg.select("#fen-node-" + i).datum()}
+	var data = {"source": svg.select("#fen-node-" + old_idx).datum(), "target" : svg.select("#fen-node-" + i).datum()};
 	var path = svg.insert("path", "g").attr("class", "fen-arrow").attr("d", arrow_gen(data));
 	var arrow = _my.vislib.animateGrowingArrow(svg_data.arrow_holder, path, animation_duration, 0, false, 1).arrow;
 	arrow.attr("class", "fen-arrow-head");
@@ -2396,7 +2393,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 
     sum_callbacks[1] = function() {
 	removeFenResultMessage(fenIndexData);
-    }
+    };
 
     sum_callbacks[5] = {"pre": function(start, end, sum) {
 	var animation_duration = this.AlgorithmContext.getBaselineAnimationSpeed();
@@ -2407,7 +2404,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	par.append("span").text(" is equal to ");
 	par.append("span").attr("class", "fen-sum-result-num").text(sum);
 	fadeIn(par, animation_duration);
-    }}
+    }};
 
     read_callbacks[1] = function(idx) {
 	var animation_duration = this.AlgorithmContext.getBaselineAnimationSpeed();
@@ -2416,7 +2413,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	dynamicData.summaryField.select("span:last-child").text(0);
 	fadeIn(dynamicData.currentField, 1.2 * animation_duration).select("span:last-child").text(bitPattern(idx));
 	return 1.2 * animation_duration;
-    }
+    };
     update_callbacks[1] = function(idx, value) {
 	var animation_duration = this.AlgorithmContext.getBaselineAnimationSpeed();
 	removeFenResultMessage(fenIndexData);
@@ -2425,23 +2422,23 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	dynamicData.summaryField.select("span:last-child").text(value);
 	fadeIn(dynamicData.currentField, 1.2 * animation_duration).select("span:last-child").text(bitPattern(idx));
 	return 1.2 * animation_duration;
-    }
+    };
     update_callbacks[4] = function(i) {
 	var animation_duration = (1/2) * this.AlgorithmContext.getBaselineAnimationSpeed();
 	fadeIn(dynamicData.minusCurrentField, animation_duration).select("span:last-child").text(bitPattern(-i));
 	fadeIn(dynamicData.andCurrentField, 2 * animation_duration).select("span:last-child").text(bitPattern(i & -i));
 	return animation_duration * 2;
-    }
+    };
     read_callbacks[3] = update_callbacks[2] = function(i) {
 	dynamicData.currentField.select("span:last-child").text(bitPattern(i));
 	highlighting(i);
-    }
+    };
     read_callbacks[5] = function(i) {
 	var animation_duration = (1/2) * this.AlgorithmContext.getBaselineAnimationSpeed();
 	fadeIn(dynamicData.minusCurrentField, animation_duration).select("span:last-child").text(bitPattern(-i));
 	fadeIn(dynamicData.andCurrentField, 2 * animation_duration).select("span:last-child").text(bitPattern(i & -i));
 	return animation_duration * 2;
-    }
+    };
     read_callbacks[6] = function(i, lowest_set_bit) {
 	var animation_duration = (1/2) * this.AlgorithmContext.getBaselineAnimationSpeed();
 	fadeIn(dynamicData.nextField, animation_duration).select("span:last-child").text(bitPattern(i));
@@ -2452,7 +2449,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	dynamicData.currentField.transition()
 	    .delay(duration).duration(animation_duration).select("span:last-child").text(bitPattern(i));
 	return duration + animation_duration;
-    }
+    };
     update_callbacks[3] = function(tree, i) {
 	var animation_duration = this.AlgorithmContext.getBaselineAnimationSpeed();
 	var node = svg.select("#fen-node-" + i).select(".fen-sum");
@@ -2461,7 +2458,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    node.classed("fen-text-highlight", false);
 	}, animation_duration);
 	return animation_duration;
-    }
+    };
     update_callbacks[5] = function(i, lowest_set_bit) {
 	var animation_duration = (1/2) * this.AlgorithmContext.getBaselineAnimationSpeed();
 	fadeIn(dynamicData.nextField, animation_duration).select("span:last-child").text(bitPattern(i));
@@ -2472,7 +2469,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	dynamicData.currentField.transition()
 	    .delay(duration).duration(animation_duration).select("span:last-child").text(bitPattern(i));
 	return duration + animation_duration;
-    }
+    };
 
     function cleanup() {
 	d3.selectAll(".fen-arrow-head").remove();
@@ -2497,7 +2494,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 
     var wrapped_read = function(idx, tree) {
 	return fenwick_read_algo.runWithSharedAnimationQueue(fenwick_sum, idx, tree);
-    }
+    };
     
     function initOnIndexSelection() {
 	var clicked = 0;
@@ -2519,7 +2516,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    clicked = (clicked + 1) % 2;
 	    
 	});
-    };
+    }
     initOnIndexSelection();
 
     function initOnValueChanges() {
@@ -2556,8 +2553,8 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 		    }
 		}
 	    });
-	})
-    };
+	});
+    }
     reinitButtons();
     _my.AlgorithmUtils.appendCode(algorithmTabId, "fen-sum-code", fenwick_sum);
     _my.AlgorithmUtils.appendCode(algorithmTabId, "fen-read-code", fenwick_read_algo);
@@ -2568,7 +2565,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 ;ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) {
     // alias our algorithm module -- since we are running this code from main it must be ready
     var _my = ALGORITHM_MODULE;
-    if (_my == undefined) {
+    if (_my === undefined) {
 	throw "Algorithm module is not defined!";
     }
     var algorithm1TabId = "fft-tab-tran";
@@ -2606,13 +2603,13 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    .attr("type","text")
 	    .attr("class",inputBoxClass)
 	    .attr("maxlength", 2)
-	    .attr("value", function(d) { return d; })
+	    .attr("value", function(d) { return d; });
 	var labels = forms_spans.append("span")
-	    .text(function(d, i) { return i < poly.length-1 ? "x" : ""});
+	    .text(function(d, i) { return i < poly.length-1 ? "x" : "";});
 	forms_spans.append("sup")
-	    .text(function(d, i) { return i < poly.length-1 ? "" + (poly.length-i-1) : ""});
+	    .text(function(d, i) { return i < poly.length-1 ? "" + (poly.length-i-1) : "";});
 	forms_spans.append("span")
-	    .text(function(d, i) { return i < poly.length-1 ? " +" : ""});
+	    .text(function(d, i) { return i < poly.length-1 ? " +" : "";});
     }
     /*******************************/
     /*      Complex number type    */
@@ -2631,26 +2628,26 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    angle += 2*Math.PI;
 	}
 	return angle;
-    }
+    };
     Complex.equals = function(c1, c2) {
 	return (Math.abs(c1.real - c2.real) < 1e-6 && Math.abs(c1.imaginary - c2.imaginary) < 1e-6);
-    }
+    };
     Complex.create.prototype.toString = function() {
 	function addI(val) {
-	    if (val == 1) {
+	    if (val === 1) {
 		return "i";
 	    }
-	    if (val == -1) {
+	    if (val === -1) {
 		return "-i";
 	    }
 	    return val + "i";
 	}
 	var ri = Math.round10(this.imaginary, -2);
 	var rr = Math.round10(this.real, -2);
-	if (ri == 0) {
+	if (ri === 0) {
 	    return "" + rr;
 	}
-	if (rr == 0) {
+	if (rr === 0) {
 	    return "" + addI(ri);
 	}
 	return "" + rr + " " + (this.imaginary >= 0 ? "+ " : "- ") + addI(Math.abs(ri));
@@ -2658,33 +2655,33 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     Complex.ZERO = Complex.create(0,0);
 
     Complex.add = function add(a, b) {
-	if (a == undefined && b == undefined) {
+	if (a === undefined && b === undefined) {
 	    return Complex.create(0,0);
 	}
-	if (a == undefined) {
+	if (a === undefined) {
 	    return b;
 	}
-	if (b == undefined) {
+	if (b === undefined) {
 	    return a;
 	}
     	return Complex.create(a.real + b.real,a.imaginary + b.imaginary);
     };
 
     Complex.sub = function sub(a, b) {
-	if (a == undefined && b == undefined) {
+	if (a === undefined && b === undefined) {
 	    return Complex.create(0,0);
 	}
-	if (a == undefined) {
+	if (a === undefined) {
 	    return b;
 	}
-	if (b == undefined) {
+	if (b === undefined) {
 	    return a;
 	}
 	return Complex.create(a.real - b.real, a.imaginary - b.imaginary);
     };
 
     Complex.mult = function mult(a, b) {
-	if (a == undefined || b == undefined) {
+	if (a === undefined || b === undefined) {
 	    return Complex.create(0,0);
 	}
 	return Complex.create(a.real*b.real - a.imaginary*b.imaginary, a.real*b.imaginary + a.imaginary*b.real);
@@ -2698,7 +2695,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
      **    Functions     ***
      **********************/
     function FFT_transform(poly, start, N, helper_arr, Complex) {
-    	if (N == 1) {
+    	if (N === 1) {
 	    return;
     	}
 	var nearest2Pow = 1 << Math.ceil(Math.log2(N));
@@ -2767,15 +2764,15 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     var width = 900;
     var svg_fft_elem = d3.select("#" + algorithm1TabId + " .graphics").append("svg")
 	.attr("width",  width + "px")
-	.attr("height", "850px")
+	.attr("height", "850px");
     var fft_group = svg_fft_elem.append("g")
-	.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     var svg_multiply_elem = d3.select("#" + algorithm2TabId + " .graphics").append("svg")
 	.attr("width",  1.42*width + "px")
-	.attr("height", "620px")
+	.attr("height", "620px");
     var multiply_group = svg_multiply_elem.append("g")
-	.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     /**********************
      ** Wire up the Algos *
@@ -2790,7 +2787,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     function populate(poly, boxClass) {
 	d3.selectAll("." + boxClass).each(function(d, i) {
 	    var value = +this.value;
-	    poly[poly.length - i - 1] = value != 0 ? Complex.create(value,0) : Complex.ZERO;
+	    poly[poly.length - i - 1] = value !== 0 ? Complex.create(value,0) : Complex.ZERO;
 	});
     }
 
@@ -2807,7 +2804,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	var data = [];
 	for (var i=1;i<=node_num;i++) {
 	    data.push({id: i, label: 0, node_width: node_size});    
-	};
+	}
 	var lbl_cnt = 2;
 	function preorder_label(node) {
 	    if (node > data.length) return;
@@ -2815,7 +2812,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    lbl_cnt++;
 	    preorder_label(node*2);
 	    preorder_label(node*2 + 1);
-	};
+	}
 	preorder_label(1);
 	data.splice(0,0,{id: -1, label:0}, {id: 0, label:1});
 	var tree = d3.layout.tree()
@@ -2827,16 +2824,16 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    .nodeSize([node_size, 4*node_size])
 	    //.size([500, 500])
 	    .separation(function(a, b) {
-		return (a.parent == b.parent ? ((a.depth == last_level) ? 1.5 : 6) : 2);
-	    })
+		return (a.parent === b.parent ? ((a.depth === last_level) ? 1.5 : 6) : 2);
+	    });
 	var link_path_gen = (inverted === true) ? _my.vislib.interpolatableDiagonal("linear").inverted() : _my.vislib.interpolatableDiagonal("linear");
-	var nodes = tree.nodes({v: data[0]})
+	var nodes = tree.nodes({v: data[0]});
 	group.selectAll(".fft-link")
 	    .data(tree.links(nodes))
 	    .enter()
 	    .append("path")
 	    .attr("class", function(d) {return "fft-link " + "fft-link-to" + link_path_gen.target(d).v.label; })
-	    .attr("d", link_path_gen)
+	    .attr("d", link_path_gen);
 	var node_gs = 
 	    group.selectAll(".fft-node")
 	    .data(nodes)
@@ -2844,7 +2841,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    .append("g")
 	    .attr("class", "fft-node")
 	    .attr("id", function(d) { return "fft-node-num" + d.v.label; })
-	    .attr("transform", function(d) { return "translate(" + d.x + " " + d.y + ")";})
+	    .attr("transform", function(d) { return "translate(" + d.x + " " + d.y + ")";});
 	node_gs.append("circle").attr("class", "fft-node-circle").attr("r", node_size / 2);
     }// end of prepareLayout
 
@@ -2869,9 +2866,9 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    .append("tspan")
 	    .attr("class", function(d) { return "fft-coef-" + d.key;})
 	    .attr("style", (invisible === true) ? "visibility:hidden" : "visibility:visible")
-	    .text(function(d){return d.val})
+	    .text(function(d){return d.val;})
 	    .append("tspan")
-	    .attr("style", function(d, i) { return i == elems.length-1 ? "display:none" : "display:inline"; })
+	    .attr("style", function(d, i) { return i === elems.length-1 ? "display:none" : "display:inline"; })
 	    .text(",");
 
 	if (invert === true) {
@@ -2897,7 +2894,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    if (sin_zeroes === true && Complex.equals(poly[i], Complex.ZERO)) { 
 		continue;
 	    }
-	    elems.push({"value": poly[i], "real_sign" : Math.sign(poly[i].real), "key": i, "has_img" : (Math.round10(poly[i].imaginary, -2) != 0), "f_non_z" : f_non_zero});
+	    elems.push({"value": poly[i], "real_sign" : Math.sign(poly[i].real), "key": i, "has_img" : (Math.round10(poly[i].imaginary, -2) !== 0), "f_non_z" : f_non_zero});
 	    f_non_zero = false;
 	}
 	function signString(elem) {
@@ -2915,16 +2912,16 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    .data(elems, function(d) { return d.key; })
 	    .enter()
 	    .append("tspan")
-	    .attr("id", function(d) { return "fft-tspan" + d.key})
+	    .attr("id", function(d) { return "fft-tspan" + d.key;})
 	    .attr("class", "fft-poly")
-	    .text(function(d) { return signString(d, i) + wrapComplex(d) + (d.key == 0 ? "" : "x"); });
+	    .text(function(d) { return signString(d, i) + wrapComplex(d) + (d.key === 0 ? "" : "x"); });
 	textFields.filter(function(d) { return d.key >= 2; })
 	    .attr("class", "fft-poly fft-has-super")
 	    .append("tspan")
 	    .attr("class", "fft-super")
 	    .attr("font-size", 15)
 	    .attr("dy", -15)
-	    .text(function(d) { return d.key < 2 ? " " : d.key; })
+	    .text(function(d) { return d.key < 2 ? " " : d.key; });
 	//the dy is sticky and moves everything else up so we add another dy=20 to move down
 	text.selectAll(".fft-has-super + tspan").attr("dy", 15);
 
@@ -2956,13 +2953,13 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 
 	var radial = d3.svg.arc().innerRadius(radius).outerRadius(radius)
 	    .endAngle(function(d, i) { return data[(i+1) % data.length].angle; })
-	    .startAngle(function(d, i) { return data[i].angle; })
+	    .startAngle(function(d, i) { return data[i].angle; });
 
 	// this arc generator is only used to compute a point on the circle using arc.centroid so that we
 	// can use this point to move around the circle
 	var total_circle = d3.svg.arc().innerRadius(radius).outerRadius(radius)
 	    .endAngle(function(d) { return 7*Math.PI/2 - 0.001; })
-	    .startAngle(function(d) { return 3*Math.PI/2; })
+	    .startAngle(function(d) { return 3*Math.PI/2; });
 
 	var point_on_crc = total_circle.centroid(data[0], 0);
 	var center_of_crc = [point_on_crc[0] - total_circle.outerRadius()(), point_on_crc[1]];
@@ -2971,18 +2968,18 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    .source(function() {
 		return {"x": center_of_crc[0], "y": center_of_crc[1]}; })
 	    .target(function() {
-		return {"x": point_on_crc[0], "y": point_on_crc[1]}; })
+		return {"x": point_on_crc[0], "y": point_on_crc[1]}; });
 	
     
 	  var path = group.selectAll(".arc").data(data).enter().append("path").attr("d", radial).each(function(d, i) {
 	      // the stroke-dasharray trick to animate a line by decreasing the gap between in the stroke dashes
 	      _my.vislib.animatePath(d3.select(this), duration, (duration / 2) * i, false, 1);
 	  })
-	      .attr("class", function(d, i) { return "root-of-unity-circle fft-root-of-unity-path-to-" + i});
+	      .attr("class", function(d, i) { return "root-of-unity-circle fft-root-of-unity-path-to-" + i;});
 
 	// our diagonal inside the circle that points at the roots of unity
 	var diagonal = group.append("path").attr("d", d1(1)).attr("class","root-of-unity-arrow").attr("id", "unity-arrow")
-	    .style("display", "none")
+	    .style("display", "none");
 
 	var scale_factor = radius / 80;
 	var unit_groups = group.selectAll("fft-unit-circle-roots")
@@ -2991,7 +2988,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    .append("g")
 	    .attr("class", "fft-unit-circle-roots")
 	    .attr("id", function(d, i) { return "fft-root-of-unity" + i; })
-	    .style("display", "none")
+	    .style("display", "none");
 	
         unit_groups.append("circle")
 	    .attr("class", "fft-root")
@@ -3004,14 +3001,14 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    .attr("dy", (8 * scale_factor) + "px")
 	    .attr("font-size", "1.5em")
 	    .text(function(d) { return d.text; })
-	    .attr("transform", function(d) { return "rotate(" + -radToDeg(d.angle - Math.PI/2) + ")"; })
+	    .attr("transform", function(d) { return "rotate(" + -radToDeg(d.angle - Math.PI/2) + ")"; });
 	var text = unit_groups.append("text")
 	    .attr("class", "fft-text")
 	    .attr("dx", (1 * scale_factor) + "em")
 	    .attr("dy", (8 * scale_factor) + "px")
 	    .attr("font-size", "1.5em")
 	    .text(function(d) { return d.text; })
-	    .attr("transform", function(d) { return "rotate(" + -radToDeg(d.angle - Math.PI/2) + ")"; })
+	    .attr("transform", function(d) { return "rotate(" + -radToDeg(d.angle - Math.PI/2) + ")"; });
 
 	unit_groups.transition()
 	    .transition()
@@ -3050,8 +3047,9 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 
     ev_calls[1] = function(poly, start, N) {
 	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
+	var top_down_tree;
 	recursion_depth++;
-	if (recursion_depth == 1) {
+	if (recursion_depth === 1) {
 	    current_id = 1;
 	    var nearest2Pow = 1 << Math.ceil(Math.log2(N));
 	    fft_group.select("#fft-poly-tree").remove();
@@ -3059,12 +3057,12 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    prepareLayoutForPolys(nearest2Pow, 50, fft_group, "fft-poly-tree", tree_x_offset, tree1_y_offset);
 	    prepareLayoutForPolys(nearest2Pow, 50, fft_group, "fft-poly-tree-upside-down", 0, 0, true);
 	    d3.select("#fft-poly-tree-upside-down").attr("transform", "translate(" + tree_x_offset + ", " + tree2_y_offset+") scale(-1,1) rotate(180)");
-	    var top_down_tree = d3.select("#fft-poly-tree");
+	    top_down_tree = d3.select("#fft-poly-tree");
 	    drawPoly(poly.slice(start, start + N), top_down_tree.select("#fft-node-num" + 0), true);
 	}
 	else {
 	    current_id++;
-	    var top_down_tree = d3.select("#fft-poly-tree");
+	    top_down_tree = d3.select("#fft-poly-tree");
 	    var elem_to_draw_into = top_down_tree.select("#fft-node-num" + current_id);
 	    var transition = _my.vislib.animateGrowingArrow(top_down_tree, top_down_tree.selectAll(".fft-link-to" + current_id), animation_duration, 0, false, 0.7).transition;
 	    transition.each("end", function() {
@@ -3084,13 +3082,14 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	});
 	drawLayerLabel(fft_group, N, recursion_depth, 2.5, elem_to_draw_into.datum().y + tree1_y_offset);
 	return animation_duration;
-    }
+    };
     ev_calls[14] = { "pre" : function(poly, start, N) {
 	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
-	if (recursion_depth == 1) {
+	var top_down_tree, elem_to_draw_into;
+	if (recursion_depth === 1) {
 	    current_id++;
-	    var top_down_tree = d3.select("#fft-poly-tree");
-	    var elem_to_draw_into = top_down_tree.select("#fft-node-num" + current_id);
+	    top_down_tree = d3.select("#fft-poly-tree");
+	    elem_to_draw_into = top_down_tree.select("#fft-node-num" + current_id);
 	    var transition = _my.vislib.animateGrowingArrow(top_down_tree, top_down_tree.selectAll(".fft-link-to" + current_id), animation_duration, 0, false, 0.7).transition;
 	    transition.each("end", function() {
 		drawCoefs(poly.slice(start, start + N), elem_to_draw_into, false);
@@ -3101,8 +3100,8 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    drawLayerLabel(fft_group, N, recursion_depth, 2.5, elem_to_draw_into.datum().y + tree1_y_offset);
 	}
 	else {
-	    var top_down_tree = d3.select("#fft-poly-tree");
-	    var elem_to_draw_into = top_down_tree.select("#fft-node-num" + current_id);
+	    top_down_tree = d3.select("#fft-poly-tree");
+	    elem_to_draw_into = top_down_tree.select("#fft-node-num" + current_id);
 	    drawCoefs(poly.slice(start, start + N), elem_to_draw_into, true);
 	}
 	return 1.2 * animation_duration;
@@ -3110,16 +3109,16 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     ev_calls[16] = function(poly, start, i, x, half_N) {
 	var animation_duration = (4/5) * this.AlgorithmContext.getBaselineAnimationSpeed();
 	var top_down_tree = d3.select("#fft-poly-tree");
-	var elem_to_draw_into = top_down_tree.select("#fft-node-num" + current_id)
+	var elem_to_draw_into = top_down_tree.select("#fft-node-num" + current_id);
 	var visible_coefs = elem_to_draw_into.select(".fft-coef-text-false");
 	var invisible_coefs = elem_to_draw_into.select(".fft-coef-text-true");
 	invisible_coefs.select(".fft-coef-" + i).text("" + poly[x] + ",").style("visibility", "visible");
 
-	var ci = visible_coefs.select(".fft-coef-" + (x - start)).classed("fft-coefs-highlight", true)
-	var cf = invisible_coefs.select(".fft-coef-" + i).classed("fft-coefs-highlight", true)
+	var ci = visible_coefs.select(".fft-coef-" + (x - start)).classed("fft-coefs-highlight", true);
+	var cf = invisible_coefs.select(".fft-coef-" + i).classed("fft-coefs-highlight", true);
 	setTimeout(function() {
-	    ci.classed("fft-coefs-highlight", false)
-	    cf.classed("fft-coefs-highlight", false)
+	    ci.classed("fft-coefs-highlight", false);
+	    cf.classed("fft-coefs-highlight", false);
 	}, animation_duration);
 	return animation_duration;
     };
@@ -3132,11 +3131,11 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	invisible_coefs.select(".fft-coef-" + (i + half_N)).text("" + poly[x+1] + ((i + half_N < N-1) ? "," : ""))
 	    .style("visibility", "visible");
 
-	var ci = visible_coefs.select(".fft-coef-" + (x+1-start)).classed("fft-coefs-highlight", true)
-	var cf = invisible_coefs.select(".fft-coef-" + (i + half_N)).classed("fft-coefs-highlight", true)
+	var ci = visible_coefs.select(".fft-coef-" + (x+1-start)).classed("fft-coefs-highlight", true);
+	var cf = invisible_coefs.select(".fft-coef-" + (i + half_N)).classed("fft-coefs-highlight", true);
 	setTimeout(function() {
-	    ci.classed("fft-coefs-highlight", false)
-	    cf.classed("fft-coefs-highlight", false)
+	    ci.classed("fft-coefs-highlight", false);
+	    cf.classed("fft-coefs-highlight", false);
 	}, animation_duration);
 	return animation_duration;
     };
@@ -3150,7 +3149,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 
 	var transition = _my.vislib.animateGrowingArrows(down_top_tree, down_top_tree.selectAll(".fft-link-to" + our_id), animation_duration, 0, false, 0.7).transition;
 	transition.each("end", function() {
-	    drawCoefs(poly.slice(start, start + N), elem_to_draw_into, false, true)
+	    drawCoefs(poly.slice(start, start + N), elem_to_draw_into, false, true);
 	    drawCoefs(poly.slice(start, start + N), elem_to_draw_into, true, true);
 	});
 	return 1.2 * animation_duration;
@@ -3177,14 +3176,14 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	invisible_coefs.select(".fft-coef-" + k).text(equa + ",")
 	    .style("visibility", "visible");
 
-	var ci1 = visible_coefs.select(".fft-coef-" + (k)).classed("fft-coefs-highlight", true)
-	var ci2 = visible_coefs.select(".fft-coef-" + (k + half_N)).classed("fft-coefs-highlight", true)
-	var cf = invisible_coefs.select(".fft-coef-" + (k)).classed("fft-coefs-highlight", true)
+	var ci1 = visible_coefs.select(".fft-coef-" + (k)).classed("fft-coefs-highlight", true);
+	var ci2 = visible_coefs.select(".fft-coef-" + (k + half_N)).classed("fft-coefs-highlight", true);
+	var cf = invisible_coefs.select(".fft-coef-" + (k)).classed("fft-coefs-highlight", true);
 	var drawing = drawArrowFromCircle(elem_to_draw_into, lvl, k, animation_duration);
 	setTimeout(function() {
-	    ci1.classed("fft-coefs-highlight", false)
-	    ci2.classed("fft-coefs-highlight", false)
-	    cf.classed("fft-coefs-highlight", false)
+	    ci1.classed("fft-coefs-highlight", false);
+	    ci2.classed("fft-coefs-highlight", false);
+	    cf.classed("fft-coefs-highlight", false);
 	    cf.text("" + helper_arr[k] + ",");
 	    drawing.circle.remove();
 	    drawing.path.remove();
@@ -3201,14 +3200,14 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	var comma = ((k + half_N < N-1) ? "," : "");
 	invisible_coefs.select(".fft-coef-" + (k + half_N)).text(equa + comma)
 	    .style("visibility", "visible");
-	var ci1 = visible_coefs.select(".fft-coef-" + (k)).classed("fft-coefs-highlight", true)
-	var ci2 = visible_coefs.select(".fft-coef-" + (k + half_N)).classed("fft-coefs-highlight", true)
-	var cf = invisible_coefs.select(".fft-coef-" + (k + half_N)).classed("fft-coefs-highlight", true)
+	var ci1 = visible_coefs.select(".fft-coef-" + (k)).classed("fft-coefs-highlight", true);
+	var ci2 = visible_coefs.select(".fft-coef-" + (k + half_N)).classed("fft-coefs-highlight", true);
+	var cf = invisible_coefs.select(".fft-coef-" + (k + half_N)).classed("fft-coefs-highlight", true);
 	var drawing = drawArrowFromCircle(elem_to_draw_into, lvl, k + half_N, animation_duration);
 	setTimeout(function() {
-	    ci1.classed("fft-coefs-highlight", false)
-	    ci2.classed("fft-coefs-highlight", false)
-	    cf.classed("fft-coefs-highlight", false)
+	    ci1.classed("fft-coefs-highlight", false);
+	    ci2.classed("fft-coefs-highlight", false);
+	    cf.classed("fft-coefs-highlight", false);
 	    cf.text("" + helper_arr[k + half_N] + comma);
 	    drawing.circle.remove();
 	    drawing.path.remove();
@@ -3218,7 +3217,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     ev_calls[33] = ev_calls[3] = { 
 	"pre": function(poly, N) { 
 	    recursion_depth--;
-	    if (recursion_depth == 0) {
+	    if (recursion_depth === 0) {
 		var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
 		var lvl = Math.log2(N);
 		var down_top_tree = d3.select("#fft-poly-tree-upside-down");
@@ -3241,7 +3240,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 
     function drawArrowFromCircle(elem_to_draw_into, lvl, k, animation_duration) {
 	var target_bound_rect = elem_to_draw_into.datum();
-	var root_unity = fft_group.select("#fft-circle-lvl" + lvl + " #fft-root-of-unity" + k)
+	var root_unity = fft_group.select("#fft-circle-lvl" + lvl + " #fft-root-of-unity" + k);
 	var text_root_traned = fft_group.select("#fft-circle-lvl" + lvl + " .fft-root-of-unity-path-to-" + k).node().getPointAtLength(0);
 	var text_root_unity_bound = {x:450 + text_root_traned.x,y: elem_to_draw_into.datum().y - text_root_traned.y};
 	var highlight_circ = root_unity.insert("circle", "circle").attr("class", "fft-highlight-circle").attr("r", "40");
@@ -3274,7 +3273,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	cleanup();
 	var sharedCalc = function(idx, N, Complex) {
 	    return calc.runWithSharedAnimationQueue(ev, idx, N, Complex);
-	}
+	};
 	var ComplexClone = _my.AlgorithmUtils.clone(Complex);
 	ComplexClone.calc_unity = sharedCalc;
 	var p = poly_ev.slice();
@@ -3282,7 +3281,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	console.log("After fft transform", "" + p);
 	
 	executionFunction();
-    };
+    }
 
     function prepareMultiplyLayout(N, node_size, fft_group, group_name, left_margin, top_margin) {
 	var node_num = 2*N - 1;
@@ -3303,8 +3302,8 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    })
 	    .nodeSize([node_width_coef*node_size, 4*node_size])
 	    .separation(function(a, b) {
-		return (a.parent == b.parent ? ((a.depth == last_level) ? 1.5 : 8) : 2);
-	    })
+		return (a.parent === b.parent ? ((a.depth === last_level) ? 1.5 : 8) : 2);
+	    });
 	var link_path_gen = _my.vislib.interpolatableDiagonal("linear").inverted();
 	var nodes = tree.nodes(data[0]);
 	group.selectAll(".fft-link")
@@ -3312,7 +3311,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    .enter()
 	    .append("path")
 	    .attr("class", function(d) {return "fft-link " + "fft-link-to" + link_path_gen.target(d).v; })
-	    .attr("d", link_path_gen)
+	    .attr("d", link_path_gen);
 	var node_gs = 
 	    group.selectAll(".fft-node")
 	    .data(nodes)
@@ -3320,7 +3319,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    .append("g")
 	    .attr("class", "fft-node")
 	    .attr("id", function(d) { return "fft-node-num" + d.v; })
-	    .attr("transform", function(d) { return "translate(" + d.x + " " + d.y + ")";})
+	    .attr("transform", function(d) { return "translate(" + d.x + " " + d.y + ")";});
 	node_gs.append("circle").attr("class", "fft-node-circle").attr("r", node_size / 2);
     }// end of prepareMultiplyLayout
     function animateNodeMultDrawing(node_id, draw_function, polynom, third_argument_bool_value, algo_ctx) {
@@ -3347,7 +3346,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	drawPoly(p, nodea, true, true);
 	var nodeb = mult_tree.select("#fft-node-num8");
 	drawPoly(q, nodeb, true, true);
-    }
+    };
     fft_calls[7] = function(p) {
 	return animateNodeMultDrawing(4, drawPoly, p, false, this.AlgorithmContext);
     };
@@ -3368,21 +3367,21 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     fft_calls[15] = function(res, p, q, i, nearest2Pow) {
 	var animation_duration = (4/5) * this.AlgorithmContext.getBaselineAnimationSpeed();
 	var mult_tree = d3.select("#multiply-poly-tree");
-	var elem_to_draw_from1 = mult_tree.select("#fft-node-num3")
-	var elem_to_draw_from2 = mult_tree.select("#fft-node-num6")
-	var elem_to_draw_into = mult_tree.select("#fft-node-num2")
+	var elem_to_draw_from1 = mult_tree.select("#fft-node-num3");
+	var elem_to_draw_from2 = mult_tree.select("#fft-node-num6");
+	var elem_to_draw_into = mult_tree.select("#fft-node-num2");
 	var visible_coefs1 = elem_to_draw_from1.select(".fft-coef-text-false");
 	var visible_coefs2 = elem_to_draw_from2.select(".fft-coef-text-false");
 	var invisible_coefs = elem_to_draw_into.select(".fft-coef-text-true");
-	invisible_coefs.select(".fft-coef-" + i).text("" + res[i] + (i!=nearest2Pow-1 ? "," : "")).style("visibility", "visible");
+	invisible_coefs.select(".fft-coef-" + i).text("" + res[i] + (i!==nearest2Pow-1 ? "," : "")).style("visibility", "visible");
 
-	var ci1 = visible_coefs1.select(".fft-coef-" + i).classed("fft-coefs-highlight", true)
-	var ci2 = visible_coefs2.select(".fft-coef-" + i).classed("fft-coefs-highlight", true)
-	var cf = invisible_coefs.select(".fft-coef-" + i).classed("fft-coefs-highlight", true)
+	var ci1 = visible_coefs1.select(".fft-coef-" + i).classed("fft-coefs-highlight", true);
+	var ci2 = visible_coefs2.select(".fft-coef-" + i).classed("fft-coefs-highlight", true);
+	var cf = invisible_coefs.select(".fft-coef-" + i).classed("fft-coefs-highlight", true);
 	setTimeout(function() {
-	    ci1.classed("fft-coefs-highlight", false)
-	    ci2.classed("fft-coefs-highlight", false)
-	    cf.classed("fft-coefs-highlight", false)
+	    ci1.classed("fft-coefs-highlight", false);
+	    ci2.classed("fft-coefs-highlight", false);
+	    cf.classed("fft-coefs-highlight", false);
 	}, animation_duration);
 	return animation_duration;
     };
@@ -3392,30 +3391,30 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     fft_calls[22] = function(res, i, nearest2Pow, temp) {
 	var animation_duration = (4/5) * this.AlgorithmContext.getBaselineAnimationSpeed();
 	var mult_tree = d3.select("#multiply-poly-tree");
-	var elem_to_draw_into = mult_tree.select("#fft-node-num1")
+	var elem_to_draw_into = mult_tree.select("#fft-node-num1");
 	var ci1 = elem_to_draw_into.select(".fft-coef-" + i).classed("fft-coefs-highlight", true);
 	var ci2 = elem_to_draw_into.select(".fft-coef-" + (nearest2Pow - i)).classed("fft-coefs-highlight-green", true);
 	setTimeout(function() {
 	    ci1.text("" + res[i] + ",");
-	    ci1.classed("fft-coefs-highlight", false).classed("fft-coefs-highlight-green", true)
-	    ci2.text("" + res[nearest2Pow - i] + (i != 0 ? "," : ""));
-	    ci2.classed("fft-coefs-highlight-green", false).classed("fft-coefs-highlight", true)
+	    ci1.classed("fft-coefs-highlight", false).classed("fft-coefs-highlight-green", true);
+	    ci2.text("" + res[nearest2Pow - i] + (i !== 0 ? "," : ""));
+	    ci2.classed("fft-coefs-highlight-green", false).classed("fft-coefs-highlight", true);
 	    setTimeout(function() {
-		ci1.classed("fft-coefs-highlight-green", false)
-		ci2.classed("fft-coefs-highlight", false)
+		ci1.classed("fft-coefs-highlight-green", false);
+		ci2.classed("fft-coefs-highlight", false);
 	    }, animation_duration);
 	}, animation_duration);
 	return 2*animation_duration;
     };
     fft_calls[25] = function(res, i, nearest2Pow) {
 	var animation_duration = (1/5) * this.AlgorithmContext.getBaselineAnimationSpeed();
-	var idx = (i == 0) ? 0 : (i < nearest2Pow / 2) ? nearest2Pow - i : i;
+	var idx = (i === 0) ? 0 : (i < nearest2Pow / 2) ? nearest2Pow - i : i;
 	var mult_tree = d3.select("#multiply-poly-tree");
-	var elem_to_draw_into = mult_tree.select("#fft-node-num1")
+	var elem_to_draw_into = mult_tree.select("#fft-node-num1");
 	var ci1 = elem_to_draw_into.select(".fft-coef-" + idx)
-	    .text("" + Math.round10(res[i].real, -2) + (i != nearest2Pow-1 ? "," : "")).classed("fft-coefs-highlight", true);
+	    .text("" + Math.round10(res[i].real, -2) + (i !== nearest2Pow-1 ? "," : "")).classed("fft-coefs-highlight", true);
 	setTimeout(function() {
-	    ci1.classed("fft-coefs-highlight", false)
+	    ci1.classed("fft-coefs-highlight", false);
 	}, animation_duration);
 	return animation_duration;
     };
@@ -3435,16 +3434,16 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	cleanup();
 	var sharedEv = function(poly, len, start, helper_arr, Complex) {
 	    return ev.run(poly, len, start, helper_arr, Complex);
-	}
+	};
 	var sharedCalc = function(idx, N, Complex) {
 	    return calc.run(idx, N, Complex);
-	}
+	};
 	Complex.calc_unity = sharedCalc;
 	var result = fft.runCodeAndPopulateAnimationQueue(poly_p.slice(), poly_q.slice(), sharedEv, Complex);
 	//var result = ev.runCodeAndPopulateAnimationQueue(poly_ev, poly_ev.length, 0, [], Complex);
 	console.log("After fft multiply", "" + result);
 	executionFunction();
-    };
+    }
     _my.AlgorithmUtils.appendCode(algorithm1TabId, "calc-code", calc);
     _my.AlgorithmUtils.appendCode(algorithm1TabId, "eval-code", ev);
     _my.AlgorithmUtils.appendCode(algorithm2TabId, "fft-code", fft);
@@ -3461,7 +3460,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 ;ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
     // alias our algorithm module -- since we are running this code from main it must be ready
     var _my = ALGORITHM_MODULE;
-    if (_my == undefined) {
+    if (_my === undefined) {
 	throw "Algorithm module is not defined!";
     }
     var algorithmTabId = "hld-tab";
@@ -3499,14 +3498,15 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	var maxSubTreeSize = -1;
 	var specialChild = -1;
 	var children = tree[current_node].children;
-	for (var idx = 0; idx < children.length; idx++) {
+	var idx = 0;
+	for (idx = 0; idx < children.length; idx++) {
 	    if (tree[children[idx]].subTreeSize > maxSubTreeSize) {
 		maxSubTreeSize = tree[children[idx]].subTreeSize;
 		specialChild = children[idx];
 	    }
 	}
 	heavyLightDecomposition(tree, specialChild, current_chain, chains);
-	for (var idx = 0; idx < children.length; idx++) {
+	for (idx = 0; idx < children.length; idx++) {
 	    if (children[idx] != specialChild) {
 		var new_chain_num = ++chains.numChains;
 		heavyLightDecomposition(tree, children[idx], new_chain_num, chains);
@@ -3570,10 +3570,10 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    .enter()
 	   .append("g")
 	    .attr("id", function(d) { return "hld-node-" + d.idx; })
-	    .call(force.drag())
+	    .call(force.drag());
 	fnodes.append("circle")
 	     .attr("class", "hld-circle")
-	     .attr("r", radius)
+	     .attr("r", radius);
 
 	tree_group.select("#hld-node-" + 0).append("text").attr("class", "hld-root-id")
 	    .attr("text-anchor", "middle").text("Root");
@@ -3581,12 +3581,12 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	// this function is called on tick events inside the force graph and it's how we simulate node movement
 	force.on("tick", function() {
 	    fnodes
-		.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")";})
+		.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")";});
 	    flinks
 		.attr("x1", function(d) { return d.source.x; })
 		.attr("y1", function(d) { return d.source.y; })
 		.attr("x2", function(d) { return d.target.x; })
-		.attr("y2", function(d) { return d.target.y; })
+		.attr("y2", function(d) { return d.target.y; });
 	});
     }
     // compute subtree size callbacks -> show small number of subtree size and colorful edges that are done
@@ -3653,7 +3653,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     /******************/
     var remover = function() {
 	_my.AlgorithmUtils.resetControls(algorithmTabId);
-    }
+    };
     var context = _my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj);
     var hld_algo = new _my.Algorithm(heavyLightDecomposition, hld_callbacks, "hld-code", context, remover);
     var ss_algo = new _my.Algorithm(computeSubtreeSize, ss_callbacks, "ss-code", context, remover);
@@ -3676,7 +3676,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    }
 	}
 	nodes.size = N - 1;
-	nodes.isLeafNode = function(val) { return this[val].children.length == 0; };
+	nodes.isLeafNode = function(val) { return this[val].children.length === 0; };
 	return nodes;
     }
     var tree = createRandomTree(TREE_SIZE);
@@ -3687,7 +3687,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	.attr("title", "Permute the tree input data. (You want to do this .. Trust me!")
         .on("click", function() {
 	    d3.select("#hld-tree-group").remove();
-	    tree = createRandomTree(TREE_SIZE)
+	    tree = createRandomTree(TREE_SIZE);
 	    initialize(tree);
 	})
 	.text("Shuffle Data");
@@ -3728,7 +3728,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 ;ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) {
     // alias our algorithm module -- since we are running this code from main it must be ready
     var _my = ALGORITHM_MODULE;
-    if (_my == undefined) {
+    if (_my === undefined) {
 	throw "Algorithm module is not defined!";
     }
     var algorithmTabId = "quicksort-tab";
@@ -3787,7 +3787,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     // create data which includes an old index that is used to identify the circle group an element belongs to
     var data = sequence_to_sort.map(function(d, i) {
 	return {val : d, old_idx: i};
-    });;
+    });
 
     var margin = { left: 10, top: 30, right: 10, bottom: 100};
     var svg = d3.select("#" + algorithmTabId + " .graphics").append("svg")
@@ -3856,7 +3856,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    .attr("class", "quicksort-text")
 	    .style("font-size", function(d) { return ((computeWidth(d.val) / mini_width) * 100) + "%"; })
 	    .text(function(d) { return d.val; });
-    }
+    };
     // now call the initialization
     init_circles(data);
 
@@ -3871,12 +3871,12 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	d3.selectAll("text.q-left-text").remove();
 	d3.selectAll("text.q-right-text").remove();
 	d3.selectAll("image.q-arrow").remove();
-	if (left == 0 && right == data.length - 1) {
+	if (left === 0 && right === data.length - 1) {
 	    return animationDuration; // we don't want to move the entire array down, only subarrays
 	}
 	var layer_y = (2.5 * maxi_width) * recursion_depth;
 	var depth_label_id = "q-rec-label-depth-" + recursion_depth;
-	if (svg.select("#" + depth_label_id).size() == 0) {
+	if (svg.select("#" + depth_label_id).size() === 0) {
 	    svg.insert("text", "#qsort-circle-gradient-defs")
 		.attr("x", 20)
 		.attr("y", layer_y)
@@ -3894,24 +3894,24 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	}
 
 	return animationDuration;
-    }
+    };
     // pivot animation
     q_callbacks[5] = function(pivot, data) {
 	var pi = data[pivot].old_idx;
-	var g = d3.select("#q-g-" + pi)
+	var g = d3.select("#q-g-" + pi);
 	var radius = g.select(".quicksort-circle").attr("r");
 
-	var pivot = g.append("g").attr("id", "qsort-pivot");
-	pivot.append("rect")
+	var pivot_dom_elem = g.append("g").attr("id", "qsort-pivot");
+	pivot_dom_elem.append("rect")
 	    .attr("width", 2*radius)
 	    .attr("height", 2*radius)
 	    .attr("x", -radius)
 	    .attr("y", -radius);
-	pivot.append("text")
+	pivot_dom_elem.append("text")
 	    .text("Pivot")
 	    .attr("dy", -(1.1)*radius);
 	return this.AlgorithmContext.getBaselineAnimationSpeed();
-    }
+    };
     // left animation
     function updateLeft(data, new_left) {
 	if (new_left >= data.length) {
@@ -3934,7 +3934,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	var g = d3.select("#q-g-" + pos_i);
 	var radius = g.select("circle").attr("r");
 	var gleft = d3.selectAll("g." + class_name)
-	    .classed(class_name, false)
+	    .classed(class_name, false);
 	gleft.select("image.q-arrow")
 	    .remove();
 	gleft.select("text." + text_class)
@@ -3949,16 +3949,16 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    .attr("transform", "rotate(180)");
 	g.append("text")
 	    .attr("class", text_class + " quicksort-text")
-	    .attr("dy", (maxi_width * 1.7) + 18).text(text)
+	    .attr("dy", (maxi_width * 1.7) + 18).text(text);
 	g.classed(class_name, true);
 	return this.AlgorithmContext.getBaselineAnimationSpeed();
-    };
+    }
     q_callbacks[7] = q_callbacks[11] = q_callbacks[20] = function(data, new_left) {
 	return updateLeft.apply(this, arguments);
     };
     q_callbacks[8] = q_callbacks[14] = q_callbacks[21] = function(data, new_right) {
 	return updateRight.apply(this, arguments);
-    }
+    };
     // end of while cleanup
     q_callbacks[23] = function() {
 	svg.selectAll("#qsort-pivot").remove();
@@ -3968,7 +3968,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     // move subarray back
     q_callbacks[25] = q_callbacks[2] = function(data, left, right) {
 	var animationDuration = this.AlgorithmContext.getBaselineAnimationSpeed();
-	if (left == 0 && right == data.length - 1) {
+	if (left === 0 && right === data.length - 1) {
 	    return animationDuration; // we don't want to move the entire array up, only subarrays
 	}
 	for (var i=left; i<=right; i++) {
@@ -3982,7 +3982,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	svg.select("#q-rec-label-depth-" + recursion_depth).remove();
 	recursion_depth--; // these are return statements so we want to decrease the recursion depth
 	return animationDuration;
-    }
+    };
     // we are going to do the animation inside swap and return the length of that
     // animation in the post swap callbacks to correctly animate the delay
     q_callbacks[17] = {
@@ -3998,8 +3998,8 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    var j = new_right;
 	    if (i == j) return;
 
-	    var gi = d3.select("#q-g-" + data[i].old_idx)
-	    var gj = d3.select("#q-g-" + data[j].old_idx)
+	    var gi = d3.select("#q-g-" + data[i].old_idx);
+	    var gj = d3.select("#q-g-" + data[j].old_idx);
 
 	    var di = gi.datum();
 	    var dj = gj.datum();
@@ -4037,7 +4037,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	});
 	console.log("After", data.map(function(d) { return d.val; }));
 	executionFunction();
-    };
+    }
     // setup the controls
     _my.AlgorithmUtils.attachAlgoToControls(qual_algo, algorithmTabId, kickoff);
 
@@ -4078,7 +4078,7 @@ $(function (ALGORITHM_MODULE) {
 
     // alias our algorithm module -- since we are running this as callback on doc ready it should already be defined
     var _my = ALGORITHM_MODULE;
-    if (_my == undefined) {
+    if (_my === undefined) {
 	throw "Algorithm module is not defined!";
     }
 
@@ -4116,7 +4116,7 @@ $(function (ALGORITHM_MODULE) {
     
     $('a[data-toggle="tab"]').off('shown.bs.tab');
     $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
-	resizingSvg(e)
+	resizingSvg(e);
 	raptorFromEvent(e);
     });
     $('a', "#algoTabs").off("click");
@@ -4148,9 +4148,9 @@ $(function (ALGORITHM_MODULE) {
 		var hash = window.location.hash;
 		var selector = hash ? 'a[href="' + hash + '"]' : 'li.active > a';
 		$(selector, context).tab('show');
-	    }
+	    };
 	    // Set the correct tab when the page loads
-	    showTabFromHash(context)
+	    showTabFromHash(context);
 	    // Set the correct tab when a user uses their back/forward button
 	    window.addEventListener('hashchange', showTabFromHash, false);
 	    // Change the URL when tabs are clicked
@@ -4179,7 +4179,7 @@ $(function (ALGORITHM_MODULE) {
 		callbacks[i]();
 	    }
 	}
-	$('[data-toggle="popover"]').popover()
+	$('[data-toggle="popover"]').popover();
 	$(tab).attr("data-raptored", true);
     }
     function resizingSvg(e) {

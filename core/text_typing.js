@@ -1,5 +1,5 @@
 function TextTypingPlugin(typing_delay_millis) {
-    this.typing_delay_millis = typing_delay_millis != undefined ? typing_delay_millis : 250;
+    this.typing_delay_millis = typing_delay_millis !== undefined ? typing_delay_millis : 250;
 }
 
 TextTypingPlugin.prototype.animateText = function(text, container) {
@@ -9,7 +9,7 @@ TextTypingPlugin.prototype.animateText = function(text, container) {
     
     this.__loop(container, text, 0);
     return (text.length - 1) * this.typing_delay_millis;
-}
+};
 
 
 TextTypingPlugin.prototype.__loop = function(container, text, pos) {
@@ -27,4 +27,4 @@ TextTypingPlugin.prototype.__loop = function(container, text, pos) {
     setTimeout(function() {
 	self.__loop(container, text, pos + 1);
     }, this.typing_delay_millis);
-}
+};

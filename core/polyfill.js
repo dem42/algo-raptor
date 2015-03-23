@@ -49,7 +49,7 @@
     // fill is ecma6
     if (!Array.prototype.fill) {
 	Array.prototype.fill = function(value) {
-	    if (this == null) {
+	    if (this === null) {
 		throw new TypeError('this is null or not defined');
 	    }
 	    var O = Object(this);

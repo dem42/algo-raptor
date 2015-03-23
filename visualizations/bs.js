@@ -2,7 +2,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 
     // alias our algorithm module -- since we are running this code from main it must be ready
     var _my = ALGORITHM_MODULE;
-    if (_my == undefined) {
+    if (_my === undefined) {
 	throw "Algorithm module is not defined!";
     }
 
@@ -106,7 +106,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	    var viewBox = _my.AlgorithmUtils.calcViewBox("#" + algorithmTabId + " .graphics", width, height);
 	    svg.attr("width", viewBox.width)
 		.attr("height", viewBox.height)
-		.attr("viewBox", viewBox.string)
+		.attr("viewBox", viewBox.string);
 
 	    /* the gs have an old_i which is their old order .. we move the gs to where they are
 	     * in the old order
@@ -149,24 +149,27 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	return function(data, key) { 
 	    var animation_duration = 4 * this.AlgorithmContext.getBaselineAnimationSpeed();
 	    var move_up_animation_duration = (1/5) * this.AlgorithmContext.getBaselineAnimationSpeed();
-
+	    var i = 0;
 	    /* the gs have an old_i which is their old order .. we move the gs to where they are
 	     * in the old order
 	     */
 	    var gs = svgg.selectAll(".bs-gs");
 	    map_of_new_pos = {};
-	    for (var i=0;i < data.length; i++) {
+	    for (i = 0;i < data.length; i++) {
 		map_of_new_pos[data[i].old_i] = i;
 	    }
 
+	    var translator_function = function(i) {
+		return function(d) {
+		    return "translate(" + (2*w*i) + "," + (2.5*Y) + ")";
+		};
+	    };
 	    var single_iterm_anim_duration = animation_duration / data.length;
-	    for (var i=0; i<data.length; i++) {
+	    for (i = 0; i<data.length; i++) {
 		svgg.select("#bs-item-" + data[i].old_i).transition()
 		    .delay(i*single_iterm_anim_duration)
 		    .duration(single_iterm_anim_duration)
-		    .attr("transform", function(d) {
-			return "translate(" + (2*w*i) + "," + (2.5*Y) + ")";
-		    });
+		    .attr("transform", translator_function(i));
 	    }
 
 	    /*interpolating works with transforms too .. so cool -> move to new spot*/
@@ -273,7 +276,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 
     function initialize(forms, data) {
 	/*setup the DOM elements*/
-	var forms = forms.selectAll("input[type='text']")
+	forms.selectAll("input[type='text']")
 	    .data(data)
 	    .enter().append("input")
 	    .attr("type","text")
@@ -312,7 +315,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 			    data.forEach(function (v,i) { v.old_i = i; });
 			    var bs_wrapped = function(data, tf) {
 				return balgo.runWithSharedAnimationQueue(prep_algo, data, tf);
-			    }
+			    };
 			    console.log(prep_algo.runCodeAndPopulateAnimationQueue(data, tf, bs_wrapped));
 			    executionFunction();
 			}
@@ -322,7 +325,7 @@ ALGORITHM_MODULE.bsearch_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	    // this is a jquery object and therefore the .on function can be used
 	    // to attach multiple handlers .. they will be called in order of addition
 	    // unless one of them call e.stopImmediatePropagation
-	    dialog.on("shown.bs.modal", function() { $("#bs-find").focus(); })
+	    dialog.on("shown.bs.modal", function() { $("#bs-find").focus(); });
 	};
     }
 

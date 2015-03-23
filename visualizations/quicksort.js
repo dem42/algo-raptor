@@ -1,7 +1,7 @@
 ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) {
     // alias our algorithm module -- since we are running this code from main it must be ready
     var _my = ALGORITHM_MODULE;
-    if (_my == undefined) {
+    if (_my === undefined) {
 	throw "Algorithm module is not defined!";
     }
     var algorithmTabId = "quicksort-tab";
@@ -60,7 +60,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
     // create data which includes an old index that is used to identify the circle group an element belongs to
     var data = sequence_to_sort.map(function(d, i) {
 	return {val : d, old_idx: i};
-    });;
+    });
 
     var margin = { left: 10, top: 30, right: 10, bottom: 100};
     var svg = d3.select("#" + algorithmTabId + " .graphics").append("svg")
@@ -129,7 +129,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	    .attr("class", "quicksort-text")
 	    .style("font-size", function(d) { return ((computeWidth(d.val) / mini_width) * 100) + "%"; })
 	    .text(function(d) { return d.val; });
-    }
+    };
     // now call the initialization
     init_circles(data);
 
@@ -144,12 +144,12 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	d3.selectAll("text.q-left-text").remove();
 	d3.selectAll("text.q-right-text").remove();
 	d3.selectAll("image.q-arrow").remove();
-	if (left == 0 && right == data.length - 1) {
+	if (left === 0 && right === data.length - 1) {
 	    return animationDuration; // we don't want to move the entire array down, only subarrays
 	}
 	var layer_y = (2.5 * maxi_width) * recursion_depth;
 	var depth_label_id = "q-rec-label-depth-" + recursion_depth;
-	if (svg.select("#" + depth_label_id).size() == 0) {
+	if (svg.select("#" + depth_label_id).size() === 0) {
 	    svg.insert("text", "#qsort-circle-gradient-defs")
 		.attr("x", 20)
 		.attr("y", layer_y)
@@ -167,24 +167,24 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	}
 
 	return animationDuration;
-    }
+    };
     // pivot animation
     q_callbacks[5] = function(pivot, data) {
 	var pi = data[pivot].old_idx;
-	var g = d3.select("#q-g-" + pi)
+	var g = d3.select("#q-g-" + pi);
 	var radius = g.select(".quicksort-circle").attr("r");
 
-	var pivot = g.append("g").attr("id", "qsort-pivot");
-	pivot.append("rect")
+	var pivot_dom_elem = g.append("g").attr("id", "qsort-pivot");
+	pivot_dom_elem.append("rect")
 	    .attr("width", 2*radius)
 	    .attr("height", 2*radius)
 	    .attr("x", -radius)
 	    .attr("y", -radius);
-	pivot.append("text")
+	pivot_dom_elem.append("text")
 	    .text("Pivot")
 	    .attr("dy", -(1.1)*radius);
 	return this.AlgorithmContext.getBaselineAnimationSpeed();
-    }
+    };
     // left animation
     function updateLeft(data, new_left) {
 	if (new_left >= data.length) {
@@ -207,7 +207,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	var g = d3.select("#q-g-" + pos_i);
 	var radius = g.select("circle").attr("r");
 	var gleft = d3.selectAll("g." + class_name)
-	    .classed(class_name, false)
+	    .classed(class_name, false);
 	gleft.select("image.q-arrow")
 	    .remove();
 	gleft.select("text." + text_class)
@@ -222,16 +222,16 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	    .attr("transform", "rotate(180)");
 	g.append("text")
 	    .attr("class", text_class + " quicksort-text")
-	    .attr("dy", (maxi_width * 1.7) + 18).text(text)
+	    .attr("dy", (maxi_width * 1.7) + 18).text(text);
 	g.classed(class_name, true);
 	return this.AlgorithmContext.getBaselineAnimationSpeed();
-    };
+    }
     q_callbacks[7] = q_callbacks[11] = q_callbacks[20] = function(data, new_left) {
 	return updateLeft.apply(this, arguments);
     };
     q_callbacks[8] = q_callbacks[14] = q_callbacks[21] = function(data, new_right) {
 	return updateRight.apply(this, arguments);
-    }
+    };
     // end of while cleanup
     q_callbacks[23] = function() {
 	svg.selectAll("#qsort-pivot").remove();
@@ -241,7 +241,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
     // move subarray back
     q_callbacks[25] = q_callbacks[2] = function(data, left, right) {
 	var animationDuration = this.AlgorithmContext.getBaselineAnimationSpeed();
-	if (left == 0 && right == data.length - 1) {
+	if (left === 0 && right === data.length - 1) {
 	    return animationDuration; // we don't want to move the entire array up, only subarrays
 	}
 	for (var i=left; i<=right; i++) {
@@ -255,7 +255,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	svg.select("#q-rec-label-depth-" + recursion_depth).remove();
 	recursion_depth--; // these are return statements so we want to decrease the recursion depth
 	return animationDuration;
-    }
+    };
     // we are going to do the animation inside swap and return the length of that
     // animation in the post swap callbacks to correctly animate the delay
     q_callbacks[17] = {
@@ -271,8 +271,8 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	    var j = new_right;
 	    if (i == j) return;
 
-	    var gi = d3.select("#q-g-" + data[i].old_idx)
-	    var gj = d3.select("#q-g-" + data[j].old_idx)
+	    var gi = d3.select("#q-g-" + data[i].old_idx);
+	    var gj = d3.select("#q-g-" + data[j].old_idx);
 
 	    var di = gi.datum();
 	    var dj = gj.datum();
@@ -310,7 +310,7 @@ ALGORITHM_MODULE.quicksort_module = (function chart(ALGORITHM_MODULE, $, d3, boo
 	});
 	console.log("After", data.map(function(d) { return d.val; }));
 	executionFunction();
-    };
+    }
     // setup the controls
     _my.AlgorithmUtils.attachAlgoToControls(qual_algo, algorithmTabId, kickoff);
 

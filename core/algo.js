@@ -22,11 +22,11 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 
     // alias our algorithm module
     var _my = ALGORITHM_MODULE;
-    if (_my == undefined) {
+    if (_my === undefined) {
 	throw "Algorithm module is not defined!";
     }
 
-    console.debug("executing definitions of algo.js")
+    console.debug("executing definitions of algo.js");
     
     // used for transition refactoring from default to baseline speed
     function getAnimationDuration(algoContext) {
@@ -56,30 +56,31 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	var tokens = func.toString().split("\n");
 	var LN = tokens.length;
 	this.lastRowNum = LN;
-	var result = undefined;
+	var result;
+	var i = 0;
 	var args = this.param[1].split(",");
-	for (var i=0;i < args.length; i++) {
+	for (i = 0;i < args.length; i++) {
 	    this.varname_map[$.trim(args[i])] = {"row_num": 1, "idx": i};
 	}
 
 	var var_pat = /\s*var\s+([a-zA-Z_$][0-9a-zA-Z_$]*)\s*=/;
 	var ret_pat = /^return\s*;|^return\s+.*|.*\s+return\s*;|.*\s+return\s+.*/;
 	var _found_vars = args.length;
-	for (var i=0; i < LN; i++) {
+	for (i = 0; i < LN; i++) {
 	    // direct eval uses the global context so the variable names are in global
 	    var trimmed = $.trim(tokens[i]);
 	    var strm = trimmed.substring(0,2);
-	    if (strm == "//" || strm == "/*") {
+	    if (strm === "//" || strm === "/*") {
 		continue;
 	    }
-	    var result = trimmed.match(var_pat);
-	    if (result != null) {
+	    result = trimmed.match(var_pat);
+	    if (result !== null) {
 		args += "," + result[1];
 		this.var_map[_found_vars] = {"row_num" : i+1, "name" : result[1]};
 		this.varname_map[result[1]] = {"row_num" : i+1, "idx" : _found_vars};
 		_found_vars++;
 	    }
-	    this.return_rows[i+1] = ret_pat.test(tokens[i]) || i == LN-1;
+	    this.return_rows[i+1] = ret_pat.test(tokens[i]) || i === LN-1;
 	}
 	this.found_vars = args;
 	/*
@@ -96,7 +97,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    setTimeout(function() {
 		$(rowToHighlightSelector).toggleClass("highlighted-row");
 	    }, startDelay);
-	    if (durationOfHighlight != undefined) {
+	    if (durationOfHighlight !== undefined) {
 		setTimeout(function() {
 		    $(rowToHighlightSelector).toggleClass("highlighted-row");
 		}, startDelay + durationOfHighlight);
@@ -122,10 +123,10 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 		    var param_vals = [];
 		    fun_param[1].split(",").forEach(function(p) {
 			var trimmed = $.trim(p);
-			if (trimmed == "") {
+			if (trimmed === "") {
 			    return;
 			}
-			if (selfie.varname_map[$.trim(p)].idx == undefined) {
+			if (selfie.varname_map[$.trim(p)].idx === undefined) {
 			    console.error("Your callback is looking for a variable named", p, "which isn't defined in the function", selfie.funcName);
 			}
 	    		param_vals.push(var_array[selfie.varname_map[$.trim(p)].idx]);
@@ -157,10 +158,10 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 		    var param_vals = [];
 		    fun_param[1].split(",").forEach(function(p) {
 			var trimmed = $.trim(p);
-			if (trimmed == "") {
+			if (trimmed === "") {
 			    return;
 			}
-			if (selfie.varname_map[$.trim(p)].idx == undefined) {
+			if (selfie.varname_map[$.trim(p)].idx === undefined) {
 			    console.error("Your callback is looking for a variable named", p, "which isn't defined in the function", selfie.funcName);
 			}
 	    		param_vals.push(var_array[selfie.varname_map[$.trim(p)].idx]);
@@ -172,17 +173,17 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 		    animation_duration = getAnimationDuration(selfie.AlgorithmContext);
 		}
 
-		if (animation_duration == undefined) {
+		if (animation_duration === undefined) {
 		    animation_duration = getAnimationDuration(selfie.AlgorithmContext);
 		}
 
 		var_array.forEach(function(var_elem, idx) {
-		    if (selfie.var_map[idx] == undefined) {
+		    if (selfie.var_map[idx] === undefined) {
 			return;
 		    }
 		    var rowToHighlightSelector = getRowToHighlightSelector(selfie.var_map[idx].row_num, codeContainerId);
 		    /*** add or remove dynamic debugging info **/
-		    if (var_elem == undefined) {
+		    if (var_elem === undefined) {
 			setTimeout(function() {
 			    var comment_span = d3.select(rowToHighlightSelector).select("code").select("span.com");
 			    if (comment_span.empty()) {
@@ -206,8 +207,8 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	};
 
 	// variables that are used in callbacks must be set here
-	this.callbacks["AlgorithmContext"] = this.AlgorithmContext;
-	this.callbacks["var_map"] = this.var_map;
+	this.callbacks.AlgorithmContext = this.AlgorithmContext;
+	this.callbacks.var_map = this.var_map;
 	this.codeContainerId = codeContainerId;
     }
     /* statics */
@@ -217,14 +218,14 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    return Math.round10(object, -4);
 	}
 	return object;
-    }
+    };
 
     Algorithm.paramArg = function(N) {
 	var res = "";
 	for(var i=0;i<N;i++)
 	{
 	    res+="arguments["+i+"]";
-	    if(i != N-1)
+	    if(i !== N-1)
 		res+=",";
 	}
 	return res;
@@ -238,7 +239,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
      */
     Algorithm.prototype.addDebugging = function(fstr) {
 	var lmp = {}, i, nfun, tokens;
-	if (typeof(fstr) != "string")
+	if (typeof(fstr) !== "string")
 	{
 	    fstr = fstr.toString();
 	}
@@ -247,12 +248,12 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	for (i=0;i<tokens.length;i++)
 	{
 	    // preExecute is for rows like if or while conditions that get evaluated to false
-	    if (i > 0 && $.trim(tokens[i]) != "" && $.trim(tokens[i]).indexOf("{") != 0 && $.trim(tokens[i]).indexOf("else") != 0) {
+	    if (i > 0 && $.trim(tokens[i]) !== "" && $.trim(tokens[i]).indexOf("{") !== 0 && $.trim(tokens[i]).indexOf("else") !== 0) {
 		nfun += "self.preRowExecute(" + (i+1) + ", [" + this.found_vars + "]);";
 	    }
 
    	    nfun += tokens[i];
-	    if (i < tokens.length-1 && ($.trim(tokens[i+1]).indexOf("{") != 0) && ($.trim(tokens[i+1]).indexOf("else") != 0)) { 
+	    if (i < tokens.length-1 && ($.trim(tokens[i+1]).indexOf("{") !== 0) && ($.trim(tokens[i+1]).indexOf("else") !== 0)) { 
 		// add the handle row function to every row except for the first and last
 		// this function will deal with row highlighting and var printing
 		nfun += "self.postRowExecute(" + (i+1) + ", [" + this.found_vars + "]);";
@@ -261,30 +262,30 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    nfun += "\n";
 	}
 	return nfun;
-    }
+    };
     /**
      * Returns the number of parameters of the original function
      */
     Algorithm.prototype.getParams = function(){
 	return this.param[1].split(",");
-    }
+    };
     /**
      * Returns the string representation of the original undecorated function
      */
     Algorithm.prototype.toString = function(){
 	return this.func.toString();
-    }
+    };
     /**
      * Returns a string representation of the decorated function. 
      * A decorated function is one that has callbacks, preExecuteRow and postExecuteRows inserted in its source code
      */
     Algorithm.prototype.getDecorated = function() {
 	return this.addDebugging(this.func);
-    }
+    };
 
     Algorithm.prototype.getAnimationQueue = function() {
 	return this.animation_queue;
-    }
+    };
 
     /**
      * Start algorithm animation
@@ -296,7 +297,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	this.animation_queue = []; // reset the animation queue
 	var result = this.run.apply(this, arguments);
 	return result;
-    }
+    };
 
     /** 
      * Execute the function with using animating the algorithm
@@ -309,7 +310,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	//preserve this for the eval inside var self
 	var self = this;
 	return eval(c);
-    }
+    };
 
     // a visualization is always limited to just one animation queue
     // this will be the animation queue of the function that you started with runCodeAndPopulateAnimationQueue
@@ -328,12 +329,12 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	var params = Array.prototype.slice.call(arguments);
 	params.shift();
 	return this.run.apply(this, params);
-    }
+    };
 
     Algorithm.prototype.executeInContinuousMode = function() {
 	this.runningInContMode = true;
 	this.__executeNextRow();
-    }
+    };
 
     Algorithm.prototype.executeNextRowInStepMode = function() {
 	if (this.animation_queue.length > 0) {
@@ -346,11 +347,11 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    this.runningInStepMode = true;
 	    this.__executeNextRow(rownum);
 	}
-    }
+    };
 
     Algorithm.prototype.isRunning = function() {
 	return this.animation_queue.length > 0;
-    }
+    };
 
     /*** __executeNextRow is shared by both step by step and continuous execution and does all the animation frame queueing
          and recursion frame shennanigans */
@@ -363,13 +364,13 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    var frameAlgoCtx = this.animation_queue[0].algorithmCtx;
 
 	    // only do one step in non-continuous mode
-	    if (!this.runningInContMode && rownum != prevRowNum) {
+	    if (!this.runningInContMode && rownum !== prevRowNum) {
 		return;
 	    }
 
 	    // stack frame visualization adds extra time because it takes a bit to animate
 	    var preanimation_extra_time = 0;
-	    if (rownum == 1) {
+	    if (rownum === 1) {
 		if (existsOnTheStack(codeId, this.functionStack)) {
 		    preanimation_extra_time += _my.AlgorithmUtils.visualizeNewStackFrame(codeId, frameAlgoCtx);
 		}
@@ -384,7 +385,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	else {
 	    var lastFunc = this.runningCodeStack.pop();
 	    this.removeAllRowHighlighting(lastFunc);
-	    if(this.resetControls != undefined) {
+	    if(this.resetControls !== undefined) {
 		this.resetControls(this.codeContainerId);
 	    }
 	    this.runningInContMode = false;
@@ -394,7 +395,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	function frameAnimatorGenerator(this_obj, rownum, doFrameRemoval, codeId, frameAlgoCtx, prevRowNum, animationFunction) { 
 	    return function() {
 		// this is where the animation frame is scheduled
-		if (this_obj.runningInContMode && rownum != prevRowNum) {
+		if (this_obj.runningInContMode && rownum !== prevRowNum) {
 		    var lastFunc = this_obj.runningCodeStack.pop();
 		    this_obj.removeAllRowHighlighting(lastFunc);
 		    this_obj.highlightRow(codeId, rownum, 0, undefined);
@@ -435,7 +436,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	function existsOnTheStack(codeId, stack) {
 	    var N = stack.length;
 	    for (var i=0;i<N;i++) {
-		if (stack[i] == codeId) return true;
+		if (stack[i] === codeId) return true;
 	    }
 	    return false;
 	}
@@ -444,13 +445,13 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    var N = stack.length;
 	    var cnt = 0;
 	    for (var i=0;i<N;i++) {
-		if (stack[i] == codeId) {
+		if (stack[i] === codeId) {
 		    cnt++;
 		}
 	    }
 	    return cnt > 1;
 	}
-    }
+    };
 
     function AnimationFrame(type, rowNumber, returnRows, codeContainerId, algorithmCtx, animationFunction) {
 	this.type = type;
@@ -462,7 +463,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     }
     AnimationFrame.prototype.isReturnRow = function() {
 	return this.returnRows[this.rowNumber];
-    }
+    };
     _my.Algorithm = Algorithm;
     return _my;
 })(ALGORITHM_MODULE, $, d3);

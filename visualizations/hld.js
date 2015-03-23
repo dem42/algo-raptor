@@ -1,7 +1,7 @@
 ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
     // alias our algorithm module -- since we are running this code from main it must be ready
     var _my = ALGORITHM_MODULE;
-    if (_my == undefined) {
+    if (_my === undefined) {
 	throw "Algorithm module is not defined!";
     }
     var algorithmTabId = "hld-tab";
@@ -39,14 +39,15 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
 	var maxSubTreeSize = -1;
 	var specialChild = -1;
 	var children = tree[current_node].children;
-	for (var idx = 0; idx < children.length; idx++) {
+	var idx = 0;
+	for (idx = 0; idx < children.length; idx++) {
 	    if (tree[children[idx]].subTreeSize > maxSubTreeSize) {
 		maxSubTreeSize = tree[children[idx]].subTreeSize;
 		specialChild = children[idx];
 	    }
 	}
 	heavyLightDecomposition(tree, specialChild, current_chain, chains);
-	for (var idx = 0; idx < children.length; idx++) {
+	for (idx = 0; idx < children.length; idx++) {
 	    if (children[idx] != specialChild) {
 		var new_chain_num = ++chains.numChains;
 		heavyLightDecomposition(tree, children[idx], new_chain_num, chains);
@@ -110,10 +111,10 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
 	    .enter()
 	   .append("g")
 	    .attr("id", function(d) { return "hld-node-" + d.idx; })
-	    .call(force.drag())
+	    .call(force.drag());
 	fnodes.append("circle")
 	     .attr("class", "hld-circle")
-	     .attr("r", radius)
+	     .attr("r", radius);
 
 	tree_group.select("#hld-node-" + 0).append("text").attr("class", "hld-root-id")
 	    .attr("text-anchor", "middle").text("Root");
@@ -121,12 +122,12 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
 	// this function is called on tick events inside the force graph and it's how we simulate node movement
 	force.on("tick", function() {
 	    fnodes
-		.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")";})
+		.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")";});
 	    flinks
 		.attr("x1", function(d) { return d.source.x; })
 		.attr("y1", function(d) { return d.source.y; })
 		.attr("x2", function(d) { return d.target.x; })
-		.attr("y2", function(d) { return d.target.y; })
+		.attr("y2", function(d) { return d.target.y; });
 	});
     }
     // compute subtree size callbacks -> show small number of subtree size and colorful edges that are done
@@ -193,7 +194,7 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
     /******************/
     var remover = function() {
 	_my.AlgorithmUtils.resetControls(algorithmTabId);
-    }
+    };
     var context = _my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj);
     var hld_algo = new _my.Algorithm(heavyLightDecomposition, hld_callbacks, "hld-code", context, remover);
     var ss_algo = new _my.Algorithm(computeSubtreeSize, ss_callbacks, "ss-code", context, remover);
@@ -216,7 +217,7 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
 	    }
 	}
 	nodes.size = N - 1;
-	nodes.isLeafNode = function(val) { return this[val].children.length == 0; };
+	nodes.isLeafNode = function(val) { return this[val].children.length === 0; };
 	return nodes;
     }
     var tree = createRandomTree(TREE_SIZE);
@@ -227,7 +228,7 @@ ALGORITHM_MODULE.hld_module = (function chart(ALGORITHM_MODULE, d3, bootbox) {
 	.attr("title", "Permute the tree input data. (You want to do this .. Trust me!")
         .on("click", function() {
 	    d3.select("#hld-tree-group").remove();
-	    tree = createRandomTree(TREE_SIZE)
+	    tree = createRandomTree(TREE_SIZE);
 	    initialize(tree);
 	})
 	.text("Shuffle Data");

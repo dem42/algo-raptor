@@ -63,7 +63,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	_my.vislib.animatePath(path, duration, delay, make_proportional, length_to_show_percentage);
 	var tran = _my.vislib.animateMovingAlongAPath(arrow, path, duration, delay, make_proportional, length_to_show_percentage, true, -90);
 	return {"arrow": arrow, "transition": tran};
-    }
+    };
 
     /*** ice cold coolness!! takes a selection which should be translateable and animates it moving along a path
      * .. with_rotate only works properly for straight paths .. we could calculate tangent more often too tho so
@@ -78,7 +78,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    .duration(duration)
 	    .delay(delay)
 	    .ease("linear")
-	    .attrTween("transform", translateAlong(path.node()))
+	    .attrTween("transform", translateAlong(path.node()));
 
 	// Returns an attrTween for translating along the specified path element.
 	function translateAlong(path) {
@@ -109,7 +109,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	// kudos to elusive-code on stackoverflow for this nice code
 	var line = d3.svg.line()
             .x( function(point) { return point.lx; })
-            .y( function(point) { return point.ly; })
+            .y( function(point) { return point.ly; });
 
 	if (interpolateType !== undefined) {
 	    line = line.interpolate(interpolateType);
@@ -201,7 +201,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	result.transition = transition;
 	result.arrows = arrows;
 	return result;
-    }
+    };
 
     /*** ice cold coolness!! takes a selection which should be translateable and animates it moving along a path
      * .. with_rotate only works properly for straight paths .. we could calculate tangent more often too tho so
@@ -228,7 +228,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    .duration(duration)
 	    .delay(delay)
 	    .ease("linear")
-	    .attrTween("transform", function(d) { return d.translateAlong(); })
+	    .attrTween("transform", function(d) { return d.translateAlong(); });
 
 	// Returns an attrTween for translating along the specified path element.
 	function translateAlong(path) {
@@ -256,30 +256,30 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
     /** fetch the window coordinates of an element accounting for scroll */
     _my.vislib.getOffsetRect = function(elem) {
 	// (1)
-	var box = elem.getBoundingClientRect()
+	var box = elem.getBoundingClientRect();
 	
-	var body = document.body
-	var docElem = document.documentElement
+	var body = document.body;
+	var docElem = document.documentElement;
 	
 	// (2)
-	var scrollTop = window.pageYOffset || docElem.scrollTop || body.scrollTop
-	var scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft
+	var scrollTop = window.pageYOffset || docElem.scrollTop || body.scrollTop;
+	var scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft;
 	
 	// (3)
-	var clientTop = docElem.clientTop || body.clientTop || 0
-	var clientLeft = docElem.clientLeft || body.clientLeft || 0
+	var clientTop = docElem.clientTop || body.clientTop || 0;
+	var clientLeft = docElem.clientLeft || body.clientLeft || 0;
 	
 	// (4)
-	var top  = box.top +  scrollTop - clientTop
-	var left = box.left + scrollLeft - clientLeft
+	var top  = box.top +  scrollTop - clientTop;
+	var left = box.left + scrollLeft - clientLeft;
 	
-	return { y: Math.round(top), x: Math.round(left) }
-    }
+	return { y: Math.round(top), x: Math.round(left) };
+    };
     _my.vislib.getCoordsInSvg = function(elem, svg_elem) {
 	var document_coords_elem = _my.vislib.getOffsetRect(elem);
 	var document_coords_svg = _my.vislib.getOffsetRect(svg_elem.node());
 	return { "y": document_coords_elem.y - document_coords_svg.y, "x": document_coords_elem.x - document_coords_svg.x};
-    }
+    };
     _my.vislib.getCoordWithTranApplied = function(shape_and_coord, svg) {
 	console.log(svg);
 	var matrix = shape_and_coord.shape.getCTM();
@@ -289,7 +289,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	position.y = shape_and_coord.coord.y;
 	position = position.matrixTransform(matrix);
 	return position;
-    }
+    };
     
     /**** based off of a gist by msqr on github ****/
     // draws a speed gauge and returns an object to update and query the gauge for the speed values
@@ -328,20 +328,13 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 			  scale: 1,
 			  speedModifier: 100
 	    };
-	    var range = undefined;
-	    var r = undefined;
-	    var pointerHeadLength = undefined;
+	    var range, r, pointerHeadLength;
 	    var value = 0;
 	    var majorTicks = labelData.length;
 	    var minValue = 0;
 	    var maxValue = 2*labelData.length;
 	    
-	    var svg = undefined;
-	    var arc = undefined;
-	    var scale = undefined;
-	    var ticks = undefined;
-	    var tickData = undefined;
-	    var pointer = undefined;
+	    var svg, arc, scale, ticks, tickData, pointer;
 
 	    function deg2rad(deg) {
 		return deg * Math.PI / 180;
@@ -349,8 +342,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    
 	    function newAngle(d) {
 		var ratio = scale(d);
-		var newAngle = config.minAngle + (ratio * range);
-		return newAngle;
+		return config.minAngle + (ratio * range);
 	    }
 	    function getValue() {
 		return value;
@@ -367,7 +359,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    }
 	    that.setSpeedModifier = setSpeedModifier;
 
-	    var prop = undefined;
+	    var prop;
 	    for ( prop in configuration ) {
 		config[prop] = configuration[prop];
 	    }
@@ -395,7 +387,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 		    var ratio = d * (i+1);
 		    return deg2rad(config.minAngle + (ratio * range));
 		})
-		.padAngle(0.01)
+		.padAngle(0.01);
 
 	    
 	    function render(newValue) {
@@ -406,10 +398,10 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 		    .attr('height', config.clipHeight*config.scale)
 		    .attr("viewBox", "0 0 " + config.clipWidth + " " + config.clipHeight)
 		    .append("g")
-		    .attr("transform", "translate(" + (r*1) + "," + (r*.95) + ")");		
-		var defs = svg.append('defs')
+		    .attr("transform", "translate(" + (r * 1) + "," + (r * 0.95) + ")");
+		var defs = svg.append('defs');
 		var arcs = svg.append('g')
-		    .attr('class', 'arc')
+		    .attr('class', 'arc');
 		
 		defs.selectAll('path')
 		    .data(tickData)
@@ -422,7 +414,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 		    .attr('xlink:href', function(d, i) { return "#mypath" + i + "-of(" + holder_selector + ")"; })
 		    .attr('fill', function(d, i) {
 			return arcColorFn[i % arcColorFn.length];
-		    })
+		    });
 		svg.selectAll('.arc-label')
 		    .data(labelData)
 		    .enter().append('text')
@@ -444,19 +436,19 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 				 [0, -pointerHeadLength] ];
 		var pointerLine = d3.svg.line().interpolate('monotone');
 		pointer = svg.append('g')
-		    .attr('transform', 'rotate(' +config.minAngle +')')
+		    .attr('transform', 'rotate(' +config.minAngle +')');
 		pointer.append('circle').attr('class', 'circle-big')
 		    .attr('r', config.pointerWidth / 2);
 		var pg1 = pointer.append('g').data([lineData1])
-		    .attr('class', 'pointer_dark')
+		    .attr('class', 'pointer_dark');
 		var pg2 = pointer.append('g').data([lineData2])
-		    .attr('class', 'pointer_light')
+		    .attr('class', 'pointer_light');
 		pointer.append('circle').attr('class', 'circle-small')
 		    .attr('r', config.pointerWidth / 4);
 		pg1.append('path')
-		    .attr('d', pointerLine)
+		    .attr('d', pointerLine);
 		pg2.append('path')
-		    .attr('d', pointerLine)
+		    .attr('d', pointerLine);
 		
 		update(newValue === undefined ? 0 : newValue);
 	    }
@@ -479,14 +471,14 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    }
 	    that.update = update;
 	    return that;
-	};
+	}
 
 	return gaugeObj;
     };
 
     function createRaptorPopupTemplate(text) {
 	var raptor_num = Math.floor(Math.random()*2) + 1;
-	var temp =  "<div class='clearfix'><img class='pull-left raptor-img' src='assets/raptor_fade_sm" + raptor_num + ".jpg'><p>" + text + "</p></div>"
+	var temp =  "<div class='clearfix'><img class='pull-left raptor-img' src='assets/raptor_fade_sm" + raptor_num + ".jpg'><p>" + text + "</p></div>";
 	console.log(temp);
 	return temp;
     }
@@ -509,6 +501,6 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    var img = $(algorithmCodeHolder).append('<img class="' + algorithmCodeClass + lineNum + '" src="assets/raptor24.png" style="position: absolute; margin-left: 2px; z-index:10; top: ' + 
 						raptor_top + 'px; left: ' + raptor_left + 'px" data-toggle="popover" data-trigger="click focus" data-title="Dr.Raptor\'s Hint" data-placement="left" data-html="true" data-content="' + createRaptorPopupTemplate(text) +'"></img>');
 	});
-    }
+    };
     return _my;
 }(ALGORITHM_MODULE || {}, d3, $));

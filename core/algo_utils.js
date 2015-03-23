@@ -17,20 +17,20 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     // create a deep clone of obj
     AlgorithmUtils.clone = function clone(obj) {
 	
-	if (obj == null || typeof obj != "object") {
+	if (obj === null || typeof obj !== "object") {
 	    // these are immutable and can be returned
 	    return obj;
 	}
 
 	var cpy = new obj.constructor();
-	for (prop in obj) {
+	for (var prop in obj) {
 	    if (obj.hasOwnProperty(prop)) {
 		//console.log(obj.constructor, cpy, obj);
 		cpy[prop] = clone(obj[prop]);
 	    }
 	}
 	return cpy;
-    }
+    };
 
     AlgorithmUtils.insertCustomControls = function(layout, algorithmId, algorithmName, comments) {
 	var customControlsHolder = layout.visPanelContents.append("div").attr("class", "custom-controls-holder");
@@ -42,7 +42,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	}
 	layout.customControlsLayout = customControlsHolder;
 	layout.customControlsHeader = customControlsHeader;
-    }
+    };
 
     // create and populate a section for standard algorithm controls
     AlgorithmUtils.insertDefaultControls = function(layout, algorithmId) {
@@ -72,7 +72,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	buttonsDiv.append("p").append("button").attr("class", "btn btn-info btn-sm")
 	    .on("click", function() {
 		var current = gaugeObj.getValue();
-		gaugeObj.update(current+1);
+		gaugeObj.update(current + 1);
 	    })
 	    .append("span").attr("class", "glyphicon glyphicon-plus");
 	buttonsDiv.append("p").append("button").attr("class", "btn btn-info btn-sm")
@@ -100,14 +100,14 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    //layout.controlsPanelHolder.attr("class", "col-md-4");
 	});
 	return {"speedGauge" : gaugeObj};
-    }
+    };
 
     AlgorithmUtils.resetControls = function(algorithmId) {
 	d3.select("#" + "play-btn-of-" + algorithmId + " span span").attr("class", "play-btn");
 	d3.select("#" + "play-btn-of-" + algorithmId + " span").attr("title", "Start the algorithm in continuous mode (the algorithm will run on its own)");
 	d3.select("#" + "next-btn-of-" + algorithmId).classed("disabled-btn", false);
 	d3.select("#" + "next-btn-of-" + algorithmId).classed("enabled-btn", true);
-    }
+    };
 
     // connect the algorithm to default control callbacks
     // this is necessary if you want the default controls to kick the algorithm off
@@ -143,7 +143,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	// allows us to reattach the controls as we like
 	res.attach = function(algorithm, algorithmId, kickoffCallback) {
 	    d3.select("#" + "play-btn-of-" + algorithmId).on("click", function() {
-		if (!algorithm.isRunning() && kickoffCallback != undefined) {
+		if (!algorithm.isRunning() && kickoffCallback !== undefined) {
 		    kickoffCallback(res.play_maker(algorithm, algorithmId));
 		}
 		else {
@@ -151,7 +151,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 		}
 	    });
 	    d3.select("#" + "next-btn-of-" + algorithmId).on("click", function() {
-		if (!algorithm.isRunning() && kickoffCallback != undefined) {
+		if (!algorithm.isRunning() && kickoffCallback !== undefined) {
 		    kickoffCallback(res.next_maker(algorithm, algorithmId));
 		}
 		else {
@@ -160,12 +160,12 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    });
 	};
 	return res;
-    }
+    };
 
     AlgorithmUtils.attachAlgoToControls = function(algorithm, algorithmId, kickoffCallback) {
 	var attacher = AlgorithmUtils.createAlgoAttacher();
 	attacher.attach(algorithm, algorithmId, kickoffCallback);
-    }
+    };
 
     // create an item for the algorithm in the list of all available algorithms 
     AlgorithmUtils.insertIntoHeaderList = function(tabId, headerText, menuConfig) {
@@ -175,7 +175,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	listItem.append("a").data([listItemId]).attr("href", tabId).attr("role", "tab").attr("data-toggle", "tab")
 	    .attr("data-tab-id", tabId)
 	    .text(headerText);
-    }
+    };
 
     function addStackFramePreview(codeContainerId) {
 	var selector = "." + codeContainerId + " li";
@@ -193,7 +193,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	}, delay);
 
 	return delay;
-    }
+    };
 
    //remove an old stack frame and expand the previous one
     AlgorithmUtils.popStackFrame = function(codeContainerId, algorithmCtx) {
@@ -202,13 +202,13 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	var selector = "." + codeContainerId + " .preview-frame";
 	d3.select(selector).remove();
 	return delay;
-    }
+    };
 
     //remove dynamic comments (values of variables appended with // during execution of the algorithm)
     AlgorithmUtils.clearComments = function(codeContainerId) {
 	var selector = "." + codeContainerId + " div:last-of-type";
 	d3.select(selector).selectAll("span.com.dynamic").remove();
-    }
+    };
  
     //comupte a viewBox to scale svg contents properly on smaller screen sizes
     AlgorithmUtils.calcViewBox = function(parentId, width, height) {
@@ -216,7 +216,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	//ratio computed from parent width and made 10% smaller (smaller pixels than original) to fit inside the parent
 	var vbx_ratio = (width / parentWidth); 
 	return {"string" : "0 0 " + width + " " + (vbx_ratio * height), "width" : (parentWidth), "height" : height };
-    }
+    };
 
 
     AlgorithmUtils.createAlgorithmContext = function(controlsObj) {
@@ -249,15 +249,15 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    var introObject = Object.create(null);
 	    introObject.tldr = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum";
 	    introObject.readMore = "";
-	    function tldr(tldr) {
+	    function tldrFun(tldr) {
 		this.tldr = tldr;
 		layout.introductionParagraph.html(tldr);
 	    }
-	    function readMore(readMore) {
+	    function readMoreFun(readMore) {
 		this.readMore = readMore;
 	    }
-	    introObject.setIntroTlDr = tldr;
-	    introObject.setIntroReadMore = readMore;
+	    introObject.setIntroTlDr = tldrFun;
+	    introObject.setIntroReadMore = readMoreFun;
 
 	    layout.introductionParagraph = layout.introHeader.append("p").text(introObject.tldr);
 	    var readMoreTxt = "Read more...";
@@ -279,7 +279,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	}();
 
 	layout.controlsPanelHolder = tab.append("div").attr("class", "controls controls-affix").attr("data-spy", "affix").style("top","0%").style("right","0%");
-    	layout.controlsPanel = layout.controlsPanelHolder.append("div").attr("class", "panel panel-default")
+    	layout.controlsPanel = layout.controlsPanelHolder.append("div").attr("class", "panel panel-default");
 
 	layout.controlsPanelBody = layout.controlsPanel.append("div").attr("class", "panel-body");
 	layout.ops = layout.controlsPanelBody.append("div").attr("class", "options");
@@ -291,7 +291,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 
 	// row 2
 	layout.row2 = layout.container.append("div").attr("class", "row");
-	layout.leftPanel = layout.row2.append("div").attr("class", "col-md-" + columnWidths[0])
+	layout.leftPanel = layout.row2.append("div").attr("class", "col-md-" + columnWidths[0]);
 	layout.visPanel = layout.leftPanel.append("div").attr("class", "row")
     	    .append("div").attr("class", "col-md-12")
     	    .append("div");
@@ -311,7 +311,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     AlgorithmUtils.appendCode = function(algorithmTabId, codeContainerId, algo) {
 	var code_holder = d3.select("#" + algorithmTabId + " .code")
 	    .append("div")
-	    .attr("class", codeContainerId)
+	    .attr("class", codeContainerId);
 	code_holder.append("div")
 	    .attr("class", "function-code-holder")
 	    .append("pre")
@@ -327,10 +327,10 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     AlgorithmUtils.attachPrettyPrintCallback = function(tab_id, callback) {
 	var tab_id_with_hash = "#" + tab_id; // we store them with hash since that's how we'll call them
 	(pretty_print_callbacks[tab_id_with_hash] = (pretty_print_callbacks[tab_id_with_hash] || [])).push(callback);
-    }
+    };
     AlgorithmUtils.getPrettyPrintCallbacks = function(tab_id) {
 	return pretty_print_callbacks[tab_id];
-    }
+    };
     //return the augmented module
     _my.AlgorithmUtils = AlgorithmUtils;
     return _my;

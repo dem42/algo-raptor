@@ -56,8 +56,4 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-jshint');
 
     grunt.registerTask('default', ['concat', 'qunit', 'express', 'watch']);
-}
-
-
-
-
+};

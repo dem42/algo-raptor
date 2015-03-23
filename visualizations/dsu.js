@@ -1,7 +1,7 @@
 ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) {
     // alias our algorithm module -- since we are running this code from main it must be ready
     var _my = ALGORITHM_MODULE;
-    if (_my == undefined) {
+    if (_my === undefined) {
 	throw "Algorithm module is not defined!";
     }
 
@@ -98,7 +98,7 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 
 	var diagonal = d3.svg.diagonal();
 	var movers = d3.selectAll(".dsu-link-g")
-	    .data(links, function (d) { return d.source.name + "-to-" + d.target.name })
+	    .data(links, function (d) { return d.source.name + "-to-" + d.target.name; });
 	
 	movers.transition()
 	    .duration(animation_duration)
@@ -107,10 +107,10 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	movers.select(".dsu-link")
 	    .transition()
 	    .duration(animation_duration)
-	    .attr("d", diagonal)
+	    .attr("d", diagonal);
 
 	var svgLinks = svg.selectAll(".dsu-link")
-	    .data(links, function (d) { return d.source.name + "-to-" + d.target.name })
+	    .data(links, function (d) { return d.source.name + "-to-" + d.target.name; })
 	    .enter()
 	    .append("g")
 	    .attr("class", "dsu-link-g")
@@ -222,17 +222,17 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    d3.select("#from-" + data[ptr].root + "-to-" + ptr).classed("highlight-elem", true);
 	}, animationDuration);
 	return animationDuration;
-    }
+    };
     cbsFind[4] = function(ptr, data) {
 	var animationDuration = this.AlgorithmContext.getBaselineAnimationSpeed();
 	setTimeout(function() {
 	    d3.select("#dsu-node-" + ptr).classed("highlight-elem", true);
 	}, animationDuration);
 	return animationDuration;
-    }
+    };
     cbsUnion[3] = function(r1,r2,a,b) {
 	return this.AlgorithmContext.getBaselineAnimationSpeed();
-    }
+    };
     cbsUnion[4] = function(r1, r2) {
 	d3.select("#dsu-node-" + r1).select(".dsu-node-rank").transition()
 	    .attr("dx","-30")
@@ -243,15 +243,15 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	    .attr("dy","60")
 	    .style("font-size", "26");
 	return this.AlgorithmContext.getBaselineAnimationSpeed();
-    }
+    };
     cbsUnion[6] = function(r1, r2) {
 	d3.select("#dsu-node-" + r2).select(".dsu-node-rank").remove();
 	return cleanup(r1, r2, this.AlgorithmContext);
-    }
+    };
     cbsUnion[9] = function(r2, r1) {
 	d3.select("#dsu-node-" + r1).select(".dsu-node-rank").remove();
 	return cleanup(r2, r1, this.AlgorithmContext);
-    }
+    };
 
     cbsUnion[5] = cbsUnion[8] = cbsUnion[12] = function(data, r2, r1, prob) {
 
@@ -295,10 +295,10 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	}, animation_duration);
 
 	return animation_duration + transition_duration;
-    }
+    };
     cbsUnion[14] = function(r2, r1, data) {
 	return cleanup(r2, r1, this.AlgorithmContext);
-    }
+    };
     cbsUnion[15] = cbsUnion[19] = function(r2, r1, data) {
 	var a = r1, b = r2;
 	if (data[r2].rank > data[r1].rank) {
@@ -308,15 +308,15 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 	d3.select("#dsu-node-" + a).select(".dsu-node-rank").transition().text("Rank = " + data[a].rank);
 	d3.select("#dsu-node-" + b).select(".dsu-node-rank").remove();
 	return this.AlgorithmContext.getBaselineAnimationSpeed();
-    }
+    };
     cbsUnion[18] = function(r1, r2, data) {
 	return cleanup(r1, r2, this.AlgorithmContext);
-    }
+    };
     cbsUnion[22] = function(r1, r2, data) {
 	d3.selectAll(".dsu-link").classed("highlight-elem", false);
 	d3.selectAll(".dsu-node").classed("highlight-elem", false);
 	return this.AlgorithmContext.getBaselineAnimationSpeed();
-    }
+    };
     // this object determines the behaviour of the algorighm code
     var algorithmContext = _my.AlgorithmUtils.createAlgorithmContext(layout.defaultControlsObj);
     var dsuFind = new _my.Algorithm(find, cbsFind, "dsu-find-code", algorithmContext);
@@ -366,7 +366,7 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 				    var selected2 = selected[1].data.name;
 				    var findInClosure = function(node, data) {
 					return dsuFind.runWithSharedAnimationQueue(dsuUnion, node, data);
-				    }
+				    };
 				    dsuUnion.runCodeAndPopulateAnimationQueue(selected1, selected2, data, findInClosure);
 				    selected = [];
 				    // remove the click function
@@ -374,14 +374,14 @@ ALGORITHM_MODULE.dsu_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
 				    executionFunction();
 				}, 200);
 			    }
-			};
+			}
 		    }
 		}
 	    }
 	};
 
 	bootbox.dialog(dialog_obj);
-    };
+    }
     _my.AlgorithmUtils.attachAlgoToControls(dsuUnion, algorithmTabId, kickOff);
 
     /*calls google-prettify to make the code look nice

@@ -4,7 +4,7 @@ $(function (ALGORITHM_MODULE) {
 
     // alias our algorithm module -- since we are running this as callback on doc ready it should already be defined
     var _my = ALGORITHM_MODULE;
-    if (_my == undefined) {
+    if (_my === undefined) {
 	throw "Algorithm module is not defined!";
     }
 
@@ -42,7 +42,7 @@ $(function (ALGORITHM_MODULE) {
     
     $('a[data-toggle="tab"]').off('shown.bs.tab');
     $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
-	resizingSvg(e)
+	resizingSvg(e);
 	raptorFromEvent(e);
     });
     $('a', "#algoTabs").off("click");
@@ -74,9 +74,9 @@ $(function (ALGORITHM_MODULE) {
 		var hash = window.location.hash;
 		var selector = hash ? 'a[href="' + hash + '"]' : 'li.active > a';
 		$(selector, context).tab('show');
-	    }
+	    };
 	    // Set the correct tab when the page loads
-	    showTabFromHash(context)
+	    showTabFromHash(context);
 	    // Set the correct tab when a user uses their back/forward button
 	    window.addEventListener('hashchange', showTabFromHash, false);
 	    // Change the URL when tabs are clicked
@@ -105,7 +105,7 @@ $(function (ALGORITHM_MODULE) {
 		callbacks[i]();
 	    }
 	}
-	$('[data-toggle="popover"]').popover()
+	$('[data-toggle="popover"]').popover();
 	$(tab).attr("data-raptored", true);
     }
     function resizingSvg(e) {

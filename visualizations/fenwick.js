@@ -2,7 +2,7 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 
     // alias our algorithm module -- since we are running this code from main it must be ready
     var _my = ALGORITHM_MODULE;
-    if (_my == undefined) {
+    if (_my === undefined) {
 	throw "Algorithm module is not defined!";
     }
 
@@ -25,7 +25,7 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 
     var layout = _my.AlgorithmUtils.setupLayout(algorithmTabId, algorithmName,  {priority:"fenwick"}, [7, 5], "You may modify the input array here:");
     var fen_container = layout.customControlsLayout.append("div").attr("class", "clearfix").style("width", "100%");
-    var float_container = fen_container.append("div").attr("class", "fen-float-container pull-left")
+    var float_container = fen_container.append("div").attr("class", "fen-float-container pull-left");
     var fen_labels = float_container.append("div").attr("class", "fen-labels");
     var fen_forms = float_container.append("div").attr("class", "fen-forms");
     var fenIndexData = fen_container.append("div").attr("class", "fen-index-data");
@@ -111,8 +111,9 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     var log2N = Math.ceil(Math.log2(N));
     function bitPattern(num) {
 	var res = [];
+	var i = 0;
 	if (num > 0) {
-	    for (var i = 0; i <= log2N; i++) {
+	    for (i = 0; i <= log2N; i++) {
 		res.push(num % 2);
 		num = num >> 1;
 	    }
@@ -120,7 +121,7 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	else {
 	    var carry = 1;
 	    var nabs = Math.abs(num);
-	    for (var i = 0; i <= log2N; i++) {
+	    for (i = 0; i <= log2N; i++) {
 		var e = 1 - num % 2;
 		res.push((e + carry)%2);
 		if (e + carry == 1) {
@@ -143,7 +144,7 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-	svg.append("text").attr("class", "fen-text").text("Fenwick Tree:")
+	svg.append("text").attr("class", "fen-text").text("Fenwick Tree:");
 	var highest2Pow = 1 << log2N;
 	var node_size = [471, 322];
 
@@ -214,9 +215,9 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
     }
     function arrowAnimate(old_idx, i) {
 	var animation_duration = 2 * this.AlgorithmContext.getBaselineAnimationSpeed();
-	if (i == 0 || old_idx == 0 || i > N || old_idx > N) return this.AlgorithmContext.getBaselineAnimationSpeed(); 
+	if (i === 0 || old_idx === 0 || i > N || old_idx > N) return this.AlgorithmContext.getBaselineAnimationSpeed();
 	var arrow_gen = _my.vislib.interpolatableDiagonal("linear");
-	var data = {"source": svg.select("#fen-node-" + old_idx).datum(), "target" : svg.select("#fen-node-" + i).datum()}
+	var data = {"source": svg.select("#fen-node-" + old_idx).datum(), "target" : svg.select("#fen-node-" + i).datum()};
 	var path = svg.insert("path", "g").attr("class", "fen-arrow").attr("d", arrow_gen(data));
 	var arrow = _my.vislib.animateGrowingArrow(svg_data.arrow_holder, path, animation_duration, 0, false, 1).arrow;
 	arrow.attr("class", "fen-arrow-head");
@@ -243,7 +244,7 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 
     sum_callbacks[1] = function() {
 	removeFenResultMessage(fenIndexData);
-    }
+    };
 
     sum_callbacks[5] = {"pre": function(start, end, sum) {
 	var animation_duration = this.AlgorithmContext.getBaselineAnimationSpeed();
@@ -254,7 +255,7 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	par.append("span").text(" is equal to ");
 	par.append("span").attr("class", "fen-sum-result-num").text(sum);
 	fadeIn(par, animation_duration);
-    }}
+    }};
 
     read_callbacks[1] = function(idx) {
 	var animation_duration = this.AlgorithmContext.getBaselineAnimationSpeed();
@@ -263,7 +264,7 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	dynamicData.summaryField.select("span:last-child").text(0);
 	fadeIn(dynamicData.currentField, 1.2 * animation_duration).select("span:last-child").text(bitPattern(idx));
 	return 1.2 * animation_duration;
-    }
+    };
     update_callbacks[1] = function(idx, value) {
 	var animation_duration = this.AlgorithmContext.getBaselineAnimationSpeed();
 	removeFenResultMessage(fenIndexData);
@@ -272,23 +273,23 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	dynamicData.summaryField.select("span:last-child").text(value);
 	fadeIn(dynamicData.currentField, 1.2 * animation_duration).select("span:last-child").text(bitPattern(idx));
 	return 1.2 * animation_duration;
-    }
+    };
     update_callbacks[4] = function(i) {
 	var animation_duration = (1/2) * this.AlgorithmContext.getBaselineAnimationSpeed();
 	fadeIn(dynamicData.minusCurrentField, animation_duration).select("span:last-child").text(bitPattern(-i));
 	fadeIn(dynamicData.andCurrentField, 2 * animation_duration).select("span:last-child").text(bitPattern(i & -i));
 	return animation_duration * 2;
-    }
+    };
     read_callbacks[3] = update_callbacks[2] = function(i) {
 	dynamicData.currentField.select("span:last-child").text(bitPattern(i));
 	highlighting(i);
-    }
+    };
     read_callbacks[5] = function(i) {
 	var animation_duration = (1/2) * this.AlgorithmContext.getBaselineAnimationSpeed();
 	fadeIn(dynamicData.minusCurrentField, animation_duration).select("span:last-child").text(bitPattern(-i));
 	fadeIn(dynamicData.andCurrentField, 2 * animation_duration).select("span:last-child").text(bitPattern(i & -i));
 	return animation_duration * 2;
-    }
+    };
     read_callbacks[6] = function(i, lowest_set_bit) {
 	var animation_duration = (1/2) * this.AlgorithmContext.getBaselineAnimationSpeed();
 	fadeIn(dynamicData.nextField, animation_duration).select("span:last-child").text(bitPattern(i));
@@ -299,7 +300,7 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	dynamicData.currentField.transition()
 	    .delay(duration).duration(animation_duration).select("span:last-child").text(bitPattern(i));
 	return duration + animation_duration;
-    }
+    };
     update_callbacks[3] = function(tree, i) {
 	var animation_duration = this.AlgorithmContext.getBaselineAnimationSpeed();
 	var node = svg.select("#fen-node-" + i).select(".fen-sum");
@@ -308,7 +309,7 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	    node.classed("fen-text-highlight", false);
 	}, animation_duration);
 	return animation_duration;
-    }
+    };
     update_callbacks[5] = function(i, lowest_set_bit) {
 	var animation_duration = (1/2) * this.AlgorithmContext.getBaselineAnimationSpeed();
 	fadeIn(dynamicData.nextField, animation_duration).select("span:last-child").text(bitPattern(i));
@@ -319,7 +320,7 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	dynamicData.currentField.transition()
 	    .delay(duration).duration(animation_duration).select("span:last-child").text(bitPattern(i));
 	return duration + animation_duration;
-    }
+    };
 
     function cleanup() {
 	d3.selectAll(".fen-arrow-head").remove();
@@ -344,7 +345,7 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 
     var wrapped_read = function(idx, tree) {
 	return fenwick_read_algo.runWithSharedAnimationQueue(fenwick_sum, idx, tree);
-    }
+    };
     
     function initOnIndexSelection() {
 	var clicked = 0;
@@ -366,7 +367,7 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 	    clicked = (clicked + 1) % 2;
 	    
 	});
-    };
+    }
     initOnIndexSelection();
 
     function initOnValueChanges() {
@@ -403,8 +404,8 @@ ALGORITHM_MODULE.fenwick_module = (function chart(ALGORITHM_MODULE, $, d3, bootb
 		    }
 		}
 	    });
-	})
-    };
+	});
+    }
     reinitButtons();
     _my.AlgorithmUtils.appendCode(algorithmTabId, "fen-sum-code", fenwick_sum);
     _my.AlgorithmUtils.appendCode(algorithmTabId, "fen-read-code", fenwick_read_algo);
