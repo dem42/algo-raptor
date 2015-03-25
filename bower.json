@@ -1,0 +1,28 @@
+{
+  "name": "algoraptor",
+  "version": "0.0.1",
+  "homepage": "https://github.com/dem42/algo-raptor",
+  "authors": [
+    "dem42 <martin.papanek@gmail.com>"
+  ],
+  "description": "algorithm visualizations",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "d3": "~3.5.5",
+    "jquery": "~2.1.3",
+    "bootstrap": "~3.3.4",
+    "google-code-prettify": "~1.0.4",
+    "bootbox": "~4.4.0"
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "qunit": "~1.17.1"
+  }
+}
