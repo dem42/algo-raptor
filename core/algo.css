@@ -1,7 +1,8 @@
 .controls-affix {
     z-index: 10;
     opacity: 0.9;
-    padding-top: 4em;
+    /* this padding offsets the navbar */
+    padding-top: 55px;
 }
 
 .aviz-footer {
