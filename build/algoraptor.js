@@ -883,9 +883,9 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
     };
 
     function createRaptorPopupTemplate(text) {
-	var raptor_num = Math.floor(Math.random()*2) + 1;
+	var RAPTOR_HEAD_COUNT = 3;
+	var raptor_num = Math.floor(Math.random()*RAPTOR_HEAD_COUNT) + 1;
 	var temp =  "<div class='clearfix'><img class='pull-left raptor-img' src='assets/raptor_fade_sm" + raptor_num + ".jpg'><p>" + text + "</p></div>";
-	console.log(temp);
 	return temp;
     }
 
@@ -902,7 +902,6 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 	    var lineObj = $(algorithmCodeHolder + " " + "li.L" + lineR)[lineQ]; 
 	    var raptor_top = lineObj.getBoundingClientRect().top - dvObj.getBoundingClientRect().top;
 	    var raptor_left = 0;
-	    console.log("selecting", dvObj.getBoundingClientRect(), lineObj.getBoundingClientRect());
 
 	    var img = $(algorithmCodeHolder).append('<img class="' + algorithmCodeClass + lineNum + '" src="assets/raptor24.png" style="position: absolute; margin-left: 2px; z-index:10; top: ' + 
 						raptor_top + 'px; left: ' + raptor_left + 'px" data-toggle="popover" data-trigger="click focus" data-title="Dr.Raptor\'s Hint" data-placement="left" data-html="true" data-content="' + createRaptorPopupTemplate(text) +'"></img>');
