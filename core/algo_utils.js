@@ -64,7 +64,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	appendButton(exRadioDiv, "play-btn", algorithmId, "Start the algorithm in continuous mode (the algorithm will run on its own)");
 	appendButton(exRadioDiv, "next-btn", algorithmId, "Take the next step in the algorithm in step-by-step mode (you have to click for the algorithm to keep going)");
 	var speedDialCell = defaultControls.append("td").attr("id", algorithmId + "speed-dial-div");
-	speedDialCell.append("p").attr("class", "controls-info-text").text("Adjust the speed at which to run the algorithm:");
+	speedDialCell.append("p").attr("class", "controls-info-text").text("Adjust the algorithm speed:");
 //	speedDialCell.append("div")
 	var gaugeObj = _my.vislib.addSpeedGauge("#" + algorithmId + "speed-dial-div", 0.6);
 	layout.gaugeObj = gaugeObj;
