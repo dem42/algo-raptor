@@ -31,6 +31,7 @@
     padding-left: 2px;
     border-left: steelBlue 1px solid;
     font-weight: bold;
+    cursor: pointer;
 }
 
 .fen-label-highlighted {
@@ -44,7 +45,7 @@
 }
 
 .fen-float-container {
-    width: 400px;
+    width: 40em;
 }
 
 .fen-rect {

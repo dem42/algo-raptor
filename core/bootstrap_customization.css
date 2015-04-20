@@ -1,3 +1,29 @@
+@media only screen and (min-width: 60em) {
+    nav.navbar {
+	height: 5em;
+    }
+
+    #algoTabs > li > a {
+	padding: 1.8em 2em;
+    }
+
+    #my-logo {
+	padding-left: 2.6em;
+	padding-top: 0.8em;
+    }
+
+    #my-logo::before {
+	content: "";
+	width: 2.8em;
+	height: 2.8em;
+	display: block;
+	position: absolute;
+	top: -0.5em;
+	left: 0.8em;
+	background: url('../assets/raptor_logo.png') no-repeat scroll 0% 0% / 100% auto transparent;
+    }
+}
+
 .navbar-inverse {
     -moz-box-shadow: 0px 1px 5px #888888;
     -webkit-box-shadow: 0px 1px 5px #888888;
@@ -26,7 +52,7 @@
 /* .navbar-default { */
 /*     background : #f5f5f5; */
 /* } */
-
+/* customizing keyword colors in algos */
 .kwd {
     color: #07a;
 }
@@ -36,10 +62,11 @@
 .function:not(.kwd) {
     color:#dd4a68;
 }
+
 /*we need to add the padding because we are using a fixed top navbar*/
 body {
-    padding-top: 50px;
-
+    padding-top: 5em;
+    font-size: 1.6em;
 }
 
 .navbar {
@@ -56,7 +83,7 @@ h1, h2, h3, h4 {
 #my-logo {
     color:#e83b3b;
     font-family: troika_regular, sans-serif;
-    font-size: 2em;
+    font-size: 2.6em;
 }
 
 /* used for the logo */

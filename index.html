@@ -36,10 +36,10 @@
 	  </button>
 
 	  <a id="my-logo" class="navbar-brand" href="#home-tab" role="tab" data-toggle="tab" title="Algorithm visualizations in d3.js">
-	    <span style="position: relative; bottom:12px">
-	      <img alt="Brand" src="assets/raptor_small.png">
+
+	      <!--<img alt="Brand" src="assets/raptor_small.png">-->
 	      <span>Algo Raptor</span>
-	    </span>
+
 	  </a>
 
 	</div>
@@ -47,29 +47,36 @@
 	<!-- Collect the nav links, forms, and other content for toggling -->
 	<div class="collapse navbar-collapse">
 
-	  <ul class="nav navbar-nav" role="tablist" id="algoTabs">
+	  <ul class="nav navbar-nav navbar-right" role="tablist" id="algoTabs">
 	    <li class="active"><a href="#home-tab" role="tab" data-toggle="tab">About</a></li>
+	    <li><a href="#gallery-tab" role="tab" data-toggle="tab">Gallery</a></li>
 	    <!-- filled dynamically through main.js -->
-	    <li id="a-hld"></li>
-	    <li id="fenwick"></li>
-	    <li id="fft" class="dropdown">
+	    <li id="algorithmsMenu" class="dropdown">
 	      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" 
-		 aria-expanded="false"> Fast Fourier <span class="caret"></span></a>
+		 aria-expanded="false"> Algorithms <span class="caret"></span></a>
 	      <ul class="dropdown-menu inverse-dropdown" role="menu">
-		<li id="fft1-tran"></li>
-		<li id="fft2-mult"></li>
+		<li id="a-hld"></li>
+		<li id="fenwick"></li>
+		<li id="fft" class="dropdown">
+		  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" 
+		     aria-expanded="false"> Fast Fourier <span class="caret"></span></a>
+		  <ul class="dropdown-menu inverse-dropdown" role="menu">
+		    <li id="fft1-tran"></li>
+		    <li id="fft2-mult"></li>
+		  </ul>
+		</li>
+		<li id="graphs-1-dsu"></li>
+		<li id="binary-search" class="dropdown">
+		  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" 
+		     aria-expanded="false"> Binary Search <span class="caret"></span></a>
+		  <ul class="dropdown-menu inverse-dropdown" role="menu">
+		    <li id="bin-search-norm"></li>
+		    <li id="bin-search-def"></li>
+		  </ul>
+		</li>
+		<li id="sorting-quick"></li>
 	      </ul>
 	    </li>
-	    <li id="graphs-1-dsu"></li>
-	    <li id="binary-search" class="dropdown">
-	      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" 
-		 aria-expanded="false"> Binary Search <span class="caret"></span></a>
-	      <ul class="dropdown-menu inverse-dropdown" role="menu">
-		<li id="bin-search-norm"></li>
-		<li id="bin-search-def"></li>
-	      </ul>
-	    </li>
-	    <li id="sorting-quick"></li>
 	  </ul>
 	</div><!-- /.navbar-collapse -->
       </div><!-- /.container-fluid -->
@@ -100,8 +107,17 @@
 	    </div>
 	  </div>
 	</div>
-	<!-- filled dynamically through main.js -->
       </div>
+      <div class="tab-pane" id="gallery-tab">
+	<div class="container">
+	  <div class="row">
+	    <div class="col-md-12">
+	      <h2 class="page-header">Algorithms</h2>
+	    </div>
+	  </div>
+	</div>
+      </div>
+      <!-- filled dynamically through main.js -->
     </div>
 
     <footer role="contentinfo">

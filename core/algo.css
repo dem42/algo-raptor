@@ -2,7 +2,7 @@
     z-index: 10;
     opacity: 0.9;
     /* this padding offsets the navbar */
-    padding-top: 55px;
+    padding-top: 5em;
 }
 
 .aviz-footer {
