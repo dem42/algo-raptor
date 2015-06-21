@@ -116,20 +116,16 @@ h1, h2, h3, h4 {
 	padding: 1.8em 2em;
     }
 
-    #my-logo {
-	padding-left: 2.6em;
-	padding-top: 0.8em;
+    #my-logo:focus {
+	outline: none;
     }
 
-    #my-logo::before {
-	content: "";
-	width: 2.6em;
-	height: 2.6em;
-	display: block;
-	position: absolute;
-	top: -0.4em;
-	left: 0.8em;
-	background: url('../assets/raptor_logo.png') no-repeat scroll 0% 0% / 100% auto transparent;
+    #my-logo {
+	margin-top: -0.4em;
+    }
+
+    #my-logo img {
+	display: inline;
     }
 
     body {

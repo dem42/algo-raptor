@@ -17,6 +17,15 @@ First clone this repository using git. Then get `docker` and start the docker da
 
 The last command starts the algoraptor app in docker. The path `/absolute-path-to-host-algoraptor` is where you cloned the algoraptor repository. The path `/aboslute-path-to-client-algoraptor` is where this repository will be mounted in docker.
 
+Alternatively, install npm, grunt and bower and run it locally:
+
+    > sudo apt-get install nodejs
+    > sudo apt-get install npm
+    > npm install -g grunt-cli
+    > npm install -g bower
+    > npm install
+    > grunt
+
 MIT License
 -----------
 
