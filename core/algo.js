@@ -3,12 +3,12 @@
 /////////////////////////////////////////////////////////////////
 /**
  * This class represents source code which has been decorated
- * with user defined callbacks on arbitrary, user-defined code lines
+ * with user defined callbacks on arbitrary, user-specified code lines
  * This decorated source code can then be executed using Algorithm#run
  *
- * Callbacks added to the algorithm can bind to any local variable inside
- * the algorithm. The binding is by name, this means that when defining the
- * callback you should give the callback arguments the same name as the
+ * Callbacks added to the algorithm can take any local variable of the
+ * the algorithm as argument. The function argument must have they same name,
+ * this means you should give the callback arguments the same name as the
  * name of the local variable that they should bind to.
  *
  * USAGE:
@@ -26,8 +26,6 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	throw "Algorithm module is not defined!";
     }
 
-    console.debug("executing definitions of algo.js");
-    
     // used for transition refactoring from default to baseline speed
     function getAnimationDuration(algoContext) {
 	var andur = algoContext.getBaselineAnimationSpeed !== undefined ? algoContext.getBaselineAnimationSpeed() : algoContext.default_animation_duration;
@@ -451,6 +449,10 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    }
 	    return cnt > 1;
 	}
+    };
+
+    Algorithm.prototype.getPreviewThumbnail = function() {
+
     };
 
     function AnimationFrame(type, rowNumber, returnRows, codeContainerId, algorithmCtx, animationFunction) {

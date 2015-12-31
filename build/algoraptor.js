@@ -914,12 +914,12 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, d3, $) {
 /////////////////////////////////////////////////////////////////
 /**
  * This class represents source code which has been decorated
- * with user defined callbacks on arbitrary, user-defined code lines
+ * with user defined callbacks on arbitrary, user-specified code lines
  * This decorated source code can then be executed using Algorithm#run
  *
- * Callbacks added to the algorithm can bind to any local variable inside
- * the algorithm. The binding is by name, this means that when defining the
- * callback you should give the callback arguments the same name as the
+ * Callbacks added to the algorithm can take any local variable of the
+ * the algorithm as argument. The function argument must have they same name,
+ * this means you should give the callback arguments the same name as the
  * name of the local variable that they should bind to.
  *
  * USAGE:
@@ -937,8 +937,6 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	throw "Algorithm module is not defined!";
     }
 
-    console.debug("executing definitions of algo.js");
-    
     // used for transition refactoring from default to baseline speed
     function getAnimationDuration(algoContext) {
 	var andur = algoContext.getBaselineAnimationSpeed !== undefined ? algoContext.getBaselineAnimationSpeed() : algoContext.default_animation_duration;
@@ -1364,6 +1362,10 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	}
     };
 
+    Algorithm.prototype.getPreviewThumbnail = function() {
+
+    };
+
     function AnimationFrame(type, rowNumber, returnRows, codeContainerId, algorithmCtx, animationFunction) {
 	this.type = type;
 	this.rowNumber = rowNumber;
@@ -1419,10 +1421,6 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     h = 20,
     N = 15,
     Y = 50;
-    var cbs_norm = [];
-    var cbs_def = [];
-    var prep_calls_def = [];
-    var prep_calls_norm = [];
     // used to store new position, this var is here because we cannot store it on data since the callbacks
     // receive their own copy of data and any changes they make won't be preserved
     var map_of_new_pos = {}; 
@@ -1622,40 +1620,49 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	    return animation_duration;
 	}};
     }
-    /* callback called right after entering the function
-     * it initializes the data
-     */
-    prep_calls_def[1] = prep_fun_gen(svg_def, svgg_def, algorithmDefTabId);
-    prep_calls_norm[1] = prep_fun_gen(svg_norm, svgg_norm, algorithmNormTabId);
-    /* callback called after the array has been sorted
-     * it draws the data
-     */
-    prep_calls_def[3] = prep_sort_gen(svgg_def);
-    prep_calls_norm[3] = prep_sort_gen(svgg_norm);
-    /*callback called inside every iteration
-     * updates the arrow pointer
-     */
-    cbs_def[1] = bs_enter_gen(svgg_def);
-    cbs_norm[1] = bs_enter_gen(svgg_norm);
-    cbs_def[6] = cbs_def[13] = mid_gen(svgg_def);
-    cbs_norm[6] = mid_gen(svgg_norm);
-    cbs_def[8] = low_up_gen(svgg_def);
-    cbs_norm[11] = low_up_gen(svgg_norm);
-    cbs_def[10] = high_up_gen(svgg_def);
-    cbs_norm[13] = high_up_gen(svgg_norm);
-    /*callback called after a match was found
-     */
-    cbs_def[15] = res_check_gen(svgg_def);
-    cbs_norm[8] = res_check_gen(svgg_norm);
-    /*callback called if a match was NOT found
-     */
-    cbs_def[17] = not_found_gen(svgg_def);
-    cbs_norm[16] = not_found_gen(svgg_norm);
 
+    var createDeferredBsCallbacks = function(svg_def, svgg_def, algorithmDefTabId) {
+	var prep_calls_def = [];
+	var cbs_def = [];
+	/* callback called right after entering the function
+	 * it initializes the data
+	 */
+	prep_calls_def[1] = prep_fun_gen(svg_def, svgg_def, algorithmDefTabId);
+	/* callback called after the array has been sorted
+	 * it draws the data
+	 */
+	prep_calls_def[3] = prep_sort_gen(svgg_def);
+	/*callback called inside every iteration
+	 * updates the arrow pointer
+	 */
+	cbs_def[1] = bs_enter_gen(svgg_def);
+	cbs_def[6] = cbs_def[13] = mid_gen(svgg_def);
+	cbs_def[8] = low_up_gen(svgg_def);
+	cbs_def[10] = high_up_gen(svgg_def);
+	/*callback called after a match was found
+	 */
+	cbs_def[15] = res_check_gen(svgg_def);
+	/*callback called if a match was NOT found
+	 */
+	cbs_def[17] = not_found_gen(svgg_def);
+	return { "prep_calls_def": prep_calls_def, "cbs_def": cbs_def };
+    }
+    var createNormBsCallbacks = function(svg_norm, svgg_norm, algorithmNormTabId) {
+	var cbs_norm = [];
+	var prep_calls_norm = [];
+	prep_calls_norm[1] = prep_fun_gen(svg_norm, svgg_norm, algorithmNormTabId);
+	prep_calls_norm[3] = prep_sort_gen(svgg_norm);
+	cbs_norm[1] = bs_enter_gen(svgg_norm);
+	cbs_norm[6] = mid_gen(svgg_norm);
+	cbs_norm[11] = low_up_gen(svgg_norm);
+	cbs_norm[13] = high_up_gen(svgg_norm);
+	cbs_norm[8] = res_check_gen(svgg_norm);
+	cbs_norm[16] = not_found_gen(svgg_norm);
+	return { "prep_calls_norm": prep_calls_norm, "cbs_norm": cbs_norm };
+    }
     /*setup the data*/	 
     var data_def = new Array(N);
     var data_norm = new Array(N);
-
 
     function initialize(forms, data) {
 	/*setup the DOM elements*/
@@ -1713,13 +1720,15 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     }
 
     /* create an Algorithm instance wired with callbacks */
-    var prep_algo_def = new _my.Algorithm(preprocess, prep_calls_def, "prep-code-def", _my.AlgorithmUtils.createAlgorithmContext(layout_def.defaultControlsObj), function() { _my.AlgorithmUtils.resetControls(algorithmDefTabId); });
+    var defCallbacks = createDeferredBsCallbacks(svg_def, svgg_def);
+    var prep_algo_def = new _my.Algorithm(preprocess, defCallbacks.prep_calls_def, "prep-code-def", _my.AlgorithmUtils.createAlgorithmContext(layout_def.defaultControlsObj), function() { _my.AlgorithmUtils.resetControls(algorithmDefTabId); });
 
-    var balgo_def = new _my.Algorithm(deferred_bsearch, cbs_def, "bs-code-def", _my.AlgorithmUtils.createAlgorithmContext(layout_def.defaultControlsObj), function() { _my.AlgorithmUtils.resetControls(algorithmDefTabId); });
+    var balgo_def = new _my.Algorithm(deferred_bsearch, defCallbacks.cbs_def, "bs-code-def", _my.AlgorithmUtils.createAlgorithmContext(layout_def.defaultControlsObj), function() { _my.AlgorithmUtils.resetControls(algorithmDefTabId); });
 
-    var prep_algo_norm = new _my.Algorithm(preprocess, prep_calls_norm, "prep-code-norm", _my.AlgorithmUtils.createAlgorithmContext(layout_norm.defaultControlsObj), function() { _my.AlgorithmUtils.resetControls(algorithmNormTabId); });
+    var normCallbacks = createNormBsCallbacks(svg_norm, svgg_norm);
+    var prep_algo_norm = new _my.Algorithm(preprocess, normCallbacks.prep_calls_norm, "prep-code-norm", _my.AlgorithmUtils.createAlgorithmContext(layout_norm.defaultControlsObj), function() { _my.AlgorithmUtils.resetControls(algorithmNormTabId); });
 
-    var balgo_norm = new _my.Algorithm(bsearch, cbs_norm, "bs-code-norm", _my.AlgorithmUtils.createAlgorithmContext(layout_norm.defaultControlsObj), function() { _my.AlgorithmUtils.resetControls(algorithmNormTabId); });
+    var balgo_norm = new _my.Algorithm(bsearch, normCallbacks.cbs_norm, "bs-code-norm", _my.AlgorithmUtils.createAlgorithmContext(layout_norm.defaultControlsObj), function() { _my.AlgorithmUtils.resetControls(algorithmNormTabId); });
 
 
     
