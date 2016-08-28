@@ -1720,12 +1720,12 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
     }
 
     /* create an Algorithm instance wired with callbacks */
-    var defCallbacks = createDeferredBsCallbacks(svg_def, svgg_def);
+    var defCallbacks = createDeferredBsCallbacks(svg_def, svgg_def, algorithmDefTabId);
     var prep_algo_def = new _my.Algorithm(preprocess, defCallbacks.prep_calls_def, "prep-code-def", _my.AlgorithmUtils.createAlgorithmContext(layout_def.defaultControlsObj), function() { _my.AlgorithmUtils.resetControls(algorithmDefTabId); });
 
     var balgo_def = new _my.Algorithm(deferred_bsearch, defCallbacks.cbs_def, "bs-code-def", _my.AlgorithmUtils.createAlgorithmContext(layout_def.defaultControlsObj), function() { _my.AlgorithmUtils.resetControls(algorithmDefTabId); });
 
-    var normCallbacks = createNormBsCallbacks(svg_norm, svgg_norm);
+    var normCallbacks = createNormBsCallbacks(svg_norm, svgg_norm, algorithmNormTabId);
     var prep_algo_norm = new _my.Algorithm(preprocess, normCallbacks.prep_calls_norm, "prep-code-norm", _my.AlgorithmUtils.createAlgorithmContext(layout_norm.defaultControlsObj), function() { _my.AlgorithmUtils.resetControls(algorithmNormTabId); });
 
     var balgo_norm = new _my.Algorithm(bsearch, normCallbacks.cbs_norm, "bs-code-norm", _my.AlgorithmUtils.createAlgorithmContext(layout_norm.defaultControlsObj), function() { _my.AlgorithmUtils.resetControls(algorithmNormTabId); });
