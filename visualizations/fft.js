@@ -884,9 +884,6 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
     _my.AlgorithmUtils.appendCode(algorithm1TabId, "eval-code", ev);
     _my.AlgorithmUtils.appendCode(algorithm2TabId, "fft-code", fft);
 
-    $(".fft-radio-button").click(function() {
-	$(this).addClass("active").siblings().removeClass("active");
-    });
 
     _my.AlgorithmUtils.attachAlgoToControls(fft, algorithm2TabId, kickoff_fft_multiply);
     _my.AlgorithmUtils.attachAlgoToControls(ev, algorithm1TabId, kickoff_fft_trans);

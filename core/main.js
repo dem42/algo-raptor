@@ -1,7 +1,6 @@
 // this is jquery syntax for adding this as a callback to run on a document ready event
 $(function (ALGORITHM_MODULE) {
 
-
     // alias our algorithm module -- since we are running this as callback on doc ready it should already be defined
     var _my = ALGORITHM_MODULE;
     if (_my === undefined) {
@@ -44,6 +43,7 @@ $(function (ALGORITHM_MODULE) {
     $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
 	resizingSvg(e);
 	raptorFromEvent(e);
+	fixTabsHighlighting(e);
     });
     $('a', "#algoTabs").off("click");
     $('a', "#algoTabs").on('click', function(e) {
@@ -91,6 +91,7 @@ $(function (ALGORITHM_MODULE) {
 	raptoringItUp(tabz);
     }
 
+    // adding the raptors .. they are fetched as pretty print callbacks
     function raptoringItUp(tab_id) {
 	if (!prettification_complete) {
 	    return;
@@ -128,5 +129,13 @@ $(function (ALGORITHM_MODULE) {
     function postPrettificationTagging() {
 	console.log("calling this thing");
 	$("span.pun:contains(()").prev().addClass("function");
+    }
+
+    // unfortuante hack to fix the broken active flag
+    function fixTabsHighlighting(e) {
+	$(".dropdown-menu > li").removeClass("active");
+	var target = $(e.target);
+	var parent = target.parent("li");
+	parent.addClass("active");
     }
 }(ALGORITHM_MODULE));
