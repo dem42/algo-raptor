@@ -51,7 +51,6 @@
 .fen-rect {
     stroke: steelBlue;
     fill: white;
-    width: 20px;
     margin: 10px;
     text-align: center;
 }
