@@ -2510,9 +2510,10 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	var clicked = 0;
 	d3.selectAll(".fen-label").on("click", function(d) {
 	    if(clicked == 1) {
-		var start = d3.select(".fen-label-highlighted").datum();
+		var startDatum = d3.select(".fen-label-highlighted").datum();
+		var start = Math.min(startDatum, d);
 		d3.select(this).classed("fen-label-highlighted", true);
-		var end = d;
+		var end = Math.max(startDatum, d);
 		console.log("starting fenwick index thing with", start, end);
 		var attacher = _my.AlgorithmUtils.createAlgoAttacher();
 		attacher.attach(fenwick_sum, algorithmTabId);
