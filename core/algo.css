@@ -246,3 +246,12 @@ svg.gauge {
 .preview-frame {
     margin-bottom: -5px;
 }
+
+.tell-me-more-btn {
+    display: inline-block !important;
+}
+
+.tell-me-more-p {
+    margin: auto;
+    width: 50%;
+}

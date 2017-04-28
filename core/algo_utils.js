@@ -143,6 +143,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	// allows us to reattach the controls as we like
 	res.attach = function(algorithm, algorithmId, kickoffCallback) {
 	    d3.select("#" + "play-btn-of-" + algorithmId).on("click", function() {
+		d3.event.preventDefault();
 		if (!algorithm.isRunning() && kickoffCallback !== undefined) {
 		    kickoffCallback(res.play_maker(algorithm, algorithmId));
 		}
@@ -151,6 +152,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 		}
 	    });
 	    d3.select("#" + "next-btn-of-" + algorithmId).on("click", function() {
+		d3.event.preventDefault();
 		if (!algorithm.isRunning() && kickoffCallback !== undefined) {
 		    kickoffCallback(res.next_maker(algorithm, algorithmId));
 		}

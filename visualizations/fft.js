@@ -197,16 +197,16 @@ ALGORITHM_MODULE.fft_module = (function chart(ALGORITHM_MODULE, $, d3, bootbox) 
      **   Set up SVG   ****
      *********************/
     var margin = { left: 10, top: 30, right: 10, bottom: 100};
-    var width = 900;
+    var width = 1200;
     var svg_fft_elem = d3.select("#" + algorithm1TabId + " .graphics").append("svg")
 	.attr("width",  width + "px")
-	.attr("height", "850px");
+	.attr("height", "1000px");
     var fft_group = svg_fft_elem.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     var svg_multiply_elem = d3.select("#" + algorithm2TabId + " .graphics").append("svg")
 	.attr("width",  1.42*width + "px")
-	.attr("height", "620px");
+	.attr("height", "720px");
     var multiply_group = svg_multiply_elem.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 

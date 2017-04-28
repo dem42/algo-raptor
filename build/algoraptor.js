@@ -212,6 +212,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	// allows us to reattach the controls as we like
 	res.attach = function(algorithm, algorithmId, kickoffCallback) {
 	    d3.select("#" + "play-btn-of-" + algorithmId).on("click", function() {
+		d3.event.preventDefault();
 		if (!algorithm.isRunning() && kickoffCallback !== undefined) {
 		    kickoffCallback(res.play_maker(algorithm, algorithmId));
 		}
@@ -220,6 +221,7 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 		}
 	    });
 	    d3.select("#" + "next-btn-of-" + algorithmId).on("click", function() {
+		d3.event.preventDefault();
 		if (!algorithm.isRunning() && kickoffCallback !== undefined) {
 		    kickoffCallback(res.next_maker(algorithm, algorithmId));
 		}
@@ -2508,9 +2510,10 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
 	var clicked = 0;
 	d3.selectAll(".fen-label").on("click", function(d) {
 	    if(clicked == 1) {
-		var start = d3.select(".fen-label-highlighted").datum();
+		var startDatum = d3.select(".fen-label-highlighted").datum();
+		var start = Math.min(startDatum, d);
 		d3.select(this).classed("fen-label-highlighted", true);
-		var end = d;
+		var end = Math.max(startDatum, d);
 		console.log("starting fenwick index thing with", start, end);
 		var attacher = _my.AlgorithmUtils.createAlgoAttacher();
 		attacher.attach(fenwick_sum, algorithmTabId);
@@ -2769,16 +2772,16 @@ var ALGORITHM_MODULE = (function(ALGORITHM_MODULE, $, d3) {
      **   Set up SVG   ****
      *********************/
     var margin = { left: 10, top: 30, right: 10, bottom: 100};
-    var width = 900;
+    var width = 1200;
     var svg_fft_elem = d3.select("#" + algorithm1TabId + " .graphics").append("svg")
 	.attr("width",  width + "px")
-	.attr("height", "850px");
+	.attr("height", "1000px");
     var fft_group = svg_fft_elem.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     var svg_multiply_elem = d3.select("#" + algorithm2TabId + " .graphics").append("svg")
 	.attr("width",  1.42*width + "px")
-	.attr("height", "620px");
+	.attr("height", "720px");
     var multiply_group = svg_multiply_elem.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 

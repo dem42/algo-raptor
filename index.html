@@ -37,8 +37,8 @@
 
 	  <a id="my-logo" class="navbar-brand" href="#home-tab" role="tab" data-toggle="tab" title="Algorithm visualizations in d3.js">
 
-	      <img alt="Brand" width="80" height="80" src="assets/raptor_logo.png">
-	      <span>Algo Raptor</span>
+	      <img alt="Brand" class="hidden-sm hidden-xs" width="80" height="80" src="assets/raptor_logo.png">
+	      <span class="hidden-sm hidden-xs">Algo Raptor</span>
 
 	  </a>
 
@@ -87,9 +87,9 @@
 	  <div class="row">
 	    <div class="col-md-12">
 	      <h2 class="page-header">How to use the raptor?</h2>
-	      <p class="lead">Algorithm visualizations can be accessed through links in the navigation toolbar. Each visualization is accompanied with the source code of the algorithm, implemented in Javascript. </p>
-	      <p class="lead">Using the buttons in the <i>"General Controls"</i> section, you can start/stop the algorithm, adjust its speed or even step through the visualization line-by-line.</p>
-	      <p class="lead">The small raptor heads <img src="assets/raptor24.png" title="Raptor" style="display:inline" data-toggle="popover" data-content="Raptors are dangerous" data-placement="top"> are clickable and when clicked expand to display additional comments and observations about what is going on.</p>
+	      <p class="lead">Algorithm visualizations can be accessed through links in the navigation toolbar. Each visualization is accompanied by the source code of the algorithm, implemented in Javascript. </p>
+	      <p class="lead">To start/stop the algorithm or to adjust its speed, use the buttons in the <i>"General Controls"</i> section. With these controls you can even step through the visualization line-by-line.</p>
+	      <p class="lead">The small raptor heads <img src="assets/raptor24.png" title="Raptor" style="display:inline" data-toggle="popover" data-content="Raptors are dangerous" data-placement="top"> are clickable. When clicked they expand to display additional comments and observations about what is going on.</p>
 
 	    </div>
 	  </div>
@@ -111,6 +111,78 @@
 	  <div class="row">
 	    <div class="col-md-12">
 	      <h2 class="page-header">Algorithms</h2>
+
+	      <div class="row">
+		<div class="col-sm-6 col-md-4">
+		  <div class="thumbnail">
+		    <img src="assets/algo_thumbs/fenwick.gif" alt="fenwick">
+		      <div class="caption">
+			<h3>Fenwick Tree</h3>
+			<p>Datastructure used for performing prefix sums and updates on a dynamic array in logarithmic time.</p>
+			<p class="tell-me-more-p"><a href="#fenwick-tab" class="btn btn-default" role="button"><img src="assets/raptor24.png" class="tell-me-more-btn"> Tell me more</a> </p>
+		      </div>
+		  </div>
+		</div>
+
+		<div class="col-sm-6 col-md-4">
+		  <div class="thumbnail">
+		    <img src="assets/algo_thumbs/fft.gif" alt="fft">
+		      <div class="caption">
+			<h3> Fast Fourier Transform </h3>
+			<p>Converting between representing a polynomial in terms of coefficients to a representation in terms of values at roots of unity.</p>
+			<p class="tell-me-more-p"><a href="#fft-tab-tran" class="btn btn-default" role="button"><img src="assets/raptor24.png" class="tell-me-more-btn"> Tell me more</a> </p>
+		      </div>
+		  </div>
+		</div>
+
+		<div class="col-sm-6 col-md-4">
+		  <div class="thumbnail">
+		    <img src="assets/algo_thumbs/hld.gif" alt="hld">
+		      <div class="caption">
+			<h3>Heavy Light Decomposition</h3>
+			<p>Transforming an arbitrary tree into a tree where the path from any leaf node to the parent node crosses at most a logarithmic number of parents.</p>
+			<p class="tell-me-more-p"><a href="#hld-tab" class="btn btn-default" role="button"><img src="assets/raptor24.png" class="tell-me-more-btn"> Tell me more</a> </p>
+		      </div>
+		  </div>
+		</div>
+	      </div>
+	      <div class="row">
+		<div class="col-sm-6 col-md-4">
+		  <div class="thumbnail">
+		    <img src="assets/algo_thumbs/quicksort.gif" alt="quicksort">
+		      <div class="caption">
+			<h3>Quicksort</h3>
+			<p>Sorting a sequence in amortized <i>O(n log n)</i> time by means of a divide and conquer approach. A pivot is chosen in the sequence and the left and right subsequences are sorted. </p>
+			<p class="tell-me-more-p"><a href="#quicksort-tab" class="btn btn-default" role="button"><img src="assets/raptor24.png" class="tell-me-more-btn"> Tell me more</a> </p>
+		      </div>
+		  </div>
+		</div>
+
+		<div class="col-sm-6 col-md-4">
+		  <div class="thumbnail">
+		    <img src="assets/algo_thumbs/dsu.gif" alt="dsu">
+		      <div class="caption">
+			<h3>Disjoint Set Union</h3>
+			<p>Datastructure used to keep track of multiple disjoint sets and for performing operations like merging sets and looking up which if two elements share a set, both in logarithmic time.</p>
+			<p class="tell-me-more-p"><a href="#dsu-tab" class="btn btn-default" role="button"><img src="assets/raptor24.png" class="tell-me-more-btn"> Tell me more</a> </p>
+		      </div>
+		  </div>
+		</div>
+
+		<div class="col-sm-6 col-md-4">
+		  <div class="thumbnail">
+		    <img src="assets/algo_thumbs/bsearch.gif" alt="bsearch">
+		      <div class="caption">
+			<h3>Binary Search</h3>
+			<p>Finding an element in a sorted sequence in logarithmic time.</p>
+			<p class="tell-me-more-p"><a href="#bsearch-norm-tab" class="btn btn-default" role="button"><img src="assets/raptor24.png" class="tell-me-more-btn"> Tell me more</a> </p>
+		      </div>
+		  </div>
+		</div>
+
+
+
+	      </div>
 	    </div>
 	  </div>
 	</div>
